@@ -178,7 +178,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ executes - specific
     #------------------------------------------------------------------------------------
-    async def executefull_verb_deck(self, vdj_verb: str, vdj_deck: str = None) -> bool:
+    async def execute_vdj_verb_deck(self, vdj_verb: str, vdj_deck: str = None) -> bool:
         """ Execute a vdj_script on a deck and return status """
         if vdj_deck is None:
             vdj_script = f"{vdj_verb}"
