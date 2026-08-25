@@ -1,13 +1,13 @@
 import sys
 import asyncio
-
 from rich.console import Console
-console = Console(file=sys.stderr)
 
 from virtualdj_client import VirtualDJClient
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
+    console = Console(file=sys.stderr)
+
     # Initialize VirtualDJ client
     vdj_client = VirtualDJClient()
 
@@ -25,9 +25,9 @@ def main():
     console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1}")
 
     # vdj_client - test 2
-    vdj_script1 = "deck 1 play_pause & loop 4 & crossfader -5%"
+    vdj_script2 = "deck 1 play_pause & loop 4 & crossfader -5%"
     result2 = asyncio.run(vdj_client.executefull(vdj_script2))
-    console.print(f"VirtualDJ script < {vdj_script1} > => {result2}")
+    console.print(f"VirtualDJ script < {vdj_script2} > => {result2}")
 
     # vdj_client - test 3
     result3 = asyncio.run(vdj_client.play_button('right'))
