@@ -9,7 +9,7 @@
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
-    <InterpreterId>Global|PythonCore|3.10</InterpreterId>
+    <InterpreterId>Global|PythonCore|3.14</InterpreterId>
     <LaunchProvider>IronPython (.NET) launcher</LaunchProvider>
     <OutputPath>.</OutputPath>
     <Name>LocalJSONTool</Name>
@@ -25,10 +25,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <InterpreterReference Include="Global|PythonCore|3.10" />
-    <InterpreterReference Include="Global|PythonCore|3.11" />
     <InterpreterReference Include="Global|PythonCore|3.14" />
-    <InterpreterReference Include="Global|PythonCore|3.9" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include=".\src\main.py" />
