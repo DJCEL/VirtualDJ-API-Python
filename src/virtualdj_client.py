@@ -111,7 +111,8 @@ class VirtualDJClient:
             result_final = result.get("result", "")
             return result_final
         else:
-            raise VDJError(f"Failed to query {vdj_script}: {result.get("result", "Unknown error")}")
+            result_final = result.get("result", "Unknown error")
+            raise VDJError(f"Failed to query {vdj_script}: {result_final}")
     #------------------------------------------------------------------------------------
     async def executefull(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """

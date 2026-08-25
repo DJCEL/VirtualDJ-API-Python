@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "VirtualDJ_API_Python", "VirtualDJ_API_Python.pyproj", "{31BA0375-6DCF-4361-98B8-5ABF15A5477B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{31BA0375-6DCF-4361-98B8-5ABF15A5477B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31BA0375-6DCF-4361-98B8-5ABF15A5477B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4405F528-6AF3-436F-9D3B-6B578055FD90}
+	EndGlobalSection
+EndGlobal
