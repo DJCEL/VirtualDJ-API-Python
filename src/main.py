@@ -6,6 +6,10 @@ from virtualdj_client import VirtualDJClient
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
+    print("##############################################################")
+    print("# Control VirtualDJ with the Network Control plugin #")
+    print("##############################################################")
+
     console = Console(file=sys.stderr)
 
     # Initialize VirtualDJ client
@@ -34,7 +38,6 @@ def main():
     console.print(f"VirtualDJ script < deck right play_button > => {result3}")
 
 
-    
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

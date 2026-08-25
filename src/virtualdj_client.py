@@ -48,12 +48,13 @@ class VirtualDJClient:
         encoded_vdjscript = encodeURI(vdj_script)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
-        # print(f"vdj_url_full: {vdj_url_full}")
+        #print(f"vdj_url_full: {vdj_url_full}")
 
         try:
             async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as client:
                 response = await client.get(vdj_url_full, headers=headers)
-                if response.status_code == 200:
+                status_code = response.status_code
+                if status_code == 200:
                     result = response.text.strip()
                     if is_query:
                         result_len = len(result)
@@ -67,13 +68,13 @@ class VirtualDJClient:
                         bErr = (result.lower() != "true")
                         status = "error" if bErr else "ok"
                         return {"status": status, "result": result}
-                elif response.status_code == 401:
+                elif status_code == 401:
                     status = "error"
                     result = "Authentication failed - check password"
                     return {"status": status, "result": result}
                 else:
                     status = "error"
-                    result = f"HTTP {response.status_code}: {response.text}"
+                    result = f"HTTP {status_code}: {response.text}"
                     return {"status": status, "result": result}
         except httpx.ConnectError:
             status = "error"
@@ -82,6 +83,10 @@ class VirtualDJClient:
         except httpx.TimeoutException:
             status = "error"
             result = "HTTP timeout"
+            return {"status": status, "result": result}
+        except httpx.HTTPError as e:
+            status = "error"
+            result = f"{e} It could be a problem of password too."
             return {"status": status, "result": result}
         except Exception as e:
             status = "error"
@@ -102,6 +107,9 @@ class VirtualDJClient:
         """ Query VirtualDJ with a vdj_script and return status """
         result = await self.query(vdj_script)
         bRes = (result.get("status") == "ok")
+        if bRes == False:
+            result_final = result.get("result", "Unknown error")
+            print(f"{result_final}")
         return bRes
     #------------------------------------------------------------------------------------
     async def queryfull(self, vdj_script: str) -> dict[str, Any]:
