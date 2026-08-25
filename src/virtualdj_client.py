@@ -149,6 +149,12 @@ class VirtualDJClient:
         vdj_script = f"get_var '{vdj_variable}'"
         result = await self.queryfull(vdj_script)
         return result
+    #------------------------------------------------------------------------------------
+    async def get_browsed_title_artist(self) -> Any:
+        """ Get title - artist from the browsed file """
+        vdj_script = "get_browsed_title_artist"
+        result = await self.queryfull(vdj_script)
+        return result
 
 
     #------------------------------------------------------------------------------------

@@ -18,16 +18,23 @@ def main():
         sys.exit()
 
     vdj_build = asyncio.run(vdj_client.get_build())
-    console.print(f"VirtualDJ build: {vdj_build}")
+    console.print(f"VirtualDJ script < get_build > => {vdj_build}")
 
     # vdj_client - test 1
-    vdj_script1 = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result1 = asyncio.run(vdj_client.executefull(vdj_script1))
-    console.print(f"VirtualDJ script < {vdj_script1} > => {result1}")
+    result1 = asyncio.run(vdj_client.get_browsed_title_artist())
+    console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1}")
 
     # vdj_client - test 2
-    result2 = asyncio.run(vdj_client.play('right'))
-    console.print(f"VirtualDJ script < deck right play > => {result2}")
+    vdj_script1 = "deck 1 play_pause & loop 4 & crossfader -5%"
+    result2 = asyncio.run(vdj_client.executefull(vdj_script2))
+    console.print(f"VirtualDJ script < {vdj_script1} > => {result2}")
+
+    # vdj_client - test 3
+    result3 = asyncio.run(vdj_client.play_button('right'))
+    console.print(f"VirtualDJ script < deck right play_button > => {result3}")
+
+
+    
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
