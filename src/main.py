@@ -6,9 +6,9 @@ from virtualdj_client import VirtualDJClient
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
-    print("##############################################################")
-    print("# Control VirtualDJ with the Network Control plugin #")
-    print("##############################################################")
+    print("#######################################################")
+    print("#  Control VirtualDJ with the Network Control plugin  #")
+    print("#######################################################")
 
     console = Console(file=sys.stderr)
 
