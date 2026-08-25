@@ -112,7 +112,7 @@ class VirtualDJClient:
             print(f"{result_final}")
         return bRes
     #------------------------------------------------------------------------------------
-    async def queryfull(self, vdj_script: str) -> dict[str, Any]:
+    async def query_vdj_script(self, vdj_script: str) -> dict[str, Any]:
         """ Query VirtualDJ with a vdj_script """
         result = await self.query(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -123,7 +123,7 @@ class VirtualDJClient:
             result_final = result.get("result", "Unknown error")
             raise VDJError(f"Failed to query {vdj_script}: {result_final}")
     #------------------------------------------------------------------------------------
-    async def executefull(self, vdj_script: str) -> bool:
+    async def execute_vdj_script(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """
         result = await self.execute(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -150,19 +150,19 @@ class VirtualDJClient:
     async def get_build(self) -> Any:
         """ Get the VirtualDJ build """
         vdj_script = "get_build"
-        result = await self.queryfull(vdj_script)
+        result = await self.query_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def get_variable(self, vdj_variable: str) -> Any:
         """ Get a value of a VirtualDJ variable """
         vdj_script = f"get_var '{vdj_variable}'"
-        result = await self.queryfull(vdj_script)
+        result = await self.query_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def get_browsed_title_artist(self) -> Any:
         """ Get title - artist from the browsed file """
         vdj_script = "get_browsed_title_artist"
-        result = await self.queryfull(vdj_script)
+        result = await self.query_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def get_bpm(self, vdj_deck: str = None) -> Any:
@@ -171,7 +171,7 @@ class VirtualDJClient:
             vdj_script = "get_bpm"
         else:
             vdj_script = f"deck {vdj_deck} get_bpm"
-        result = await self.queryfull(vdj_script)
+        result = await self.query_vdj_script(vdj_script)
         return result
 
 
@@ -184,37 +184,37 @@ class VirtualDJClient:
             vdj_script = f"{vdj_verb}"
         else:
             vdj_script = f"deck {vdj_deck} {vdj_verb}"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def play(self, vdj_deck: str) -> bool:
         """ Play a deck"""
         vdj_script = f"deck {vdj_deck} play"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def pause(self, vdj_deck: str) -> bool:
         """ Pause a deck """
         vdj_script = f"deck {vdj_deck} pause"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def stop(self, vdj_deck: str) -> bool:
         """ Stop a deck """
         vdj_script = f"deck {vdj_deck} stop"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------ 
     async def play_pause(self, vdj_deck: str) -> bool:
         """ Toggle between play and pause on a deck """
         vdj_script = f"deck {vdj_deck} play_pause"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def play_button(self, vdj_deck: str) -> bool:
         """ play_button a deck """
         vdj_script = f"deck {vdj_deck} play_button"
-        result = await self.executefull(vdj_script)
+        result = await self.execute_vdj_script(vdj_script)
         return result
 
 
