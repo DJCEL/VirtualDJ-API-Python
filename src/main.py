@@ -24,18 +24,22 @@ def main():
     vdj_build = asyncio.run(vdj_client.get_build())
     console.print(f"VirtualDJ script < get_build > => {vdj_build}")
 
-    # vdj_client - test 1
-    result1 = asyncio.run(vdj_client.get_browsed_title_artist())
-    console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1}")
+    # vdj_client - test 1a
+    result1a = asyncio.run(vdj_client.get_browsed_title_artist())
+    console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1a}")
 
-    # vdj_client - test 2
-    vdj_script2 = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result2 = asyncio.run(vdj_client.executefull(vdj_script2))
-    console.print(f"VirtualDJ script < {vdj_script2} > => {result2}")
+    # vdj_client - test 1b
+    result1b = asyncio.run(vdj_client.get_bpm('left'))
+    console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
 
-    # vdj_client - test 3
-    result3 = asyncio.run(vdj_client.play_button('right'))
-    console.print(f"VirtualDJ script < deck right play_button > => {result3}")
+    # vdj_client - test 2a
+    vdj_script2a = "deck 1 play_pause & loop 4 & crossfader -5%"
+    result2a = asyncio.run(vdj_client.executefull(vdj_script2a))
+    console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
+
+    # vdj_client - test 2b
+    result2b = asyncio.run(vdj_client.play_button('right'))
+    console.print(f"VirtualDJ script < deck right play_button > => {result2b}")
 
 
 #------------------------------------------------------------------------------------------------------------------------------------

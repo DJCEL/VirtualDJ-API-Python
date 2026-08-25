@@ -164,6 +164,15 @@ class VirtualDJClient:
         vdj_script = "get_browsed_title_artist"
         result = await self.queryfull(vdj_script)
         return result
+    #------------------------------------------------------------------------------------
+    async def get_bpm(self, vdj_deck: str = None) -> Any:
+        """ Get the bpm """
+        if vdj_deck is None:
+            vdj_script = "get_bpm"
+        else:
+            vdj_script = f"deck {vdj_deck} get_bpm"
+        result = await self.queryfull(vdj_script)
+        return result
 
 
     #------------------------------------------------------------------------------------
