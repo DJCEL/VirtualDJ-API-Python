@@ -5,12 +5,14 @@ __version__ = '1.0.2'
 
 import httpx
 import asyncio
-from typing import Any, Literal, Callable
+from typing import Any, Literal, Callable, TypeVar
 import psutil
 from urllib.parse import quote as encodeURI
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 from config import VDJ_PROCESS_NAME
+
+TReturn = TypeVar("TReturn")
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
