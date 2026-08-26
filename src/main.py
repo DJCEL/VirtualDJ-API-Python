@@ -42,12 +42,12 @@ def main():
 
     # test 2a
     vdj_script2a = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result2a = client.run("execute_vdj_script", vdj_script=vdj_script2a)
+    result2a = client.send(vdj_script2a)
     console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
 
     # test 2b
-    vdj_verb2b = "sync"
-    result2b = client.run("execute_vdj_verb", vdj_verb=vdj_verb2b)
+    vdj_script2b = "sync"
+    result2b = client.send(vdj_verb2b)
     console.print(f"VirtualDJ script < {vdj_verb2b} > => {result2b}")
 
     # test 2c
@@ -66,7 +66,7 @@ def main():
 
     # test 2f
     vdj_script2f = "none"
-    result2f = client.run("execute_vdj_script", vdj_script=vdj_script2f)
+    result2f = client.send(vdj_script2f)
     console.print(f"VirtualDJ script < {vdj_script2f} > => {result2f}")
 
 
