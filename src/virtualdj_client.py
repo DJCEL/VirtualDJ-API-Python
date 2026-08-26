@@ -1,11 +1,11 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 import httpx
 import asyncio
-from typing import Any, Literal
+from typing import Any, Literal, Callable
 import psutil
 from urllib.parse import quote as encodeURI
 
@@ -222,7 +222,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def run(async_fn):
+    def run(async_fn: Callable[..., TReturn]):
         return asyncio.run(async_fn)
     #------------------------------------------------------------------------------------
 
