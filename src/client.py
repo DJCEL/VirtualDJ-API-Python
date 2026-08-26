@@ -196,13 +196,19 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ executes - specific
     #------------------------------------------------------------------------------------
-    async def execute_vdj_verb(self, vdj_verb: str, vdj_deck: str = None) -> bool:
+    async def execute_vdj_verb(self, vdj_verb: str, vdj_deck: str = None, vdj_params: str = None) -> bool:
         """ Execute a vdj_script on a deck and return status """
         if vdj_deck is None:
-            vdj_script = f"{vdj_verb}"
+            if vdj_params is None: 
+                vdj_script = f"{vdj_verb}"
+            else:
+                vdj_script = f"{vdj_verb} {vdj_params}"
         else:
-            vdj_script = f"deck {vdj_deck} {vdj_verb}"
-        result = await self.execute_vdj_script(vdj_script)
+            if vdj_params is None: 
+                vdj_script = f"deck {vdj_deck} {vdj_verb}"
+            else:
+                vdj_script = f"deck {vdj_deck} {vdj_verb} {vdj_params}"
+        result = await self.execute_vdj_script(vdj_script.strip())
         return result
     #------------------------------------------------------------------------------------
     async def play(self, vdj_deck: str = None) -> bool:

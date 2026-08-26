@@ -49,6 +49,12 @@ def main():
     result2d = client.run("play_pause")
     console.print(f"VirtualDJ script < play_pause > => {result2d}")
 
+    # test 2e
+    vdj_verb2e = "loop"
+    vdj_params2e = "8"
+    result2e = client.run("execute_vdj_verb",vdj_verb=vdj_verb2e, vdj_params=vdj_params2e)
+    console.print(f"VirtualDJ script < {vdj_verb2e} {vdj_params2e} > => {result2e}")
+
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
