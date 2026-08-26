@@ -13,32 +13,32 @@ def main():
     console = Console(file=sys.stderr)
 
     # Initialize VirtualDJ client
-    vdj_client = VirtualDJClient()
+    client = VirtualDJClient()
 
-    vdj_client_connected = False
-    vdj_client_connected = asyncio.run(vdj_client.is_running())
-    console.print(f"VirtualDJ connected: {vdj_client_connected}")
-    if (vdj_client_connected == False):
+    client_connected = False
+    client_connected = asyncio.run(client.is_running())
+    console.print(f"VirtualDJ connected: {client_connected}")
+    if (client_connected == False):
         sys.exit()
 
-    vdj_build = asyncio.run(vdj_client.get_build())
+    vdj_build = asyncio.run(client.get_build())
     console.print(f"VirtualDJ script < get_build > => {vdj_build}")
 
-    # vdj_client - test 1a
-    result1a = asyncio.run(vdj_client.get_browsed_title_artist())
+    # test 1a
+    result1a = asyncio.run(client.get_browsed_title_artist())
     console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1a}")
 
-    # vdj_client - test 1b
-    result1b = asyncio.run(vdj_client.get_bpm('left'))
+    # test 1b
+    result1b = asyncio.run(client.get_bpm('left'))
     console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
 
-    # vdj_client - test 2a
+    # test 2a
     vdj_script2a = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result2a = asyncio.run(vdj_client.execute_vdj_script(vdj_script2a))
+    result2a = asyncio.run(client.execute_vdj_script(vdj_script2a))
     console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
 
-    # vdj_client - test 2b
-    result2b = asyncio.run(vdj_client.play_button('right'))
+    # test 2b
+    result2b = asyncio.run(client.play_button('right'))
     console.print(f"VirtualDJ script < deck right play_button > => {result2b}")
 
 
