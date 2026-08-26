@@ -1,4 +1,4 @@
-8""" 
+""" 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
 __version__ = '1.0.4'
