@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.4'
+__version__ = '1.0.5'
 
 import httpx
 import asyncio
@@ -114,7 +114,7 @@ class VirtualDJClient:
             print(f"{result_final}")
         return bRes
     #------------------------------------------------------------------------------------
-    async def query_vdj_script(self, vdj_script: str) -> dict[str, Any]:
+    async def _query_vdj_script(self, vdj_script: str) -> dict[str, Any]:
         """ Query VirtualDJ with a vdj_script """
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -127,7 +127,7 @@ class VirtualDJClient:
             return f"Failed to query < {vdj_script} >: {result_final}"
             
     #------------------------------------------------------------------------------------
-    async def execute_vdj_script(self, vdj_script: str) -> bool:
+    async def _execute_vdj_script(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """
         result = await self._execute(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -139,10 +139,10 @@ class VirtualDJClient:
     
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str):
-        return asyncio.run(self.execute_vdj_script(vdj_script))
+        return asyncio.run(self._execute_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     def get(self, vdj_script: str):
-        return asyncio.run(self.query_vdj_script(vdj_script))
+        return asyncio.run(self._query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
