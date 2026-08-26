@@ -136,10 +136,7 @@ class VirtualDJClient:
             return bRes2
         else:
             return False
-    #------------------------------------------------------------------------------------
-    def run(self, async_fn_name: str, *args, **kwargs):
-        async_fn = getattr(self, async_fn_name)
-        return asyncio.run(async_fn(*args, **kwargs))
+    
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str):
         return asyncio.run(self.execute_vdj_script(vdj_script))
@@ -147,7 +144,7 @@ class VirtualDJClient:
     def get(self, vdj_script: str):
         return asyncio.run(self.query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
-    #  VirtualDJ queries - specific
+    #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
     async def is_running(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
@@ -162,15 +159,7 @@ class VirtualDJClient:
         return False
     #------------------------------------------------------------------------------------
     def is_connected(self):
-        return asyncio.run(self.is_running())
-    #------------------------------------------------------------------------------------
-    async def get_variable(self, vdj_variable: str) -> Any:
-        """ Get a value of a VirtualDJ variable """
-        vdj_script = f"get_var '{vdj_variable}'"
-        result = await self.query_vdj_script(vdj_script)
-        return result
-     
-    #------------------------------------------------------------------------------------
+        return asyncio.run(self.is_running()) #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
     def vdjscript_and(vdj_script1:str, vdj_script2:str):
