@@ -32,12 +32,12 @@ def main():
 
     # test 1c
     vdj_script1c = "deck right get_bpm"
-    result1c = client.run("query_vdj_script", vdj_script=vdj_script1c)
+    result1c = client.get(vdj_script1c)
     console.print(f"VirtualDJ script < {vdj_script1c} > => {result1c}")
 
     # test 1d
     vdj_script1d = "get_none"
-    result1d = client.run("query_vdj_script", vdj_script=vdj_script1d)
+    result1d = client.get(vdj_script1d)
     console.print(f"VirtualDJ script < {vdj_script1d} > => {result1d}")
 
     # test 2a
