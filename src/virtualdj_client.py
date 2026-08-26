@@ -5,14 +5,13 @@ __version__ = '1.0.2'
 
 import httpx
 import asyncio
-from typing import Any, Literal, Callable, TypeVar
+from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 from config import VDJ_PROCESS_NAME
 
-TReturn = TypeVar("TReturn")
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
@@ -224,7 +223,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def run(async_fn: Callable[..., TReturn]):
+    def run_async(async_fn):
         return asyncio.run(async_fn)
     #------------------------------------------------------------------------------------
 
