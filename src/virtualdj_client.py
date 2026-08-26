@@ -180,7 +180,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ executes - specific
     #------------------------------------------------------------------------------------
-    async def execute_vdj_verb_deck(self, vdj_verb: str, vdj_deck: str = None) -> bool:
+    async def execute_vdj_verb(self, vdj_verb: str, vdj_deck: str = None) -> bool:
         """ Execute a vdj_script on a deck and return status """
         if vdj_deck is None:
             vdj_script = f"{vdj_verb}"
@@ -189,9 +189,12 @@ class VirtualDJClient:
         result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
-    async def play(self, vdj_deck: str) -> bool:
+    async def play(self, vdj_deck: str = None) -> bool:
         """ Play a deck"""
-        vdj_script = f"deck {vdj_deck} play"
+        if vdj_deck is None:
+            vdj_script = "play"
+        else:
+            vdj_script = f"deck {vdj_deck} play"
         result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
