@@ -48,7 +48,7 @@ def main():
     # test 2b
     vdj_script2b = "sync"
     result2b = client.send(vdj_script2b)
-    console.print(f"VirtualDJ script < {vdj_verb2b} > => {result2b}")
+    console.print(f"VirtualDJ script < {vdj_script2b} > => {result2b}")
 
     # test 2c
     vdj_script2c = "deck right play_button"
