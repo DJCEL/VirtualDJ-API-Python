@@ -31,6 +31,16 @@ def main():
     result1b = client.run("get_bpm", vdj_deck='left')
     console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
 
+    # test 1c
+    vdj_script1c = "deck right get_bpm"
+    result1c = client.run("query_vdj_script", vdj_script=vdj_script1c)
+    console.print(f"VirtualDJ script < {vdj_script1c} > => {result1c}")
+
+    # test 1d
+    vdj_script1d = "get_none"
+    result1d = client.run("query_vdj_script", vdj_script=vdj_script1d)
+    console.print(f"VirtualDJ script < {vdj_script1d} > => {result1d}")
+
     # test 2a
     vdj_script2a = "deck 1 play_pause & loop 4 & crossfader -5%"
     result2a = client.run("execute_vdj_script", vdj_script=vdj_script2a)
