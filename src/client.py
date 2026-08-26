@@ -146,7 +146,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
-    async def is_running(self) -> bool:
+    async def _is_running(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
         vdj_script = "get_version"
 
@@ -159,7 +159,8 @@ class VirtualDJClient:
         return False
     #------------------------------------------------------------------------------------
     def is_connected(self):
-        return asyncio.run(self.is_running()) #------------------------------------------------------------------------------------
+        return asyncio.run(self._is_running()) 
+#------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
     def vdjscript_and(vdj_script1:str, vdj_script2:str):
