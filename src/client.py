@@ -1,7 +1,7 @@
-""" 
+8""" 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 import httpx
 import asyncio
@@ -140,10 +140,12 @@ class VirtualDJClient:
     def run(self, async_fn_name: str, *args, **kwargs):
         async_fn = getattr(self, async_fn_name)
         return asyncio.run(async_fn(*args, **kwargs))
-
-#------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
     def send(self, vdj_script: str):
         return asyncio.run(execute_vdj_script(vdj_script))
+    #------------------------------------------------------------------------------------
+    def get(self, vdj_script: str):
+        return asyncio.run(query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     #  VirtualDJ queries - specific
     #------------------------------------------------------------------------------------
