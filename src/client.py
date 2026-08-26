@@ -140,6 +140,10 @@ class VirtualDJClient:
     def run(self, async_fn_name: str, *args, **kwargs):
         async_fn = getattr(self, async_fn_name)
         return asyncio.run(async_fn(*args, **kwargs))
+
+#------------------------------------------------------------------------------------
+    def send(self, vdj_script: str):
+        return asyncio.run(execute_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     #  VirtualDJ queries - specific
     #------------------------------------------------------------------------------------
