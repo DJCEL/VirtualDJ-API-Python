@@ -53,8 +53,8 @@ class VirtualDJClient:
         #print(f"vdj_url_full: {vdj_url_full}")
 
         try:
-            async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as client:
-                response = await client.get(vdj_url_full, headers=headers)
+            async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as http_client:
+                response = await http_client.get(vdj_url_full, headers=headers)
                 status_code = response.status_code
                 if status_code == 200:
                     result = response.text.strip()
