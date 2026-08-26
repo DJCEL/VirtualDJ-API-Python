@@ -148,7 +148,7 @@ class VirtualDJClient:
         return asyncio.run(self.query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     #  VirtualDJ queries - specific
-     #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
     async def is_running(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
         vdj_script = "get_version"
