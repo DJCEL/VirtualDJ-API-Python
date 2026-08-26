@@ -4,6 +4,7 @@ VirtualDJ HTTP API client using the Network Control plugin
 __version__ = '1.0.1'
 
 import httpx
+import asyncio
 from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
@@ -221,6 +222,10 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
+    def run(async_fn):
+        return asyncio.run(async_fn)
+    #------------------------------------------------------------------------------------
+
     def vdjscript_and(vdj_script1:str, vdj_script2:str):
         vdj_script_full = vdj_script1 + ' & ' + vdj_script2
         return vdj_script_full
