@@ -37,12 +37,17 @@ def main():
     console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
 
     # test 2b
-    result2b = client.run("play_button", vdj_deck='right')
-    console.print(f"VirtualDJ script < deck right play_button > => {result2b}")
+    vdj_verb2b = f"sync"
+    result2b = client.run("execute_vdj_verb", vdj_verb=vdj_verb2b)
+    console.print(f"VirtualDJ script < {vdj_verb2b} > => {result2b}")
 
     # test 2c
-    result2c = client.run("play_pause")
-    console.print(f"VirtualDJ script < play_pause > => {result2c}")
+    result2c = client.run("play_button", vdj_deck='right')
+    console.print(f"VirtualDJ script < deck right play_button > => {result2c}")
+
+    # test 2d
+    result2d = client.run("play_pause")
+    console.print(f"VirtualDJ script < play_pause > => {result2d}")
 
 
 #------------------------------------------------------------------------------------------------------------------------------------
