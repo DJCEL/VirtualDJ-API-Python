@@ -31,43 +31,44 @@ def main():
     console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
 
     # test 1c
-    vdj_script1c = "deck right get_bpm"
-    result1c = client.get(vdj_script1c)
-    console.print(f"VirtualDJ script < {vdj_script1c} > => {result1c}")
+    vdj_script = "deck right get_bpm"
+    result1c = client.get(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result1c}")
 
     # test 1d
-    vdj_script1d = "get_none"
-    result1d = client.get(vdj_script1d)
-    console.print(f"VirtualDJ script < {vdj_script1d} > => {result1d}")
+    vdj_script = "get_none"
+    result1d = client.get(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result1d}")
 
     # test 2a
-    vdj_script2a = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result2a = client.send(vdj_script2a)
-    console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
+    vdj_script = "deck 1 play_pause & loop 4 & crossfader -5%"
+    result2a = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2a}")
 
     # test 2b
-    vdj_script2b = "sync"
-    result2b = client.send(vdj_script2b)
-    console.print(f"VirtualDJ script < {vdj_script2b} > => {result2b}")
+    vdj_script = "sync"
+    result2b = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2b}")
 
     # test 2c
-    vdj_script2c = "deck right play_button"
-    result2c = client.send(vdj_script2c)
-    console.print(f"VirtualDJ script < {vdj_script2c} > => {result2c}")
+    vdj_script = "deck right play_button"
+    result2c = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2c}")
 
     # test 2d
-    result2d = client.send("play_pause")
-    console.print(f"VirtualDJ script < play_pause > => {result2d}")
+    vdj_script = "play_pause"
+    result2d = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2d}")
 
     # test 2e
-    vdj_script2e = "loop 8"
-    result2e = client.send(vdj_script2e)
-    console.print(f"VirtualDJ script < {vdj_script2e} > => {result2e}")
+    vdj_script = "loop 8"
+    result2e = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2e}")
 
     # test 2f
-    vdj_script2f = "none"
-    result2f = client.send(vdj_script2f)
-    console.print(f"VirtualDJ script < {vdj_script2f} > => {result2f}")
+    vdj_script = "none"
+    result2f = client.send(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result2f}")
 
 
 #------------------------------------------------------------------------------------------------------------------------------------
