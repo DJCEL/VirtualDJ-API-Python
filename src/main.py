@@ -34,7 +34,7 @@ def main():
     console.print(f"VirtualDJ script < {vdj_script} > => {result1b}")
 
     # test 1c
-    vdj_script = "deck right get_bpm"
+    vdj_script = "deck right get_key"
     result1c = client.get(vdj_script)
     console.print(f"VirtualDJ script < {vdj_script} > => {result1c}")
 
