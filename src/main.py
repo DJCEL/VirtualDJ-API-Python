@@ -19,16 +19,19 @@ def main():
     if (client_connected == False):
         sys.exit()
 
-    vdj_build = client.get("get_build")
-    console.print(f"VirtualDJ script < get_build > => {vdj_build}")
+    vdj_script = "get_build"
+    vdj_build = client.get(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {vdj_build}")
 
     # test 1a
-    result1a = client.get("get_browsed_title_artist")
-    console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1a}")
+    vdj_script = "get_browsed_title_artist"
+    result1a = client.get(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result1a}")
 
     # test 1b
-    result1b = client.get("deck left get_bpm")
-    console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
+    vdj_script = "deck left get_bpm"
+    result1b = client.get(vdj_script)
+    console.print(f"VirtualDJ script < {vdj_script} > => {result1b}")
 
     # test 1c
     vdj_script = "deck right get_bpm"
