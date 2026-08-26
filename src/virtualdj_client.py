@@ -191,12 +191,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     async def play(self, vdj_deck: str = None) -> bool:
         """ Play a deck"""
-        if vdj_deck is None:
-            vdj_script = "play"
-        else:
-            vdj_script = f"deck {vdj_deck} play"
-        result = await self.execute_vdj_script(vdj_script)
-        return result
+        return self.execute_vdj_verb("play",vdj_deck)
     #------------------------------------------------------------------------------------
     async def pause(self, vdj_deck: str) -> bool:
         """ Pause a deck """
