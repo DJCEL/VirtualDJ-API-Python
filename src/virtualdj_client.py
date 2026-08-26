@@ -191,13 +191,13 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     async def play(self, vdj_deck: str = None) -> bool:
         """ Play a deck"""
-        return self.execute_vdj_verb("play",vdj_deck)
+        vdj_verb = "play"
+        return self.execute_vdj_verb(vdj_verb,vdj_deck)
     #------------------------------------------------------------------------------------
-    async def pause(self, vdj_deck: str) -> bool:
+    async def pause(self, vdj_deck: str = None) -> bool:
         """ Pause a deck """
-        vdj_script = f"deck {vdj_deck} pause"
-        result = await self.execute_vdj_script(vdj_script)
-        return result
+        vdj_verb = "pause"
+        return self.execute_vdj_verb(vdj_verb,vdj_deck)
     #------------------------------------------------------------------------------------
     async def stop(self, vdj_deck: str) -> bool:
         """ Stop a deck """
