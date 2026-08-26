@@ -105,7 +105,7 @@ class VirtualDJClient:
         result = await self._send_vdj_request(vdj_script)
         return result
     #------------------------------------------------------------------------------------
-    async def querycheck(self, vdj_script: str) -> bool:
+    async def _querycheck(self, vdj_script: str) -> bool:
         """ Query VirtualDJ with a vdj_script and return status """
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -156,12 +156,14 @@ class VirtualDJClient:
         for proc in psutil.process_iter(["pid", "name"]):
             process_name = proc.info["name"].lower()
             if process_name and VDJ_PROCESS_NAME in process_name:
-                result = await self.querycheck(vdj_script)
+                result = await self._querycheck(vdj_script)
                 return result
 
         return False
-
-     #------------------------------------------------------------------------------------
+ #------------------------------------------------------------------------------------
+    def is_connected(self):
+        return asyncio.run(self.is_running())
+    #------------------------------------------------------------------------------------
     async def get_variable(self, vdj_variable: str) -> Any:
         """ Get a value of a VirtualDJ variable """
         vdj_script = f"get_var '{vdj_variable}'"
