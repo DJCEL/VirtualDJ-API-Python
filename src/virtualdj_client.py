@@ -223,8 +223,8 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def run_async(async_fn):
-        return asyncio.run(async_fn)
+    def run(async_fn,*args, **kwargs):
+        return asyncio.run(async_fn(*args, **kwargs))
     #------------------------------------------------------------------------------------
 
     def vdjscript_and(vdj_script1:str, vdj_script2:str):
