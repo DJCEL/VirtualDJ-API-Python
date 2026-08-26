@@ -223,7 +223,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def run_async(self, async_fn,*args, **kwargs):
+    def run(self, async_fn,*args, **kwargs):
         #async_fn = getattr(self, async_fn_name)
         return asyncio.run(async_fn(*args, **kwargs))
     #------------------------------------------------------------------------------------
