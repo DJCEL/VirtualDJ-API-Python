@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 import httpx
 import asyncio
@@ -134,8 +134,21 @@ class VirtualDJClient:
             return bRes2
         else:
             return False
- #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    def run(self, async_fn_name: str, *args, **kwargs):
+        async_fn = getattr(self, async_fn_name)
+        return asyncio.run(async_fn(*args, **kwargs))
+    #------------------------------------------------------------------------------------
     #  VirtualDJ queries - specific
+    #------------------------------------------------------------------------------------
+    async def query_vdj_verb(self, vdj_verb: str, vdj_deck: str = None) -> bool:
+        """ Execute a vdj_script on a deck and return status """
+        if vdj_deck is None:
+            vdj_script = f"{vdj_verb}"
+        else:
+            vdj_script = f"deck {vdj_deck} {vdj_verb}"
+        result = await self.query_vdj_script(vdj_script)
+        return result
     #------------------------------------------------------------------------------------
     async def is_running(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
@@ -148,6 +161,7 @@ class VirtualDJClient:
                 return result
 
         return False
+
     #------------------------------------------------------------------------------------
     async def get_build(self) -> Any:
         """ Get the VirtualDJ build """
@@ -160,6 +174,7 @@ class VirtualDJClient:
         vdj_script = f"get_var '{vdj_variable}'"
         result = await self.query_vdj_script(vdj_script)
         return result
+    
     #------------------------------------------------------------------------------------
     async def get_browsed_title_artist(self) -> Any:
         """ Get title - artist from the browsed file """
@@ -169,14 +184,9 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     async def get_bpm(self, vdj_deck: str = None) -> Any:
         """ Get the bpm """
-        if vdj_deck is None:
-            vdj_script = "get_bpm"
-        else:
-            vdj_script = f"deck {vdj_deck} get_bpm"
-        result = await self.query_vdj_script(vdj_script)
+        vdj_verb = "get_bpm"
+        result = await self.query_vdj_verb(vdj_verb,vdj_deck)
         return result
-
-
     #------------------------------------------------------------------------------------
     # VirtualDJ executes - specific
     #------------------------------------------------------------------------------------
@@ -192,40 +202,37 @@ class VirtualDJClient:
     async def play(self, vdj_deck: str = None) -> bool:
         """ Play a deck"""
         vdj_verb = "play"
-        return self.execute_vdj_verb(vdj_verb,vdj_deck)
+        result = await self.execute_vdj_verb(vdj_verb,vdj_deck)
+        return result
     #------------------------------------------------------------------------------------
     async def pause(self, vdj_deck: str = None) -> bool:
         """ Pause a deck """
         vdj_verb = "pause"
-        return self.execute_vdj_verb(vdj_verb,vdj_deck)
+        result = await self.execute_vdj_verb(vdj_verb,vdj_deck)
+        return result
     #------------------------------------------------------------------------------------
-    async def stop(self, vdj_deck: str) -> bool:
+    async def stop(self, vdj_deck: str = None) -> bool:
         """ Stop a deck """
-        vdj_script = f"deck {vdj_deck} stop"
-        result = await self.execute_vdj_script(vdj_script)
+        vdj_verb = "stop"
+        result = await self.execute_vdj_verb(vdj_verb,vdj_deck)
         return result
     #------------------------------------------------------------------------------------ 
-    async def play_pause(self, vdj_deck: str) -> bool:
+    async def play_pause(self, vdj_deck: str = None) -> bool:
         """ Toggle between play and pause on a deck """
-        vdj_script = f"deck {vdj_deck} play_pause"
-        result = await self.execute_vdj_script(vdj_script)
+        vdj_verb = "play_pause"
+        result = await self.execute_vdj_verb(vdj_verb,vdj_deck)
         return result
     #------------------------------------------------------------------------------------
-    async def play_button(self, vdj_deck: str) -> bool:
+    async def play_button(self, vdj_deck: str = None) -> bool:
         """ play_button a deck """
-        vdj_script = f"deck {vdj_deck} play_button"
-        result = await self.execute_vdj_script(vdj_script)
+        vdj_verb = "play_button"
+        result = await self.execute_vdj_verb(vdj_verb,vdj_deck)
         return result
 
 
     #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def run(self, async_fn, *args, **kwargs):
-        #async_fn = getattr(self, async_fn_name)
-        return asyncio.run(async_fn(*args, **kwargs))
-    #------------------------------------------------------------------------------------
-
     def vdjscript_and(vdj_script1:str, vdj_script2:str):
         vdj_script_full = vdj_script1 + ' & ' + vdj_script2
         return vdj_script_full

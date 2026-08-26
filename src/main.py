@@ -2,7 +2,7 @@ import sys
 import asyncio
 from rich.console import Console
 
-from virtualdj_client import VirtualDJClient
+from client import VirtualDJClient
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
