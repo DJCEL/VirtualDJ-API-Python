@@ -19,15 +19,15 @@ def main():
     if (client_connected == False):
         sys.exit()
 
-    vdj_build = client.run("get_build")
+    vdj_build = client.get("get_build")
     console.print(f"VirtualDJ script < get_build > => {vdj_build}")
 
     # test 1a
-    result1a = client.run("get_browsed_title_artist")
+    result1a = client.get("get_browsed_title_artist")
     console.print(f"VirtualDJ script < get_browsed_title_artist > => {result1a}")
 
     # test 1b
-    result1b = client.run("get_bpm", vdj_deck='left')
+    result1b = client.get("deck left get_bpm")
     console.print(f"VirtualDJ script < deck left get_bpm > => {result1b}")
 
     # test 1c
@@ -47,22 +47,22 @@ def main():
 
     # test 2b
     vdj_script2b = "sync"
-    result2b = client.send(vdj_verb2b)
+    result2b = client.send(vdj_script2b)
     console.print(f"VirtualDJ script < {vdj_verb2b} > => {result2b}")
 
     # test 2c
-    result2c = client.run("play_button", vdj_deck='right')
-    console.print(f"VirtualDJ script < deck right play_button > => {result2c}")
+    vdj_script2c = "deck right play_button"
+    result2c = client.send(vdj_script2c)
+    console.print(f"VirtualDJ script < {vdj_script2c} > => {result2c}")
 
     # test 2d
-    result2d = client.run("play_pause")
+    result2d = client.send("play_pause")
     console.print(f"VirtualDJ script < play_pause > => {result2d}")
 
     # test 2e
-    vdj_verb2e = "loop"
-    vdj_params2e = "8"
-    result2e = client.run("execute_vdj_verb",vdj_verb=vdj_verb2e, vdj_params=vdj_params2e)
-    console.print(f"VirtualDJ script < {vdj_verb2e} {vdj_params2e} > => {result2e}")
+    vdj_script2e = "loop 8"
+    result2e = client.send(vdj_script2e)
+    console.print(f"VirtualDJ script < {vdj_script2e} > => {result2e}")
 
     # test 2f
     vdj_script2f = "none"
