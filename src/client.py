@@ -153,7 +153,7 @@ class VirtualDJClient:
                 vdj_script = f"deck {vdj_deck} {vdj_verb}"
             else:
                 vdj_script = f"deck {vdj_deck} {vdj_verb} {vdj_params}"
-        result = await self.query_vdj_script(vdj_script.strip())
+        result = await self.query_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def is_running(self) -> bool:
@@ -208,7 +208,7 @@ class VirtualDJClient:
                 vdj_script = f"deck {vdj_deck} {vdj_verb}"
             else:
                 vdj_script = f"deck {vdj_deck} {vdj_verb} {vdj_params}"
-        result = await self.execute_vdj_script(vdj_script.strip())
+        result = await self.execute_vdj_script(vdj_script)
         return result
     #------------------------------------------------------------------------------------
     async def play(self, vdj_deck: str = None) -> bool:
