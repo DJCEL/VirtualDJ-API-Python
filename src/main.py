@@ -37,7 +37,7 @@ def main():
     console.print(f"VirtualDJ script < {vdj_script2a} > => {result2a}")
 
     # test 2b
-    vdj_verb2b = f"sync"
+    vdj_verb2b = "sync"
     result2b = client.run("execute_vdj_verb", vdj_verb=vdj_verb2b)
     console.print(f"VirtualDJ script < {vdj_verb2b} > => {result2b}")
 
