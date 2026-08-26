@@ -14,7 +14,7 @@ def main():
     # Initialize VirtualDJ client
     client = VirtualDJClient()
 
-    client_connected = client.run("is_running")
+    client_connected = client.is_connected()
     console.print(f"VirtualDJ connected: {client_connected}")
     if (client_connected == False):
         sys.exit()
