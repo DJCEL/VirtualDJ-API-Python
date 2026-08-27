@@ -149,6 +149,7 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
+            logger.info(f"HTTP error {status_code}: {result_final}")
             return False
     
     #------------------------------------------------------------------------------------
