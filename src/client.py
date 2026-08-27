@@ -173,15 +173,15 @@ class VirtualDJClient:
 
         return False
     #------------------------------------------------------------------------------------
-    def is_connected(self):
+    def is_connected(self) -> bool:
         return asyncio.run(self._is_virtualdj_connected()) 
 #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
-    def vdjscript_and(vdj_script1:str, vdj_script2:str):
+    def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
         vdj_script_full = vdj_script1 + ' & ' + vdj_script2
         return vdj_script_full
     #------------------------------------------------------------------------------------
-    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str):
+    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
         vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
         return vdj_script_full
