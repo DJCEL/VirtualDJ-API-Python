@@ -10,12 +10,12 @@ import psutil
 from urllib.parse import quote as encodeURI
 import logging
 
-from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
+from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 from config import VDJ_PROCESS_NAME
 
 logger = logging.getLogger(__name__)
 
-#logging.basicConfig(filename='client.log', level=logging.INFO)
+logging.basicConfig(filename='client.log', level=logging.INFO)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
@@ -53,9 +53,6 @@ class VirtualDJClient:
         vdj_url = f"{self.vdj_base_url}/{vdj_endpoint}"
         encoded_vdjscript = encodeURI(vdj_script)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
-
-        if VDJ_NETWORK_CONTROL_DEBUG:
-            logger.info(f"vdj_url_full: {vdj_url_full}")
 
         try:
             #aync with self._client as http_client:
