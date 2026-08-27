@@ -82,22 +82,27 @@ class VirtualDJClient:
                     return {"status": status, "result": result}
                 else:
                     status = "error"
+                    status_code = -1
                     result = f"HTTP {status_code}: {response.text}"
                     return {"status": status, "result": result}
         except httpx.ConnectError:
             status = "error"
+            status_code = -1
             result = "HTTP Connection error"
             return {"status": status, "result": result}
         except httpx.TimeoutException:
             status = "error"
+            status_code = -1
             result = "HTTP timeout"
             return {"status": status, "result": result}
         except httpx.HTTPError as e:
             status = "error"
+            status_code = -1
             result = f"{e} It could be a problem of password too."
             return {"status": status, "result": result}
         except Exception as e:
             status = "error"
+            status_code = -1
             result = str(e)
             return {"status": status, "result": result}
     #------------------------------------------------------------------------------------
