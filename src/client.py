@@ -15,7 +15,7 @@ from config import VDJ_PROCESS_NAME
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(filename='client.log', level=logging.INFO)
+logging.basicConfig(filename='./log/client.log', level=logging.INFO)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
