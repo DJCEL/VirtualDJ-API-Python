@@ -9,7 +9,6 @@ from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
 import logging
-import os
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME
@@ -22,6 +21,7 @@ LOG_FILENAME = 'client.log'
 #------------------------------------------------------------------------------------------------------------------------------------
 def CreateClientLog():
     if VDJ_NETWORK_CONTROL_DEBUG:
+        import os
         if not os.path.exists(LOG_FOLDER):
             os.makedirs(LOG_FOLDER)
         logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
