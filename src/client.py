@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.6'
+__version__ = '1.0.7'
 
 import httpx
 import asyncio
@@ -133,6 +133,7 @@ class VirtualDJClient:
             result_final = result.get("result", "")
             return result_final
         else:
+            status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
             #raise VDJError(f"Failed to query < {vdj_script} >: {result_final}")
             return f"Failed to query < {vdj_script} >: {result_final}"
@@ -146,6 +147,8 @@ class VirtualDJClient:
             bRes2 = (result.get("result", "").lower() == "true")
             return bRes2
         else:
+            status_code = result.get("status_code")
+            result_final = result.get("result", "Unknown error")
             return False
     
     #------------------------------------------------------------------------------------
