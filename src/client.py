@@ -9,13 +9,15 @@ from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
 import logging
+import os
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 from config import VDJ_PROCESS_NAME
 
 logger = logging.getLogger(__name__)
+LOG_FOLDER = './log'
+LOG_FILENAME = 'client.log'
 
-logging.basicConfig(filename='./log/client.log', level=logging.INFO)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
@@ -30,6 +32,9 @@ class VirtualDJClient:
     def __init__(self):
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
+        if not os.path.exists(LOG_FOLDER):
+            os.makedirs(LOG_FOLDER)
+        logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
     #------------------------------------------------------------------------------------
     async def __aenter__(self):
         self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
