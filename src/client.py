@@ -125,7 +125,7 @@ class VirtualDJClient:
             logger.info(f"HTTP error {status_code}: {result_final}")
         return bRes
     #------------------------------------------------------------------------------------
-    async def _query_vdj_script(self, vdj_script: str) -> dict[str, Any]:
+    async def _query_vdj_script(self, vdj_script: str) -> str:
         """ Query VirtualDJ with a vdj_script """
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
