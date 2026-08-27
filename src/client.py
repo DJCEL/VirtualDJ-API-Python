@@ -82,7 +82,6 @@ class VirtualDJClient:
                     return {"status": status, "result": result}
                 else:
                     status = "error"
-                    status_code = -1
                     result = f"HTTP {status_code}: {response.text}"
                     return {"status": status, "result": result}
         except httpx.ConnectError:
