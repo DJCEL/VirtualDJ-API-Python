@@ -1,17 +1,19 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.5'
+__version__ = '1.0.6'
 
 import httpx
 import asyncio
 from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
+import logging
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME
 
+logger = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
@@ -51,7 +53,7 @@ class VirtualDJClient:
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
         if VDJ_NETWORK_CONTROL_DEBUG:
-            print(f"vdj_url_full: {vdj_url_full}")
+            logger.info(f"vdj_url_full: {vdj_url_full}")
 
         try:
             async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as http_client:
