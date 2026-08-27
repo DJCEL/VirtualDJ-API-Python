@@ -9,7 +9,7 @@ from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
 
-from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
+from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME
 
 
@@ -50,7 +50,8 @@ class VirtualDJClient:
         encoded_vdjscript = encodeURI(vdj_script)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
-        #print(f"vdj_url_full: {vdj_url_full}")
+        if VDJ_NETWORK_CONTROL_DEBUG:
+            print(f"vdj_url_full: {vdj_url_full}")
 
         try:
             async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as http_client:
@@ -105,7 +106,7 @@ class VirtualDJClient:
         result = await self._send_vdj_request(vdj_script)
         return result
     #------------------------------------------------------------------------------------
-    async def _querycheck(self, vdj_script: str) -> bool:
+    async def _query_check(self, vdj_script: str) -> bool:
         """ Query VirtualDJ with a vdj_script and return status """
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
@@ -146,20 +147,20 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
-    async def _is_running(self) -> bool:
+    async def _is_virtualdj_connected(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
         vdj_script = "get_version"
 
         for proc in psutil.process_iter(["pid", "name"]):
             process_name = proc.info["name"].lower()
             if process_name and VDJ_PROCESS_NAME in process_name:
-                result = await self._querycheck(vdj_script)
+                result = await self._query_check(vdj_script)
                 return result
 
         return False
     #------------------------------------------------------------------------------------
     def is_connected(self):
-        return asyncio.run(self._is_running()) 
+        return asyncio.run(self._is_virtualdj_connected()) 
 #------------------------------------------------------------------------------------
     # VirtualDJ tools
     #------------------------------------------------------------------------------------
