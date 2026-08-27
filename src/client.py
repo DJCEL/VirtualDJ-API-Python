@@ -14,12 +14,12 @@ from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWO
 from config import VDJ_PROCESS_NAME
 
 logger = logging.getLogger(__name__)
-LOG_FOLDER = './log'
-LOG_FILENAME = 'client.log'
-
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def CreateClientLog():
+    LOG_FOLDER = './log'
+    LOG_FILENAME = 'client.log'
+
     if VDJ_NETWORK_CONTROL_DEBUG:
         import os
         if not os.path.exists(LOG_FOLDER):
