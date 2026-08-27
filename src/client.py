@@ -91,17 +91,17 @@ class VirtualDJClient:
             return {"status": status,"status_code": {status_code}, "result": result}
         except httpx.TimeoutException:
             status = "error"
-            status_code = -1
+            status_code = -2
             result = "HTTP timeout"
             return {"status": status, "status_code": {status_code}, "result": result}
         except httpx.HTTPError as e:
             status = "error"
-            status_code = -1
+            status_code = -3
             result = f"{e} It could be a problem of password too."
             return {"status": status, "status_code": {status_code}, "result": result}
         except Exception as e:
             status = "error"
-            status_code = -1
+            status_code = -4
             result = str(e)
             return {"status": status, "status_code": {status_code}, "result": result}
     #------------------------------------------------------------------------------------
