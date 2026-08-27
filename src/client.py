@@ -120,8 +120,9 @@ class VirtualDJClient:
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
         if bRes == False:
+            status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            logger.info(f"{result_final}")
+            logger.info(f"Error {status_code}: {result_final}")
         return bRes
     #------------------------------------------------------------------------------------
     async def _query_vdj_script(self, vdj_script: str) -> dict[str, Any]:
