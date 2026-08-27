@@ -11,7 +11,7 @@ from urllib.parse import quote as encodeURI
 import logging
 import os
 
-from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
+from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME
 
 logger = logging.getLogger(__name__)
@@ -19,6 +19,16 @@ LOG_FOLDER = './log'
 LOG_FILENAME = 'client.log'
 
 
+#------------------------------------------------------------------------------------------------------------------------------------
+def CreateClientLog():
+    if VDJ_NETWORK_CONTROL_DEBUG:
+        if not os.path.exists(LOG_FOLDER):
+            os.makedirs(LOG_FOLDER)
+        logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
+#------------------------------------------------------------------------------------------------------------------------------------
+def SaveClientLog(msg):
+    if VDJ_NETWORK_CONTROL_DEBUG:
+        logger.info(msg)
 #------------------------------------------------------------------------------------------------------------------------------------
 class VDJDeck:
     name : Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master']
@@ -32,9 +42,7 @@ class VirtualDJClient:
     def __init__(self):
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
-        if not os.path.exists(LOG_FOLDER):
-            os.makedirs(LOG_FOLDER)
-        logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
+        CreateClientLog()
     #------------------------------------------------------------------------------------
     async def __aenter__(self):
         self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
@@ -124,7 +132,7 @@ class VirtualDJClient:
         if bRes == False:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            logger.info(f"HTTP error {status_code}: {result_final}")
+            SaveClientLog(f"HTTP error {status_code}: {result_final}")
         return bRes
     #------------------------------------------------------------------------------------
     async def _query_vdj_script(self, vdj_script: str) -> str:
@@ -137,7 +145,7 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            logger.info(f"HTTP error {status_code}: {result_final}")
+            SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return f"Failed to query < {vdj_script} >: {result_final}"
             
     #------------------------------------------------------------------------------------
@@ -151,7 +159,7 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            logger.info(f"HTTP error {status_code}: {result_final}")
+            SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
     
     #------------------------------------------------------------------------------------
