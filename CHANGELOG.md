@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.7 (2026-08-27)
+
+* some updates
+
 ## 1.0.3 (2026-08-26)
 
 * some updates
