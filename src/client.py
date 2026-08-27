@@ -135,7 +135,7 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            #raise VDJError(f"Failed to query < {vdj_script} >: {result_final}")
+            logger.info(f"HTTP error {status_code}: {result_final}")
             return f"Failed to query < {vdj_script} >: {result_final}"
             
     #------------------------------------------------------------------------------------
