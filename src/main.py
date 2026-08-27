@@ -43,6 +43,56 @@ def main():
     result1d = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1d}")
 
+    # test 1e
+    vdj_script = "deck left get_filepath"
+    result1e = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1e}")
+
+    # test 1f
+    vdj_script = "get_browsed_filepath"
+    result1f = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1f}")
+
+    # test 1g
+    vdj_script = "get_status"
+    result1g = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1g}")
+
+    # test 1h
+    vdj_script = "get_vdj_folder"
+    result1h = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1h}")
+
+    # test 1i
+    vdj_script = "get_browsed_folder_tab"
+    result1i = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1i}")
+
+    # test 1j
+    vdj_script = "get_browsed_folder"
+    result1j = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1j}")
+
+    # test 1k
+    vdj_script = "get_browsed_folder_path"
+    result1k = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1k}")
+
+    # test 1l
+    vdj_script = "get_browsed_folder_scrollsize"
+    result1l = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1l}")
+
+    # test 1m
+    vdj_script = "get_browsed_folder_scrollpos"
+    result1m = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1m}")
+
+    # test 1n
+    vdj_script = "deck left has_stems"
+    result1n = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1n}")
+
     # test 2a
     vdj_script = "deck 1 play_pause & loop 4 & crossfader -5%"
     result2a = client.send(vdj_script)
@@ -72,6 +122,16 @@ def main():
     vdj_script = "none"
     result2f = client.send(vdj_script)
     console.print(f"VirtualDJ script send < {vdj_script} > => {result2f}")
+
+    # test 2g
+    vdj_script = "search 'guetta'"
+    result2g = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2g}")
+
+    # test 2h
+    vdj_script = "nothing"
+    result2h = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
 
 
 #------------------------------------------------------------------------------------------------------------------------------------

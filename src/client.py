@@ -127,16 +127,6 @@ class VirtualDJClient:
         result = await self._send_vdj_request(vdj_script)
         return result
     #------------------------------------------------------------------------------------
-    async def _query_vdj_script_check(self, vdj_script: str) -> bool:
-        """ Query VirtualDJ with a vdj_script and return status """
-        result = await self._query(vdj_script)
-        bRes = (result.get("status") == "ok")
-        if bRes == False:
-            status_code = result.get("status_code")
-            result_final = result.get("result", "Unknown error")
-            SaveClientLog(f"HTTP error {status_code}: {result_final}")
-        return bRes
-    #------------------------------------------------------------------------------------
     async def _query_vdj_script(self, vdj_script: str) -> str:
         """ Query VirtualDJ with a vdj_script """
         result = await self._query(vdj_script)
@@ -173,14 +163,22 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
+    async def _query_vdj_script_test(self, vdj_script: str) -> bool:
+        """ Test VirtualDJ with a vdj_script and return status """
+        result = await self._query(vdj_script)
+        bRes = (result.get("status") == "ok")
+        if bRes == False:
+            status_code = result.get("status_code")
+            result_final = result.get("result", "Unknown error")
+            SaveClientLog(f"HTTP error {status_code}: {result_final}")
+        return bRes
+    #------------------------------------------------------------------------------------
     async def _is_virtualdj_connected(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
-        vdj_script = "get_version"
-
         for proc in psutil.process_iter(["pid", "name"]):
             process_name = proc.info["name"].lower()
             if process_name and VDJ_PROCESS_NAME in process_name:
-                result = await self._query_vdj_script_check(vdj_script)
+                result = await self._query_vdj_script_test("get_version")
                 return result
 
         return False
