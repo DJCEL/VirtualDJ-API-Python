@@ -58,6 +58,7 @@ class VirtualDJClient:
             logger.info(f"vdj_url_full: {vdj_url_full}")
 
         try:
+            #aync with self._client as http_client:
             async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as http_client:
                 response = await http_client.get(vdj_url_full, headers=headers)
                 status_code = response.status_code
