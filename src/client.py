@@ -153,10 +153,10 @@ class VirtualDJClient:
             return False
     
     #------------------------------------------------------------------------------------
-    def send(self, vdj_script: str):
+    def send(self, vdj_script: str) -> bool:
         return asyncio.run(self._execute_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
-    def get(self, vdj_script: str):
+    def get(self, vdj_script: str) -> str:
         return asyncio.run(self._query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
