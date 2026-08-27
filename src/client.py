@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.7'
+__version__ = '1.0.8'
 
 import httpx
 import asyncio
@@ -73,6 +73,8 @@ class VirtualDJClient:
                 response = await http_client.get(vdj_url_full, headers=headers)
                 status_code = response.status_code
                 if status_code == 200:
+                    encoding = response.encoding
+                    content_type =  response.headers["content-type"]
                     result = response.text.strip()
                     if is_query:
                         result_len = len(result)
