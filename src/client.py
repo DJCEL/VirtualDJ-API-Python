@@ -71,39 +71,39 @@ class VirtualDJClient:
                             ext_result = result[0:6]
                             bErr = (ext_result.lower() == "error:")
                         status = "error" if bErr else "ok"
-                        return {"status": status, "result": result}
+                        return {"status": status, "status_code": {status_code}, "result": result}
                     else:
                         bErr = (result.lower() != "true")
                         status = "error" if bErr else "ok"
-                        return {"status": status, "result": result}
+                        return {"status": status, "status_code": {status_code},"result": result}
                 elif status_code == 401:
                     status = "error"
                     result = "Authentication failed - check password"
-                    return {"status": status, "result": result}
+                    return {"status": status, "status_code": {status_code}, "result": result}
                 else:
                     status = "error"
-                    result = f"HTTP {status_code}: {response.text}"
-                    return {"status": status, "result": result}
+                    result = f"{response.text}"
+                    return {"status": status, "status_code": {status_code}, "result": result}
         except httpx.ConnectError:
             status = "error"
             status_code = -1
             result = "HTTP Connection error"
-            return {"status": status, "result": result}
+            return {"status": status,"status_code": {status_code}, "result": result}
         except httpx.TimeoutException:
             status = "error"
             status_code = -1
             result = "HTTP timeout"
-            return {"status": status, "result": result}
+            return {"status": status, "status_code": {status_code}, "result": result}
         except httpx.HTTPError as e:
             status = "error"
             status_code = -1
             result = f"{e} It could be a problem of password too."
-            return {"status": status, "result": result}
+            return {"status": status, "status_code": {status_code}, "result": result}
         except Exception as e:
             status = "error"
             status_code = -1
             result = str(e)
-            return {"status": status, "result": result}
+            return {"status": status, "status_code": {status_code}, "result": result}
     #------------------------------------------------------------------------------------
     async def _query(self, vdj_script: str) -> dict[str, Any]:
         """ Query VirtualDJ with a vdj_script """
