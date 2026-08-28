@@ -219,6 +219,6 @@ class VirtualDJClient:
             if drive.upper() != main_drive:
                 external_database_path = drive + "\\VirtualDJ\\" + "database.xml"
                 if os.path.exists(external_database_path):
-    database_list.append(external_database_path)
+                    database_list.append(external_database_path)
 
         return database_list
