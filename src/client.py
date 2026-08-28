@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.8'
+__version__ = '1.0.9'
 
 import httpx
 import asyncio
@@ -9,6 +9,7 @@ from typing import Any, Literal
 import psutil
 from urllib.parse import quote as encodeURI
 import logging
+import os
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME
@@ -21,7 +22,6 @@ def CreateClientLog():
     LOG_FILENAME = 'client.log'
 
     if VDJ_NETWORK_CONTROL_DEBUG:
-        import os
         if not os.path.exists(LOG_FOLDER):
             os.makedirs(LOG_FOLDER)
         logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
@@ -186,7 +186,7 @@ class VirtualDJClient:
     def is_connected(self) -> bool:
         return asyncio.run(self._is_virtualdj_connected()) 
     #------------------------------------------------------------------------------------
-    # VirtualDJ tools
+    # VirtualDJ script tools
     #------------------------------------------------------------------------------------
     def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
         vdj_script_full = vdj_script1 + ' & ' + vdj_script2
@@ -195,3 +195,29 @@ class VirtualDJClient:
     def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
         vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
         return vdj_script_full
+    #------------------------------------------------------------------------------------
+    # VirtualDJ databases
+    #------------------------------------------------------------------------------------
+    def get_database_list(self):
+        database_list = []
+
+        client_connected = self.is_connected()
+        if client_connected == True:
+            main_virtualdj_path = self.get("get_vdj_folder")
+            main_database_path =  main_virtualdj_path + "\\" + "database.xml"
+            database_list.append(main_database_path)
+        else:
+            AppData_Local = os.getenv('LOCALAPPDATA')
+            main_database_path = AppData_Local + "\\VirtualDJ\\" + "database.xml"
+            database_list.append(main_database_path)
+
+
+        computer_drives = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+
+        main_drive = 'C:'
+        for drive in computer_drives:
+            if drive.upper() != main_drive:
+                external_database_path = drive + "\\VirtualDJ\\" + "database.xml"
+                database_list.append(external_database_path)
+
+        return database_list

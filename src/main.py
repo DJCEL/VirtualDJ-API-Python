@@ -9,11 +9,17 @@ def main():
     print("#  Control VirtualDJ with the Network Control plugin  #")
     print("#######################################################")
 
-    console = Console(file=sys.stderr)
+    #console = Console(file=sys.stderr)
+    console = Console()
 
     # Initialize VirtualDJ client
     client = VirtualDJClient()
 
+    # List of VirtualDJ database
+    database_list = client.get_database_list()
+    console.print(f"VirtualDJ database list => {database_list}")
+
+    # List of tests
     client_connected = client.is_connected()
     console.print(f"VirtualDJ connected: {client_connected}")
     if (client_connected == False):
