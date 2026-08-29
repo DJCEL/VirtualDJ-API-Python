@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.10 (2026-08-29)
+
+* Add Open/Close VirtualDJ app
+
 ## 1.0.7 (2026-08-27)
 
 * some updates
