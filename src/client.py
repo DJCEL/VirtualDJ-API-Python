@@ -180,7 +180,7 @@ class VirtualDJClient:
         if is_vdj_running == True:
             return True
 
-        app_path = VDJ_PROCESS_PATH
+        app_path = VDJ_PROCESS_PATH_WINDOWS
 
         # TODO: check if updates are activated in VirtualDJ via settings.xml
 
