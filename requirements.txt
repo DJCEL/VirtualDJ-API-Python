@@ -3,3 +3,5 @@ asyncio
 rich
 psutil
 urllib3
+subprocess
+
