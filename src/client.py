@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.10'
+__version__ = '1.0.12'
 
 import httpx
 import asyncio
@@ -11,6 +11,7 @@ from urllib.parse import quote as encodeURI
 import logging
 import os
 import subprocess
+import xml.etree.ElementTree as ET
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
 from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS
@@ -250,7 +251,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ databases
     #------------------------------------------------------------------------------------
-    def get_database_list(self):
+    def get_local_database_list(self):
         database_list = []
         database_name = "database.xml"
 
@@ -275,3 +276,18 @@ class VirtualDJClient:
                     database_list.append(external_database_path)
 
         return database_list
+    #------------------------------------------------------------------------------------
+    def read_local_database(self, database_path: str, ListAllSongs: bool = False):
+        tree = ET.parse(database_path)
+        root = tree.getroot()
+        root_tag = root.tag
+
+        if root_tag == "VirtualDJ_Database":
+            root_attrib = root.attrib
+            print(f"VirtualDJ database reading => {root_attrib}")
+            if ListAllSongs:
+                for child in root:
+                    child_tag = child.tag
+                    if child_tag == "Song":
+                        child_attrib = child.attrib
+                        print(child_attrib)

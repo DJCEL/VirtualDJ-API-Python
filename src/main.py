@@ -15,9 +15,13 @@ def main():
     # Initialize VirtualDJ client
     client = VirtualDJClient()
 
-    # List of VirtualDJ database
-    database_list = client.get_database_list()
+    # List of VirtualDJ local database
+    database_list = client.get_local_database_list()
     console.print(f"VirtualDJ database list => {database_list}")
+    for db in database_list:
+        console.print(f"VirtualDJ database reading => {db}")
+        client.read_local_database(db, ListAllSongs=False)
+
 
     # Check if VirtualDJ is running
     client_running = client.is_app_running()
