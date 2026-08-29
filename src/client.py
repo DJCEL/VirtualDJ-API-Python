@@ -13,7 +13,7 @@ import os
 import subprocess
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
-from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH
+from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS
 
 logger = logging.getLogger(__name__)
 
