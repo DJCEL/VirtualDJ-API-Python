@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.9'
+__version__ = '1.0.10'
 
 import httpx
 import asyncio
@@ -10,23 +10,26 @@ import psutil
 from urllib.parse import quote as encodeURI
 import logging
 import os
+import subprocess
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
-from config import VDJ_PROCESS_NAME
+from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH
 
 logger = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------------------------------------------------------------
-def CreateClientLog():
+def _CreateClientLog():
     LOG_FOLDER = './log'
     LOG_FILENAME = 'client.log'
+
+    filepath = f"{LOG_FOLDER}/{LOG_FILENAME}"
 
     if VDJ_NETWORK_CONTROL_DEBUG:
         if not os.path.exists(LOG_FOLDER):
             os.makedirs(LOG_FOLDER)
-        logging.basicConfig(filename=f"{LOG_FOLDER}/{LOG_FILENAME}", level=logging.INFO)
+        logging.basicConfig(filename=filepath, level=logging.INFO)
 #------------------------------------------------------------------------------------------------------------------------------------
-def SaveClientLog(msg):
+def _SaveClientLog(msg):
     if VDJ_NETWORK_CONTROL_DEBUG:
         logger.info(msg)
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -42,7 +45,7 @@ class VirtualDJClient:
     def __init__(self):
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
-        CreateClientLog()
+        _CreateClientLog()
     #------------------------------------------------------------------------------------
     async def __aenter__(self):
         self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
@@ -137,9 +140,8 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            SaveClientLog(f"HTTP error {status_code}: {result_final}")
-            return f"Failed to query < {vdj_script} >: {result_final}"
-            
+            _SaveClientLog(f"HTTP error {status_code}: {result_final}")
+            return f"Failed to query < {vdj_script} >: {result_final}"            
     #------------------------------------------------------------------------------------
     async def _execute_vdj_script(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """
@@ -151,9 +153,8 @@ class VirtualDJClient:
         else:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            SaveClientLog(f"HTTP error {status_code}: {result_final}")
+            _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
-    
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str) -> bool:
         return asyncio.run(self._execute_vdj_script(vdj_script))
@@ -161,27 +162,78 @@ class VirtualDJClient:
     def get(self, vdj_script: str) -> str:
         return asyncio.run(self._query_vdj_script(vdj_script))
     #------------------------------------------------------------------------------------
+    #  Launch / Quit VirtualDJ
+    #------------------------------------------------------------------------------------
+    def is_app_running(self) -> bool:
+        """ Check if VirtualDJ software is running """
+        bRes = False
+        for proc in psutil.process_iter(["pid", "name"]):
+            process_name = proc.info["name"].lower()
+            if process_name and VDJ_PROCESS_NAME in process_name:
+                bRes = True
+
+        return bRes
+    #------------------------------------------------------------------------------------
+    def open_app(self) -> bool:
+        """ Open VirtuaDJ """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == True:
+            return True
+
+        app_path = VDJ_PROCESS_PATH
+
+        # TODO: check if updates are activated in VirtualDJ via settings.xml
+
+        # Open the application in background:
+        try:
+            subprocess.Popen([app_path], 
+                             stdin=subprocess.DEVNULL, 
+                             stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL,
+                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
+        except Exception as e:
+            msg =  app_path + "\n" + str(e)
+            print(msg)
+            _SaveClientLog(msg)
+            return False
+
+        return True
+    #------------------------------------------------------------------------------------
+    def close_app(self, force_close: bool = False) -> bool:
+        """ Close VirtuaDJ """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == False:
+            return True
+
+        is_vdj_connected = self.is_connected()
+        if is_vdj_connected == True:
+            # TODO: Bypass the VirtualDJ security at exit if (force_close == True)
+            vdj_script = "close"
+            result = self.send(vdj_script)
+            if result == True:
+                return True
+
+        # TODO: Force kill app if (force_close == True)
+        return False
+    #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
-    async def _query_vdj_script_test(self, vdj_script: str) -> bool:
-        """ Test VirtualDJ with a vdj_script and return status """
+    async def _is_virtualdj_connected(self) -> bool:
+        """ Check if VirtualDJ software is running and Network Control Plugin is responding """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == False:
+            return False
+
+        vdj_script = "get_version"
         result = await self._query(vdj_script)
         bRes = (result.get("status") == "ok")
         if bRes == False:
             status_code = result.get("status_code")
             result_final = result.get("result", "Unknown error")
-            SaveClientLog(f"HTTP error {status_code}: {result_final}")
-        return bRes
-    #------------------------------------------------------------------------------------
-    async def _is_virtualdj_connected(self) -> bool:
-        """ Check if VirtualDJ software is running and Network Control Plugin is responding """
-        for proc in psutil.process_iter(["pid", "name"]):
-            process_name = proc.info["name"].lower()
-            if process_name and VDJ_PROCESS_NAME in process_name:
-                result = await self._query_vdj_script_test("get_version")
-                return result
-
-        return False
+            _SaveClientLog(f"HTTP error {status_code}: {result_final}")
+            return False
+        else:
+            return True
     #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
         return asyncio.run(self._is_virtualdj_connected()) 
@@ -210,7 +262,6 @@ class VirtualDJClient:
             AppData_Local = os.getenv('LOCALAPPDATA')
             main_database_path = AppData_Local + "\\VirtualDJ\\" + "database.xml"
             database_list.append(main_database_path)
-
 
         computer_drives = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 

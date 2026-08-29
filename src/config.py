@@ -7,3 +7,4 @@ VDJ_NETWORK_CONTROL_DEBUG = False # default (bool): False
 
 # VirtualDJ - Process name in tasks manager
 VDJ_PROCESS_NAME = "virtualdj"
+VDJ_PROCESS_PATH = r"C:\Program Files\VirtualDJ\virtualdj.exe"

@@ -19,10 +19,25 @@ def main():
     database_list = client.get_database_list()
     console.print(f"VirtualDJ database list => {database_list}")
 
-    # List of tests
+    # Check if VirtualDJ is running
+    client_running = client.is_app_running()
+    console.print(f"VirtualDJ running => {client_running}")
+
+    # Launch VirtualDJ if not running
+    if client_running == False:
+        console.print("Launching VirtualDJ...")
+        client_launching = client.open_app()
+        console.print(f"VirtualDJ launching => {client_launching}")
+        client_running = client.is_app_running()
+        console.print(f"VirtualDJ running => {client_running}")
+        if (client_running == False):
+            sys.exit()
+
+    # Check the NetWork Control plugin
     client_connected = client.is_connected()
-    console.print(f"VirtualDJ connected: {client_connected}")
+    console.print(f"VirtualDJ NetWork Control plugin connected => {client_connected}")
     if (client_connected == False):
+        console.print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
         sys.exit()
 
     vdj_script = "get_build"
@@ -40,7 +55,7 @@ def main():
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1b}")
 
     # test 1c
-    vdj_script = "deck right get_key"
+    vdj_script = "deck left get_key"
     result1c = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1c}")
 
@@ -139,6 +154,10 @@ def main():
     result2h = client.send(vdj_script)
     console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
 
+
+    # Close VirtualDJ
+    #console.print(f"VirtualDJ closing...")
+    #client.close_app()
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
