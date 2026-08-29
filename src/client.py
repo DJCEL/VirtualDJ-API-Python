@@ -203,7 +203,8 @@ class VirtualDJClient:
                              stdin=subprocess.DEVNULL, 
                              stdout=subprocess.DEVNULL,
                              stderr=subprocess.DEVNULL,
-                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
+                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
+                             start_new_session=True)
         except Exception as e:
             msg =  app_path + "\n" + str(e)
             print(msg)
@@ -266,6 +267,7 @@ class VirtualDJClient:
     def get_local_database_list(self):
         database_list = []
         database_name = "database.xml"
+        system = platform.system()
 
         client_connected = self.is_connected()
         if client_connected == True:
@@ -273,18 +275,27 @@ class VirtualDJClient:
             main_database_path = os.path.join(main_virtualdj_path, database_name)
             if os.path.exists(main_database_path):
                 database_list.append(main_database_path)
-        else:
+
+        if system == "Windows":
             AppData_Local = os.getenv('LOCALAPPDATA')
             main_database_path = os.path.join(AppData_Local, 'VirtualDJ', database_name)
             database_list.append(main_database_path)
 
-        computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+            computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 
-        for drive in computer_drives_windows:
-            drive_full = drive + "\\"
-            external_database_path = os.path.join(drive_full,'VirtualDJ', database_name)
-            if os.path.exists(external_database_path):
-                database_list.append(external_database_path)
+            for drive in computer_drives_windows:
+                drive_full = drive + "\\"
+                external_database_path = os.path.join(drive_full,'VirtualDJ', database_name)
+                if os.path.exists(external_database_path):
+                    database_list.append(external_database_path)
+
+            database_list_noduplicates = list(dict.fromkeys(database_list))
+
+            return database_list_noduplicates
+
+        elif system == "Darwin":
+            #TODO: list of drives
+            return database_list
 
         return database_list
     #------------------------------------------------------------------------------------
