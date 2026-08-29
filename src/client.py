@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.12'
+__version__ = '1.0.13'
 
 import httpx
 import asyncio
@@ -11,10 +11,11 @@ from urllib.parse import quote as encodeURI
 import logging
 import os
 import subprocess
+import platform
 import xml.etree.ElementTree as ET
 
 from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
-from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS
+from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC
 
 logger = logging.getLogger(__name__)
 
@@ -181,7 +182,18 @@ class VirtualDJClient:
         if is_vdj_running == True:
             return True
 
-        app_path = VDJ_PROCESS_PATH_WINDOWS
+        system = platform.system()
+        if system == "Windows":
+            app_path = VDJ_PROCESS_PATH_WINDOWS
+        elif system == "Darwin":
+            app_path = os.path.join(VDJ_PROCESS_PATH_MAC,"Contents","MacOS","VirtualDJ")
+        else:
+            return False
+
+        if not os.path.exists(app_path):
+            raise FileNotFoundError(f"VirtualDJ not found: {app_path}")
+            _SaveClientLog(f"VirtualDJ not found: {app_path}")
+            return False
 
         # TODO: check if updates are activated in VirtualDJ via settings.xml
 
@@ -263,7 +275,7 @@ class VirtualDJClient:
                 database_list.append(main_database_path)
         else:
             AppData_Local = os.getenv('LOCALAPPDATA')
-            main_database_path = os.path.join(AppData_Local, 'VirtualDJ, database_name)
+            main_database_path = os.path.join(AppData_Local, 'VirtualDJ', database_name)
             database_list.append(main_database_path)
 
         computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
