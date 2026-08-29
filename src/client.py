@@ -280,13 +280,11 @@ class VirtualDJClient:
 
         computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 
-        main_drive_windows = 'C:'
         for drive in computer_drives_windows:
-            if drive.upper() != main_drive_windows:
-                drive_full = drive + "\\"
-                external_database_path = os.path.join(drive_full,'VirtualDJ', database_name)
-                if os.path.exists(external_database_path):
-                    database_list.append(external_database_path)
+            drive_full = drive + "\\"
+            external_database_path = os.path.join(drive_full,'VirtualDJ', database_name)
+            if os.path.exists(external_database_path):
+                database_list.append(external_database_path)
 
         return database_list
     #------------------------------------------------------------------------------------
