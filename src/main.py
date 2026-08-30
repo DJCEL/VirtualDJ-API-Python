@@ -160,7 +160,7 @@ def main():
     console.print(f"VirtualDJ database list => {database_list}")
     for db in database_list:
         console.print(f"VirtualDJ database reading => {db}")
-        client.read_local_database(db, ListAllSongs=False)
+        client.read_local_XMLdatabase(db, readAllSongs=False)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
