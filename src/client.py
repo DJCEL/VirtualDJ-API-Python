@@ -370,6 +370,8 @@ class VirtualDJClient:
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
             print(f"VirtualDJ database reading => {root_attrib}")
+            songs_count = len(root.findall(".//Song"))
+            print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
             if readAllSongs:
                 for child in root:
                     child_tag = child.tag
@@ -393,6 +395,6 @@ class VirtualDJClient:
                             elif subchild_tag in ["Comment"]:
                                 subchild_attrib = subchild.attrib
                                 subchild_text = subchild.text
-                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text)
+                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
                             else:
                                 print(f"subchild_tag < {subchild_tag} > not defined")
