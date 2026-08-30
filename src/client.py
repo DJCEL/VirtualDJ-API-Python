@@ -355,3 +355,5 @@ class VirtualDJClient:
                     if child_tag == "Song":
                         child_attrib = child.attrib
                         print(child_attrib)
+                        for subchild in child:
+                            subchild_tag = subchild.tag
