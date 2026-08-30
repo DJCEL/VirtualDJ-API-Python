@@ -172,7 +172,7 @@ class VirtualDJClient:
         bRes = False
         for proc in psutil.process_iter(["pid", "name"]):
             process_name = proc.info["name"]
-            if process_name and VDJ_PROCESS_NAME in process_name.lower():
+            if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():
                 bRes = True
 
         return bRes
@@ -265,7 +265,7 @@ class VirtualDJClient:
         return vdj_script_full
     #------------------------------------------------------------------------------------
     @staticmethod
-    def vdjscript_if_then_else(self,vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
+    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
         vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
         return vdj_script_full
     #------------------------------------------------------------------------------------
