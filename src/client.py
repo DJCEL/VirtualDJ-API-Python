@@ -341,7 +341,7 @@ class VirtualDJClient:
 
         return database_list
     #------------------------------------------------------------------------------------
-    def read_local_database(self, database_path: str, readAllSongs: bool = False):
+    def read_local_XMLdatabase(self, database_path: str, readAllSongs: bool = False):
         tree = ET.parse(database_path)
         root = tree.getroot()
         root_tag = root.tag
