@@ -369,9 +369,9 @@ class VirtualDJClient:
         songs_count = 0
 
         XMLTag_Song = ["Song"]
-        XMLTag_Data = ["Tags","Infos","Scan","CustomMix","Link"]
-        XMLTag_Poi = ["Poi"]
-        XMLTag_Comment = ["Comment"]
+        XMLTag_Song_Data = ["Tags","Infos","Scan","CustomMix","Link"]
+        XMLTag_Song_Poi = ["Poi"]
+        XMLTag_Song_Comment = ["Comment"]
 
 
         if root_tag == "VirtualDJ_Database":
@@ -390,16 +390,16 @@ class VirtualDJClient:
                         print(child_tag + str(id)+ ": " + str(child_attrib))
                         for subchild in child:
                             subchild_tag = subchild.tag
-                            if subchild_tag in XMLTag_Data:
+                            if subchild_tag in XMLTag_Song_Data:
                                subchild_attrib = subchild.attrib
                                subchild_text = subchild.text
                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                            elif subchild_tag in XMLTag_Poi:
+                            elif subchild_tag in XMLTag_Song_Poi:
                                i = i + 1
                                subchild_attrib = subchild.attrib
                                subchild_text = subchild.text
                                print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                            elif subchild_tag in XMLTag_Comment:
+                            elif subchild_tag in XMLTag_Song_Comment:
                                 subchild_attrib = subchild.attrib
                                 subchild_text = subchild.text
                                 print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
