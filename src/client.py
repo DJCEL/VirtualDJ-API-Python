@@ -158,6 +158,13 @@ class VirtualDJClient:
             result_final = result.get("result", "Unknown error")
             _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
+
+    #------------------------------------------------------------------------------------
+    async def send_async(self, vdj_script: str) -> bool:
+        return self._execute_vdj_script(vdj_script)
+    #------------------------------------------------------------------------------------
+    async def get_async(self, vdj_script: str) -> str:
+        return self._query_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str) -> bool:
         return asyncio.run(self._execute_vdj_script(vdj_script))
