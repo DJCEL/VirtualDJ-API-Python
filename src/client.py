@@ -341,7 +341,7 @@ class VirtualDJClient:
 
         return database_list
     #------------------------------------------------------------------------------------
-    def read_local_database(self, database_path: str, listAllSongs: bool = False):
+    def read_local_database(self, database_path: str, readAllSongs: bool = False):
         tree = ET.parse(database_path)
         root = tree.getroot()
         root_tag = root.tag
@@ -349,7 +349,7 @@ class VirtualDJClient:
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
             print(f"VirtualDJ database reading => {root_attrib}")
-            if listAllSongs:
+            if readAllSongs:
                 for child in root:
                     child_tag = child.tag
                     if child_tag == "Song":
