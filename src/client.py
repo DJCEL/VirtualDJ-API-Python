@@ -319,8 +319,8 @@ class VirtualDJClient:
                 database_list.append(main_database_path)
 
         if system == "Windows":
-            AppData_Local = os.getenv('LOCALAPPDATA')
-            main_database_path = os.path.join(AppData_Local, 'VirtualDJ', database_name)
+            appData_Local = os.getenv('LOCALAPPDATA')
+            main_database_path = os.path.join(appData_Local, 'VirtualDJ', database_name)
             database_list.append(main_database_path)
 
             computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
@@ -341,7 +341,7 @@ class VirtualDJClient:
 
         return database_list
     #------------------------------------------------------------------------------------
-    def read_local_database(self, database_path: str, ListAllSongs: bool = False):
+    def read_local_database(self, database_path: str, listAllSongs: bool = False):
         tree = ET.parse(database_path)
         root = tree.getroot()
         root_tag = root.tag
@@ -349,7 +349,7 @@ class VirtualDJClient:
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
             print(f"VirtualDJ database reading => {root_attrib}")
-            if ListAllSongs:
+            if listAllSongs:
                 for child in root:
                     child_tag = child.tag
                     if child_tag == "Song":
