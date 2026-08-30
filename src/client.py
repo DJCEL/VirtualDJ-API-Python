@@ -357,5 +357,5 @@ class VirtualDJClient:
                         print(child_attrib)
                         for subchild in child:
                             subchild_tag = subchild.tag
-                            if subchild_tag in ["Tags","Infos","Scan","Comment"]:
+                            if subchild_tag in ["Tags","Infos","Scan","Comment","Poi", "CustomMix","Link"]:
                                subchild_attrib = subchild.attrib
