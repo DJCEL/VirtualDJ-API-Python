@@ -76,33 +76,32 @@ class VirtualDJClient:
              self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
 
         try:
-            aync with self._client as http_client:
-                response = await http_client.get(vdj_url_full, headers=headers)
-                status_code = response.status_code
-                if status_code == 200:
-                    encoding = response.encoding
-                    content_type =  response.headers["content-type"]
-                    result = response.text.strip()
-                    if is_query:
-                        result_len = len(result)
-                        bErr = False 
-                        if (result_len >= 6):
-                            ext_result = result[0:6]
-                            bErr = (ext_result.lower() == "error:")
-                        status = "error" if bErr else "ok"
-                        return {"status": status, "status_code": status_code, "result": result}
-                    else:
-                        bErr = (result.lower() != "true")
-                        status = "error" if bErr else "ok"
-                        return {"status": status, "status_code": status_code,"result": result}
-                elif status_code == 401:
-                    status = "error"
-                    result = "Authentication failed - check password"
+            response = await self._client.get(vdj_url_full, headers=headers)
+            status_code = response.status_code
+            if status_code == 200:
+                encoding = response.encoding
+                content_type =  response.headers["content-type"]
+                result = response.text.strip()
+                if is_query:
+                    result_len = len(result)
+                    bErr = False 
+                    if (result_len >= 6):
+                        ext_result = result[0:6]
+                        bErr = (ext_result.lower() == "error:")
+                    status = "error" if bErr else "ok"
                     return {"status": status, "status_code": status_code, "result": result}
                 else:
-                    status = "error"
-                    result = f"{response.text}"
-                    return {"status": status, "status_code": status_code, "result": result}
+                    bErr = (result.lower() != "true")
+                    status = "error" if bErr else "ok"
+                    return {"status": status, "status_code": status_code,"result": result}
+            elif status_code == 401:
+                status = "error"
+                result = "Authentication failed - check password"
+                return {"status": status, "status_code": status_code, "result": result}
+            else:
+                status = "error"
+                result = f"{response.text}"
+                return {"status": status, "status_code": status_code, "result": result}
         except httpx.ConnectError:
             status = "error"
             status_code = -1
@@ -172,8 +171,8 @@ class VirtualDJClient:
         """ Check if VirtualDJ software is running """
         bRes = False
         for proc in psutil.process_iter(["pid", "name"]):
-            process_name = proc.info["name"].lower()
-            if process_name and VDJ_PROCESS_NAME in process_name:
+            process_name = proc.info["name"]
+            if process_name and VDJ_PROCESS_NAME in process_name.lower():
                 bRes = True
 
         return bRes
@@ -196,12 +195,17 @@ class VirtualDJClient:
 
         try:
             # Open the application in background:
-            subprocess.Popen([app_path], 
-                             stdin=subprocess.DEVNULL, 
-                             stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL,
-                             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
-                             start_new_session=True)
+            popen_kwargs = {
+                 "stdin": subprocess.DEVNULL, 
+                 "stdout": subprocess.DEVNULL,
+                 "stderr": subprocess.DEVNULL,
+                 "start_new_session": True
+                }
+
+            if system == "Windows":
+                 popen_kwargs["creationflags"] = (subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
+
+            subprocess.Popen([app_path], **popen_kwargs)
         except FileNotFoundError:
             print(f"VirtualDJ not found: {app_path}")
             _SaveClientLog(f"VirtualDJ not found: {app_path}")
@@ -255,11 +259,13 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ script tools
     #------------------------------------------------------------------------------------
+    @staticmethod
     def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
         vdj_script_full = vdj_script1 + ' & ' + vdj_script2
         return vdj_script_full
     #------------------------------------------------------------------------------------
-    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
+    @staticmethod
+    def vdjscript_if_then_else(self,vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
         vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
         return vdj_script_full
     #------------------------------------------------------------------------------------
