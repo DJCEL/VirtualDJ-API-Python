@@ -203,7 +203,7 @@ class VirtualDJClient:
                              creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
                              start_new_session=True)
         except FileNotFoundError:
-            raise FileNotFoundError(f"VirtualDJ not found: {app_path}")
+            print(f"VirtualDJ not found: {app_path}")
             _SaveClientLog(f"VirtualDJ not found: {app_path}")
             return False
         except Exception as e:
