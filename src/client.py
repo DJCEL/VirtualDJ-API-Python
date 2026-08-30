@@ -35,10 +35,6 @@ def _SaveClientLog(msg):
     if VDJ_NETWORK_CONTROL_DEBUG:
         logger.info(msg)
 #------------------------------------------------------------------------------------------------------------------------------------
-class VDJDeck:
-    name : Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master']
-    id : int
-#------------------------------------------------------------------------------------------------------------------------------------
 class VDJError(Exception):
     """VirtualDJ operation error"""
     pass
@@ -171,6 +167,10 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     def get(self, vdj_script: str) -> str:
         return asyncio.run(self.get_async(vdj_script))
+    #------------------------------------------------------------------------------------
+    class VDJDeck:
+        name : Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master']
+        id : int
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
