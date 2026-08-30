@@ -261,8 +261,11 @@ class VirtualDJClient:
         else:
             return True
     #------------------------------------------------------------------------------------
+    async def is_connected_async(self) -> bool:
+        return self._is_virtualdj_connected()
+    #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
-        return asyncio.run(self._is_virtualdj_connected()) 
+        return asyncio.run(self.is_connected_async()) 
     #------------------------------------------------------------------------------------
     # VirtualDJ script tools
     #------------------------------------------------------------------------------------
