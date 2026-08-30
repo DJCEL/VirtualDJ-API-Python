@@ -346,9 +346,10 @@ class VirtualDJClient:
 
         if system == "Windows":
             appData_Local = os.getenv('LOCALAPPDATA')
-            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
-            if os.path.exists(main_XMLdatabase_path):
-                database_list.append(main_XMLdatabase_path)
+            if appData_Local:
+                main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
+                if os.path.exists(main_XMLdatabase_path):
+                    database_list.append(main_XMLdatabase_path)
 
             drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 
