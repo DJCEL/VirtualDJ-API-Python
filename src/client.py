@@ -320,7 +320,7 @@ class VirtualDJClient:
        Scan_Key: str
        Scan_AudioSig: str
        Scan_Flag: int
-       Scan_Beatgrid: str
+       Scan_Beatgrid: list[str]
        Poi: list[VdjPoi]
        Link_NetSearch: str
        Link_Cover: str
