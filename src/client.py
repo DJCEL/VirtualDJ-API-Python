@@ -72,9 +72,11 @@ class VirtualDJClient:
         encoded_vdjscript = encodeURI(vdj_script)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
+        if self._client is None:
+             self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
+
         try:
-            #aync with self._client as http_client:
-            async with httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT) as http_client:
+            aync with self._client as http_client:
                 response = await http_client.get(vdj_url_full, headers=headers)
                 status_code = response.status_code
                 if status_code == 200:
