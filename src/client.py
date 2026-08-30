@@ -1,11 +1,11 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.13'
+__version__ = '1.0.14'
 
 import httpx
 import asyncio
-from typing import Any, Literal
+from typing import Any, Literal, TypedDict
 import psutil
 from urllib.parse import quote as encodeURI
 import logging
@@ -264,11 +264,22 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ databases
     #------------------------------------------------------------------------------------
-    class VdjSong:
+    class VDJPoiType:
+        name : Literal['automix','beatgrid','remix']
+    #------------------------------------------------------------------------------------
+    class VDJPoiPoint:
+        name : Literal['realStart','realEnd','fadeStart','fadeEnd','cutStart','cutEnd','tempoStart','tempoEnd']
+    #------------------------------------------------------------------------------------
+    class VdjPoi(TypedDict):
+        Name: str
+        Pos: float
+        Type: str
+        Point: str
+   #------------------------------------------------------------------------------------
+    class VdjSong():
        FilePath: str
        FileSize: int
        Flag: int
-       Tags_Flag: int
        Tags_Author: str
        Tags_Title: str
        Tags_Year: int
@@ -286,50 +297,59 @@ class VirtualDJClient:
        Tags_User1: str
        Tags_User2: str
        Tags_Internal: str
-       Scan_Version: str
-       Scan_Flag: int
-       Scan_Volume: int
-       Scan_Bpm: int
-       Scan_AltBpm: int
-       Scan_Key: str
-       Infos_SongLength: int
-       Infos_Bitrate: int
-       Infos_Cover: str
-       Infos_Color: str
-       Infos_FirstSeen: str
-       Infos_FirstPlay: str
-       Infos_LastPlay: str
+       Tags_Flag: int
+       Infos_SongLength: float
+       Infos_LastModified: int
+       Infos_FirstSeen: int
+       Infos_FirstPlay: int
+       Infos_LastPlay: int
        Infos_PlayCount: int
+       Infos_Bitrate: int
+       Infos_Cover: int
+       Infos_Color: str
        Infos_Corrupted: int
        Infos_Gain: int
        Infos_UserColor: str
        Comment: str
-  
+       Scan_Version: int
+       Scan_Bpm: float
+       Scan_Phase: float
+       Scan_AltBpm: float
+       Scan_Rigid: float
+       Scan_Volume: float
+       Scan_Key: str
+       Scan_AudioSig: str
+       Scan_Flag: int
+       Scan_Beatgrid: str
+       Poi: list[VdjPoi]
+       Link_NetSearch: str
+       Link_Cover: str
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
-        database_name = "database.xml"
+        XMLdatabase_name = "database.xml"
         system = platform.system()
 
         client_connected = self.is_connected()
         if client_connected == True:
             main_virtualdj_path = self.get("get_vdj_folder")
-            main_database_path = os.path.join(main_virtualdj_path, database_name)
-            if os.path.exists(main_database_path):
-                database_list.append(main_database_path)
+            main_XMLdatabase_path = os.path.join(main_virtualdj_path, XMLdatabase_name)
+            if os.path.exists(main_XMLdatabase_path):
+                database_list.append(main_XMLdatabase_path)
 
         if system == "Windows":
             appData_Local = os.getenv('LOCALAPPDATA')
-            main_database_path = os.path.join(appData_Local, 'VirtualDJ', database_name)
-            database_list.append(main_database_path)
+            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', XMLdatabase_name)
+            if os.path.exists(main_XMLdatabase_path):
+                database_list.append(main_XMLdatabase_path)
 
-            computer_drives_windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+            drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 
-            for drive in computer_drives_windows:
+            for drive in drives_Windows:
                 drive_full = drive + "\\"
-                external_database_path = os.path.join(drive_full,'VirtualDJ', database_name)
-                if os.path.exists(external_database_path):
-                    database_list.append(external_database_path)
+                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', XMLdatabase_name)
+                if os.path.exists(external_XMLdatabase_path):
+                    database_list.append(external_XMLdatabase_path)
 
             database_list_noduplicates = list(dict.fromkeys(database_list))
 
@@ -345,6 +365,7 @@ class VirtualDJClient:
         tree = ET.parse(database_path)
         root = tree.getroot()
         root_tag = root.tag
+        id = 0
 
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
@@ -352,10 +373,26 @@ class VirtualDJClient:
             if readAllSongs:
                 for child in root:
                     child_tag = child.tag
-                    if child_tag == "Song":
+                    if child_tag in ["Song"]:
+                        i = 0
+                        id = id + 1
                         child_attrib = child.attrib
-                        print(child_attrib)
+                        child_text = child.text
+                        print(child_tag + str(id)+ ": " + str(child_attrib))
                         for subchild in child:
                             subchild_tag = subchild.tag
-                            if subchild_tag in ["Tags","Infos","Scan","Comment","Poi", "CustomMix","Link"]:
+                            if subchild_tag in ["Tags","Infos","Scan","CustomMix","Link"]:
                                subchild_attrib = subchild.attrib
+                               subchild_text = subchild.text
+                               print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                            elif subchild_tag in ["Poi"]:
+                               i = i + 1
+                               subchild_attrib = subchild.attrib
+                               subchild_text = subchild.text
+                               print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
+                            elif subchild_tag in ["Comment"]:
+                                subchild_attrib = subchild.attrib
+                                subchild_text = subchild.text
+                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text)
+                            else:
+                                print(f"subchild_tag < {subchild_tag} > not defined")
