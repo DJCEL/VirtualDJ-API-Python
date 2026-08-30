@@ -264,6 +264,10 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     # VirtualDJ databases
     #------------------------------------------------------------------------------------
+    class VdjSong:
+       FilePath: str
+       FileSize: int
+#------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
         database_name = "database.xml"
