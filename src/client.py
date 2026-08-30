@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.15'
+__version__ = '1.0.16'
 
 import httpx
 import asyncio
@@ -157,10 +157,10 @@ class VirtualDJClient:
 
     #------------------------------------------------------------------------------------
     async def send_async(self, vdj_script: str) -> bool:
-        return self._execute_vdj_script(vdj_script)
+        return await self._execute_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
     async def get_async(self, vdj_script: str) -> str:
-        return self._query_vdj_script(vdj_script)
+        return await self._query_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str) -> bool:
         return asyncio.run(self.send_async(vdj_script))
@@ -262,7 +262,7 @@ class VirtualDJClient:
             return True
     #------------------------------------------------------------------------------------
     async def is_connected_async(self) -> bool:
-        return self._is_virtualdj_connected()
+        return await self._is_virtualdj_connected()
     #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
         return asyncio.run(self.is_connected_async()) 
@@ -292,6 +292,11 @@ class VirtualDJClient:
         Pos: float
         Type: str
         Point: str
+        Num: int
+        Bpm: float
+        Phrase: int
+        Size: float
+        Slot: int
    #------------------------------------------------------------------------------------
     class VdjSong():
        FilePath: str
@@ -301,8 +306,8 @@ class VirtualDJClient:
        Tags_Title: str
        Tags_Year: int
        Tags_Genre: str
-       Tags_Bpm: int
-       Tags_Key: int
+       Tags_Bpm: float
+       Tags_Key: str
        Tags_Album: str
        Tags_Composer: str
        Tags_Label: str
@@ -323,7 +328,7 @@ class VirtualDJClient:
        Infos_PlayCount: int
        Infos_Bitrate: int
        Infos_Cover: int
-       Infos_Color: str
+       Infos_Color: int
        Infos_Corrupted: int
        Infos_Gain: int
        Infos_UserColor: str
@@ -339,12 +344,20 @@ class VirtualDJClient:
        Scan_Flag: int
        Scan_Beatgrid: list[str]
        Poi: list[VdjPoi]
+       CustomMix: str
        Link_NetSearch: str
        Link_Cover: str
+       Link_clouddriveId: str
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
         xml_database_name = "database.xml"
+        sqlite1_database_name = "extra.db"
+        sqlite2_database_name = "cache.db"
+
+        # sqlite1_tables_name = ["lyrics","related_tracks","track_data"]
+        # sqlite2_tables_name = ["waveforms"]
+
         system = platform.system()
 
         client_connected = self.is_connected()
@@ -353,6 +366,12 @@ class VirtualDJClient:
             main_XMLdatabase_path = os.path.join(main_virtualdj_path, xml_database_name)
             if os.path.exists(main_XMLdatabase_path):
                 database_list.append(main_XMLdatabase_path)
+            main_SQLite1database_path = os.path.join(main_virtualdj_path,'VirtualDJ', sqlite1_database_name)
+            if os.path.exists(main_SQLite1database_path):
+                database_list.append(main_SQLite1database_path)
+            main_SQLite2database_path = os.path.join(main_virtualdj_path,'VirtualDJ', 'Cache', sqlite2_database_name)
+            if os.path.exists(main_SQLite2database_path):
+                database_list.append(main_SQLite2database_path)
 
         if system == "Windows":
             appData_Local = os.getenv('LOCALAPPDATA')
@@ -360,6 +379,12 @@ class VirtualDJClient:
                 main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
                 if os.path.exists(main_XMLdatabase_path):
                     database_list.append(main_XMLdatabase_path)
+                main_SQLite1database_path = os.path.join(appData_Local,'VirtualDJ', sqlite1_database_name)
+                if os.path.exists(main_SQLite1database_path):
+                    database_list.append(main_SQLite1database_path)
+                main_SQLite2database_path = os.path.join(appData_Local,'VirtualDJ', 'Cache', sqlite2_database_name)
+                if os.path.exists(main_SQLite2database_path):
+                    database_list.append(main_SQLite2database_path)
 
             drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
 
@@ -368,6 +393,12 @@ class VirtualDJClient:
                 external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', xml_database_name)
                 if os.path.exists(external_XMLdatabase_path):
                     database_list.append(external_XMLdatabase_path)
+                external_SQLite1database_path = os.path.join(drive_full,'VirtualDJ', sqlite1_database_name)
+                if os.path.exists(external_SQLite1database_path):
+                    database_list.append(external_SQLite1database_path)
+                external_SQLite2database_path = os.path.join(drive_full,'VirtualDJ', 'Cache', sqlite2_database_name)
+                if os.path.exists(external_SQLite2database_path):
+                    database_list.append(external_SQLite2database_path)
 
             database_list_noduplicates = list(dict.fromkeys(database_list))
 

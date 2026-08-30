@@ -1,4 +1,5 @@
 import sys
+import os
 from rich.console import Console
 
 from client import VirtualDJClient
@@ -158,9 +159,11 @@ def main():
     # List of VirtualDJ local database
     database_list = client.get_local_database_list()
     console.print(f"VirtualDJ database list => {database_list}")
-    for db in database_list:
-        console.print(f"VirtualDJ database reading => {db}")
-        client.read_local_XMLdatabase(db, readAllSongs=False)
+    for db_path in database_list:
+        console.print(f"VirtualDJ database reading => {db_path}")
+        file_extension = os.path.splitext(db_path)[1]
+        if (file_extension.lower() == ".xml"):
+            client.read_local_XMLdatabase(db_path, readAllSongs=False)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
