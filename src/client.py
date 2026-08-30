@@ -167,10 +167,10 @@ class VirtualDJClient:
         return self._query_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str) -> bool:
-        return asyncio.run(self._execute_vdj_script(vdj_script))
+        return asyncio.run(self.send_async(vdj_script))
     #------------------------------------------------------------------------------------
     def get(self, vdj_script: str) -> str:
-        return asyncio.run(self._query_vdj_script(vdj_script))
+        return asyncio.run(self.get_async(vdj_script))
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
