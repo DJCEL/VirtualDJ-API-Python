@@ -367,15 +367,17 @@ class VirtualDJClient:
         root_tag = root.tag
         id = 0
 
+        Song_XMLTag = "Song"
+
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
             print(f"VirtualDJ database reading => {root_attrib}")
-            songs_count = len(root.findall(".//Song"))
+            songs_count = len(root.findall(".//" +  Song_XMLTag))
             print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
             if readAllSongs:
                 for child in root:
                     child_tag = child.tag
-                    if child_tag in ["Song"]:
+                    if child_tag == Song_XMLTag:
                         i = 0
                         id = id + 1
                         child_attrib = child.attrib
