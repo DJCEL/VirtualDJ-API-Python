@@ -327,19 +327,19 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
-        XMLdatabase_name = "database.xml"
+        xml_database_name = "database.xml"
         system = platform.system()
 
         client_connected = self.is_connected()
         if client_connected == True:
             main_virtualdj_path = self.get("get_vdj_folder")
-            main_XMLdatabase_path = os.path.join(main_virtualdj_path, XMLdatabase_name)
+            main_XMLdatabase_path = os.path.join(main_virtualdj_path, xml_database_name)
             if os.path.exists(main_XMLdatabase_path):
                 database_list.append(main_XMLdatabase_path)
 
         if system == "Windows":
             appData_Local = os.getenv('LOCALAPPDATA')
-            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', XMLdatabase_name)
+            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
             if os.path.exists(main_XMLdatabase_path):
                 database_list.append(main_XMLdatabase_path)
 
@@ -347,7 +347,7 @@ class VirtualDJClient:
 
             for drive in drives_Windows:
                 drive_full = drive + "\\"
-                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', XMLdatabase_name)
+                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', xml_database_name)
                 if os.path.exists(external_XMLdatabase_path):
                     database_list.append(external_XMLdatabase_path)
 
