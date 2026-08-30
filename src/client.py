@@ -327,19 +327,19 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
-        XMLdatabase_name = "database.xml"
+        xml_database_name = "database.xml"
         system = platform.system()
 
         client_connected = self.is_connected()
         if client_connected == True:
             main_virtualdj_path = self.get("get_vdj_folder")
-            main_XMLdatabase_path = os.path.join(main_virtualdj_path, XMLdatabase_name)
+            main_XMLdatabase_path = os.path.join(main_virtualdj_path, xml_database_name)
             if os.path.exists(main_XMLdatabase_path):
                 database_list.append(main_XMLdatabase_path)
 
         if system == "Windows":
             appData_Local = os.getenv('LOCALAPPDATA')
-            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', XMLdatabase_name)
+            main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
             if os.path.exists(main_XMLdatabase_path):
                 database_list.append(main_XMLdatabase_path)
 
@@ -347,7 +347,7 @@ class VirtualDJClient:
 
             for drive in drives_Windows:
                 drive_full = drive + "\\"
-                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', XMLdatabase_name)
+                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', xml_database_name)
                 if os.path.exists(external_XMLdatabase_path):
                     database_list.append(external_XMLdatabase_path)
 
@@ -368,21 +368,21 @@ class VirtualDJClient:
         id = 0
         songs_count = 0
 
-        XMLTag_Song = ["Song"]
-        XMLTag_Song_Data = ["Tags","Infos","Scan","CustomMix","Link"]
-        XMLTag_Song_Poi = ["Poi"]
-        XMLTag_Song_Comment = ["Comment"]
+        xmlTag_Song = ["Song"]
+        xmlTag_Song_Data = ["Tags","Infos","Scan","CustomMix","Link"]
+        xmlTag_Song_Poi = ["Poi"]
+        xmlTag_Song_Comment = ["Comment"]
 
 
         if root_tag == "VirtualDJ_Database":
             root_attrib = root.attrib
             print(f"VirtualDJ database reading => {root_attrib}")
-            songs_count = len(root.findall(".//" +  XMLTag_Song[0]))
+            songs_count = len(root.findall(".//" +  xmlTag_Song[0]))
             print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
             if readAllSongs:
                 for child in root:
                     child_tag = child.tag
-                    if child_tag in XMLTag_Song:
+                    if child_tag in xmlTag_Song:
                         i = 0
                         id = id + 1
                         child_attrib = child.attrib
@@ -390,16 +390,16 @@ class VirtualDJClient:
                         print(child_tag + str(id)+ ": " + str(child_attrib))
                         for subchild in child:
                             subchild_tag = subchild.tag
-                            if subchild_tag in XMLTag_Song_Data:
+                            if subchild_tag in xmlTag_Song_Data:
                                subchild_attrib = subchild.attrib
                                subchild_text = subchild.text
                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                            elif subchild_tag in XMLTag_Song_Poi:
+                            elif subchild_tag in xmlTag_Song_Poi:
                                i = i + 1
                                subchild_attrib = subchild.attrib
                                subchild_text = subchild.text
                                print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                            elif subchild_tag in XMLTag_Song_Comment:
+                            elif subchild_tag in xmlTag_Song_Comment:
                                 subchild_attrib = subchild.attrib
                                 subchild_text = subchild.text
                                 print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
