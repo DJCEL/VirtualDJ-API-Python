@@ -267,6 +267,34 @@ class VirtualDJClient:
     class VdjSong:
        FilePath: str
        FileSize: int
+       Flag: int
+       Tags_Flag: int
+       Tags_Author: str
+       Tags_Title: str
+       Tags_Year: int
+       Tags_Genre: str
+       Tags_Bpm: int
+       Tags_Key: int
+       Tags_Album: str
+       Tags_Composer: str
+       Tags_Label: str
+       Tags_TrackNumber: str
+       Tags_Remix: str
+       Tags_Stars: int
+       Tags_Remixer: str
+       Tags_Grouping: str
+       Tags_User1: str
+       Tags_User2: str
+       Tags_Internal: str
+       Scan_Version: str
+       Scan_Flag: int
+       Scan_Volume: int
+       Scan_Bpm: int
+       Scan_AltBpm: int
+       Scan_Key: str
+       Infos_SongLength: int
+       Infos_Bitrate: int
+  
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
         database_list = []
