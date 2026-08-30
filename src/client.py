@@ -192,21 +192,20 @@ class VirtualDJClient:
         else:
             return False
 
-        if not os.path.exists(app_path):
-            raise FileNotFoundError(f"VirtualDJ not found: {app_path}")
-            _SaveClientLog(f"VirtualDJ not found: {app_path}")
-            return False
-
         # TODO: check if updates are activated in VirtualDJ via settings.xml
 
-        # Open the application in background:
         try:
+            # Open the application in background:
             subprocess.Popen([app_path], 
                              stdin=subprocess.DEVNULL, 
                              stdout=subprocess.DEVNULL,
                              stderr=subprocess.DEVNULL,
                              creationflags=subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS,
                              start_new_session=True)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"VirtualDJ not found: {app_path}")
+            _SaveClientLog(f"VirtualDJ not found: {app_path}")
+            return False
         except Exception as e:
             msg =  app_path + "\n" + str(e)
             print(msg)
