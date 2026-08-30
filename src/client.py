@@ -294,6 +294,16 @@ class VirtualDJClient:
        Scan_Key: str
        Infos_SongLength: int
        Infos_Bitrate: int
+       Infos_Cover: str
+       Infos_Color: str
+       Infos_FirstSeen: str
+       Infos_FirstPlay: str
+       Infos_LastPlay: str
+       Infos_PlayCount: int
+       Infos_Corrupted: int
+       Infos_Gain: int
+       Infos_UserColor: str
+       Comment: str
   
     #------------------------------------------------------------------------------------
     def get_local_database_list(self):
