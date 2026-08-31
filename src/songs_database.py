@@ -218,18 +218,14 @@ class VirtualDJSongsDatabase:
             i = 0
             for subchild in song_el:
                 subchild_tag = subchild.tag
+                subchild_attrib = subchild.attrib
+                subchild_text = subchild.text
                 if subchild_tag in ["Tags","Infos","Scan","CustomMix","Link"]:
-                    subchild_attrib = subchild.attrib
-                    subchild_text = subchild.text
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
                 elif subchild_tag == "Poi":
                     i = i + 1
-                    subchild_attrib = subchild.attrib
-                    subchild_text = subchild.text
                     print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
                 elif subchild_tag  == "Comment":
-                    subchild_attrib = subchild.attrib
-                    subchild_text = subchild.text
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
                 else:
                     print(f"subchild_tag < {subchild_tag} > not defined")
