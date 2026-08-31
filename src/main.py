@@ -169,7 +169,7 @@ def main():
         console.print(f"VirtualDJ database reading => {db_path}")
         file_extension = os.path.splitext(db_path)[1]
         if (file_extension.lower() == ".xml"):
-            songsDB.read_local_xml_database(db_path, read_all_songs=True)
+            songsDB.read_local_xml_database(db_path, read_all_songs=False)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
