@@ -187,46 +187,51 @@ class VirtualDJSongsDatabase:
             return []
 
 
-        xmlTag_Song = ["Song"]
-        xmlTag_Song_Data = ["Tags","Infos","Scan","CustomMix","Link"]
-        xmlTag_Song_Poi = ["Poi"]
-        xmlTag_Song_Comment = ["Comment"]
-
-
-        songs_elements = root.findall(".//" +  xmlTag_Song[0])        
-        songs_count = len(songs_elements)
+        xmlTag_Song = "Song"
+        songs_list = root.findall(".//" +  xmlTag_Song)        
+        songs_list_count = len(songs_list)
 
         print(f"VirtualDJ database reading => {root_attrib}")
-        print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
+        print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
 
         if not read_all_songs:
             return []
 
         id = 0
-        for child in root:
-            child_tag = child.tag
-            if child_tag in xmlTag_Song:
-                i = 0
-                id = id + 1
-                child_attrib = child.attrib
-                child_text = child.text
-                print(child_tag + str(id)+ ": " + str(child_attrib))
-                for subchild in child:
-                    subchild_tag = subchild.tag
-                    if subchild_tag in xmlTag_Song_Data:
-                        subchild_attrib = subchild.attrib
-                        subchild_text = subchild.text
-                        print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                    elif subchild_tag in xmlTag_Song_Poi:
-                        i = i + 1
-                        subchild_attrib = subchild.attrib
-                        subchild_text = subchild.text
-                        print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                    elif subchild_tag in xmlTag_Song_Comment:
-                        subchild_attrib = subchild.attrib
-                        subchild_text = subchild.text
-                        print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
-                    else:
-                        print(f"subchild_tag < {subchild_tag} > not defined")
+        return [self._parse_song(id, song) for song in songs_list]
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _parse_song(id:int, song_el: ET.Element) -> VdjSong:
+            song_el_tag = song_el.tag
+            song_el_attrib = song_el.attrib
+            song_el_text = song_el.text
+            id = id + 1
+            print(song_el_tag + str(id)+ ": " + str(song_el_attrib))
+
+            song = VdjSong(
+                FilePath = song_el_attrib.get("FilePath"),
+                FileSize = _to_int(song_el_attrib.get("FileSize")),
+                Flag = _to_int(song_el_attrib.get("Flag"))
+            )
+
+
+            i = 0
+            for subchild in song_el:
+                subchild_tag = subchild.tag
+                if subchild_tag in ["Tags","Infos","Scan","CustomMix","Link"]:
+                    subchild_attrib = subchild.attrib
+                    subchild_text = subchild.text
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                elif subchild_tag == "Poi":
+                    i = i + 1
+                    subchild_attrib = subchild.attrib
+                    subchild_text = subchild.text
+                    print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
+                elif subchild_tag  == "Comment":
+                    subchild_attrib = subchild.attrib
+                    subchild_text = subchild.text
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
+                else:
+                    print(f"subchild_tag < {subchild_tag} > not defined")
        
-        return []
+            return song
