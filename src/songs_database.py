@@ -1,119 +1,156 @@
- 
+#------------------------------------------------------------------------------------
+# VirtualDJ databases
+#------------------------------------------------------------------------------------
 import os
 import platform
 import xml.etree.ElementTree as ET
-from typing import Literal, TypedDict
+from typing import Optional, Any, Union
+from dataclasses import dataclass, field
+from pathlib import Path
+from enum import Enum
 
-__version__ = '1.0.5'
+__version__ = '1.0.6'
  
- 
-class VirtualDJSongsDatabase:
-    #------------------------------------------------------------------------------------
-    # VirtualDJ databases
-    #------------------------------------------------------------------------------------
-    class VDJPoiType:
-        name : Literal['automix','beatgrid','remix']
-    #------------------------------------------------------------------------------------
-    class VDJPoiPoint:
-        name : Literal['realStart','realEnd','fadeStart','fadeEnd','cutStart','cutEnd','tempoStart','tempoEnd']
-    #------------------------------------------------------------------------------------
-    class VdjPoi(TypedDict):
-        Name: str
-        Pos: float
-        Type: str
-        Point: str
-        Num: int
-        Bpm: float
-        Phrase: int
-        Size: float
-        Slot: int
-   #------------------------------------------------------------------------------------
-    class VdjSong():
+#------------------------------------------------------------------------------------
+def _to_float(value: Optional[str]) -> Optional[float]:
+    try:
+        return float(value) if value  is not None else None
+    except ValueError:
+        return None
+#------------------------------------------------------------------------------------
+def _to_int(value: Optional[str]) -> Optional[int]:
+    try:
+        return int(value) if value  is not None else None
+    except ValueError:
+        return None
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjPoi:
+        name: Optional[str] = None
+        pos: Optional[float] = None
+        type: Optional[str] = None
+        point: Optional[str] = None
+        num: Optional[int] = None
+        bpm: Optional[float] = None
+        phrase: Optional[int] = None
+        size: Optional[float] = None
+        slot: Optional[int] = None
+        #------------------------------------------------------------------------------------
+        class PoiType(str, Enum):
+            AUTOMIX = "automix"
+            BEATGRID = "beatgrid"
+            REMIX = "remix"
+        #------------------------------------------------------------------------------------
+        class PoiPoint(str, Enum):
+            REAL_START = "realStart"
+            REAL_END = "realEnd"
+            FADE_START = "fadeStart"
+            FADE_END = "fadeEnd"
+            CUT_START = "cutStart"
+            CUT_END = "cutEnd"
+            TEMPO_START = "tempoStart"
+            TEMPO_END = "tempoEnd"
+        #------------------------------------------------------------------------------------
+        @classmethod
+        def from_xml(cls, attrib: dict) -> Any:
+            return cls(
+                name = attrib.get("Name"),
+                pos = _to_float(attrib.get("Pos")),
+                type = attrib.get("Type"),
+                point = attrib.get("Point"),
+                num = _to_int(attrib.get("Num")),
+                bpm = _to_float(attrib.get("Bpm")),
+                phrase = _to_int(attrib.get("Phrase")),
+                size = _to_float(attrib.get("Size")),
+                slot = _to_int(attrib.get("Slot)")),
+            )
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjSong:
        FilePath: str
        FileSize: int
        Flag: int
-       Tags_Author: str
-       Tags_Title: str
-       Tags_Year: int
-       Tags_Genre: str
-       Tags_Bpm: float
-       Tags_Key: str
-       Tags_Album: str
-       Tags_Composer: str
-       Tags_Label: str
-       Tags_TrackNumber: str
-       Tags_Remix: str
-       Tags_Stars: int
-       Tags_Remixer: str
-       Tags_Grouping: str
-       Tags_User1: str
-       Tags_User2: str
-       Tags_Internal: str
-       Tags_Flag: int
-       Infos_SongLength: float
-       Infos_LastModified: int
-       Infos_FirstSeen: int
-       Infos_FirstPlay: int
-       Infos_LastPlay: int
-       Infos_PlayCount: int
-       Infos_Bitrate: int
-       Infos_Cover: int
-       Infos_Color: int
-       Infos_Corrupted: int
-       Infos_Gain: int
-       Infos_UserColor: str
-       Comment: str
-       Scan_Version: int
-       Scan_Bpm: float
-       Scan_Phase: float
-       Scan_AltBpm: float
-       Scan_Rigid: float
-       Scan_Volume: float
-       Scan_Key: str
-       Scan_AudioSig: str
-       Scan_Flag: int
-       Scan_Beatgrid: list[str]
-       Poi: list[VdjPoi]
-       CustomMix: str
-       Link_NetSearch: str
-       Link_Cover: str
-       Link_clouddriveId: str
+       Tags_Author: Optional[str] = None
+       Tags_Title: Optional[str] = None
+       Tags_Year: Optional[int] = None
+       Tags_Genre: Optional[str] = None
+       Tags_Bpm: Optional[float] = None
+       Tags_Key: Optional[str] = None
+       Tags_Album: Optional[str] = None
+       Tags_Composer: Optional[str] = None
+       Tags_Label: Optional[str] = None
+       Tags_TrackNumber: Optional[str] = None
+       Tags_Remix: Optional[str] = None
+       Tags_Stars: Optional[int] = None
+       Tags_Remixer: Optional[str] = None
+       Tags_Grouping: Optional[str] = None
+       Tags_User1: Optional[str] = None
+       Tags_User2: Optional[str] = None
+       Tags_Internal: Optional[str] = None
+       Tags_Flag: Optional[int] = None
+       Infos_SongLength: Optional[float] = None
+       Infos_LastModified: Optional[int] = None
+       Infos_FirstSeen: Optional[int] = None
+       Infos_FirstPlay: Optional[int] = None
+       Infos_LastPlay: Optional[int] = None
+       Infos_PlayCount: Optional[int] = None
+       Infos_Bitrate: Optional[int] = None
+       Infos_Cover: Optional[int] = None
+       Infos_Color: Optional[int] = None
+       Infos_Corrupted: Optional[int] = None
+       Infos_Gain: Optional[int] = None
+       Infos_UserColor: Optional[str] = None
+       Comment: Optional[str] = None
+       Scan_Version: Optional[int] = None
+       Scan_Bpm: Optional[float] = None
+       Scan_Phase: Optional[float] = None
+       Scan_AltBpm: Optional[float] = None
+       Scan_Rigid: Optional[float] = None
+       Scan_Volume: Optional[float] = None
+       Scan_Key: Optional[str] = None
+       Scan_AudioSig: Optional[str] = None
+       Scan_Flag: Optional[int] = None
+       Scan_Beatgrid: Optional[list[str]] = None
+       Poi: Optional[list[VdjPoi]] = None
+       CustomMix: Optional[str] = None
+       Link_NetSearch: Optional[str] = None
+       Link_Cover: Optional[str] = None
+       Link_clouddriveId: Optional[str] = None
+#------------------------------------------------------------------------------------ 
+class VirtualDJSongsDatabase:
+    XML_DATABASE_NAME = "database.xml"
+    SQLITE_EXTRA_DB = "extra.db"
+    SQLITE_CACHE_DB = "cache.db"
+    SQLITE_EXTRA_DB_TABLES = ["lyrics","related_tracks","track_data"]
+    SQLITE_CACHE_DB_TABLES = ["waveforms"]
     #------------------------------------------------------------------------------------
-    def get_local_database_list(self):
-        database_list = []
-        xml_database_name = "database.xml"
-        sqlite1_database_name = "extra.db"
-        sqlite2_database_name = "cache.db"
-
-        # sqlite1_tables_name = ["lyrics","related_tracks","track_data"]
-        # sqlite2_tables_name = ["waveforms"]
-
+    def get_local_database_list(self) -> list[Path]:
         system = platform.system()
+        database_list : list[Path]= []
 
         if system == "Windows":
-            appData_Local = os.getenv('LOCALAPPDATA')
-            if appData_Local:
-                main_XMLdatabase_path = os.path.join(appData_Local, 'VirtualDJ', xml_database_name)
+            local_appdata = os.getenv('LOCALAPPDATA')
+            if local_appdata:
+                main_XMLdatabase_path = os.path.join(local_appdata, 'VirtualDJ', self.XML_DATABASE_NAME)
                 if os.path.exists(main_XMLdatabase_path):
                     database_list.append(main_XMLdatabase_path)
-                main_SQLite1database_path = os.path.join(appData_Local,'VirtualDJ', sqlite1_database_name)
+                main_SQLite1database_path = os.path.join(local_appdata,'VirtualDJ', self.SQLITE_EXTRA_DB)
                 if os.path.exists(main_SQLite1database_path):
                     database_list.append(main_SQLite1database_path)
-                main_SQLite2database_path = os.path.join(appData_Local,'VirtualDJ', 'Cache', sqlite2_database_name)
+                main_SQLite2database_path = os.path.join(local_appdata,'VirtualDJ', 'Cache', self.SQLITE_CACHE_DB)
                 if os.path.exists(main_SQLite2database_path):
                     database_list.append(main_SQLite2database_path)
 
-            drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
-
+            drives_Windows = self._windows_drive_roots()
             for drive in drives_Windows:
                 drive_full = drive + "\\"
-                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', xml_database_name)
+                external_XMLdatabase_path = os.path.join(drive_full,'VirtualDJ', self.XML_DATABASE_NAME)
                 if os.path.exists(external_XMLdatabase_path):
                     database_list.append(external_XMLdatabase_path)
-                external_SQLite1database_path = os.path.join(drive_full,'VirtualDJ', sqlite1_database_name)
+                external_SQLite1database_path = os.path.join(drive_full,'VirtualDJ', self.SQLITE_EXTRA_DB)
                 if os.path.exists(external_SQLite1database_path):
                     database_list.append(external_SQLite1database_path)
-                external_SQLite2database_path = os.path.join(drive_full,'VirtualDJ', 'Cache', sqlite2_database_name)
+                external_SQLite2database_path = os.path.join(drive_full,'VirtualDJ', 'Cache', self.SQLITE_CACHE_DB)
                 if os.path.exists(external_SQLite2database_path):
                     database_list.append(external_SQLite2database_path)
 
@@ -122,17 +159,33 @@ class VirtualDJSongsDatabase:
             return database_list_noduplicates
 
         elif system == "Darwin":
-            #TODO: list of drives
+            # Path.home() / "Library" / 
             return database_list
 
         return database_list
     #------------------------------------------------------------------------------------
-    def read_local_XMLdatabase(self, database_path: str, readAllSongs: bool = False):
-        tree = ET.parse(database_path)
+    @staticmethod
+    def _windows_drive_roots() -> list[Path]:
+        drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+        return drives_Windows
+    #------------------------------------------------------------------------------------
+    def read_local_xml_database(self, database_path: Union[str,Path], read_all_songs: bool = False) -> list[VdjSong]:
+        try:
+            tree = ET.parse(database_path)
+        except ET.ParseError as exc:
+            print(f"Invalid VirtualDJ XML database: {database_path}")
+            return []
+        except OSError as exc:
+            print(f"Cannot read database: {database_path}")
+            return []
+
         root = tree.getroot()
         root_tag = root.tag
-        id = 0
-        songs_count = 0
+        root_attrib = root.attrib
+        if root_tag != "VirtualDJ_Database":
+            print(f"Not a VirtualDJ database file: {database_path}")
+            return []
+
 
         xmlTag_Song = ["Song"]
         xmlTag_Song_Data = ["Tags","Infos","Scan","CustomMix","Link"]
@@ -140,34 +193,40 @@ class VirtualDJSongsDatabase:
         xmlTag_Song_Comment = ["Comment"]
 
 
-        if root_tag == "VirtualDJ_Database":
-            root_attrib = root.attrib
-            print(f"VirtualDJ database reading => {root_attrib}")
-            songs_count = len(root.findall(".//" +  xmlTag_Song[0]))
-            print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
-            if readAllSongs:
-                for child in root:
-                    child_tag = child.tag
-                    if child_tag in xmlTag_Song:
-                        i = 0
-                        id = id + 1
-                        child_attrib = child.attrib
-                        child_text = child.text
-                        print(child_tag + str(id)+ ": " + str(child_attrib))
-                        for subchild in child:
-                            subchild_tag = subchild.tag
-                            if subchild_tag in xmlTag_Song_Data:
-                               subchild_attrib = subchild.attrib
-                               subchild_text = subchild.text
-                               print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                            elif subchild_tag in xmlTag_Song_Poi:
-                               i = i + 1
-                               subchild_attrib = subchild.attrib
-                               subchild_text = subchild.text
-                               print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                            elif subchild_tag in xmlTag_Song_Comment:
-                                subchild_attrib = subchild.attrib
-                                subchild_text = subchild.text
-                                print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
-                            else:
-                                print(f"subchild_tag < {subchild_tag} > not defined")
+        songs_elements = root.findall(".//" +  xmlTag_Song[0])        
+        songs_count = len(songs_elements)
+
+        print(f"VirtualDJ database reading => {root_attrib}")
+        print(f"VirtualDJ database reading => Number of songs found = {songs_count}")
+
+        if not read_all_songs:
+            return []
+
+        id = 0
+        for child in root:
+            child_tag = child.tag
+            if child_tag in xmlTag_Song:
+                i = 0
+                id = id + 1
+                child_attrib = child.attrib
+                child_text = child.text
+                print(child_tag + str(id)+ ": " + str(child_attrib))
+                for subchild in child:
+                    subchild_tag = subchild.tag
+                    if subchild_tag in xmlTag_Song_Data:
+                        subchild_attrib = subchild.attrib
+                        subchild_text = subchild.text
+                        print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                    elif subchild_tag in xmlTag_Song_Poi:
+                        i = i + 1
+                        subchild_attrib = subchild.attrib
+                        subchild_text = subchild.text
+                        print(child_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
+                    elif subchild_tag in xmlTag_Song_Comment:
+                        subchild_attrib = subchild.attrib
+                        subchild_text = subchild.text
+                        print(child_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
+                    else:
+                        print(f"subchild_tag < {subchild_tag} > not defined")
+       
+        return []
