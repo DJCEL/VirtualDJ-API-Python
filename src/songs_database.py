@@ -68,8 +68,8 @@ class VdjPoi:
 @dataclass
 class VdjSong:
        FilePath: str
-       FileSize: int
        Flag: int
+       FileSize: Optional[int] = None
        Tags_Author: Optional[str] = None
        Tags_Title: Optional[str] = None
        Tags_Year: Optional[int] = None
@@ -198,6 +198,7 @@ class VirtualDJSongsDatabase:
             return []
 
         id = 0
+    
         return [self._parse_song(id, song) for song in songs_list]
     #------------------------------------------------------------------------------------
     @staticmethod
@@ -207,13 +208,12 @@ class VirtualDJSongsDatabase:
             song_el_text = song_el.text
             id = id + 1
             print(song_el_tag + str(id)+ ": " + str(song_el_attrib))
-
             song = VdjSong(
                 FilePath = song_el_attrib.get("FilePath"),
-                FileSize = _to_int(song_el_attrib.get("FileSize")),
                 Flag = _to_int(song_el_attrib.get("Flag"))
             )
 
+            song.FileSize = _to_int(song_el_attrib.get("FileSize")),
 
             i = 0
             for subchild in song_el:
@@ -222,10 +222,18 @@ class VirtualDJSongsDatabase:
                 subchild_text = subchild.text
                 if subchild_tag == "Tags":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                    song.Tags_Author = subchild_attrib.get("Author")
+                    song.Tags_Title = subchild_attrib.get("Title")
                 elif subchild_tag == "Infos":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                    song.Infos_SongLength =  _to_float(subchild_attrib.get("SongLength"))
                 elif subchild_tag == "Scan":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                    song.Scan_Version =  _to_int(subchild_attrib.get("Version"))
+                    song.Scan_Flag =  _to_int(subchild_attrib.get("Flag"))
+                    song.Scan_Bpm =  _to_float(subchild_attrib.get("Bpm"))
+                    song.Scan_Key =  subchild_attrib.get("Key")
+                    song.Scan_Phase =  subchild_attrib.get("Phase")
                 elif subchild_tag == "CustomMix":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
                 elif subchild_tag == "Link":
