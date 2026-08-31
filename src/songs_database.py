@@ -220,7 +220,15 @@ class VirtualDJSongsDatabase:
                 subchild_tag = subchild.tag
                 subchild_attrib = subchild.attrib
                 subchild_text = subchild.text
-                if subchild_tag in ["Tags","Infos","Scan","CustomMix","Link"]:
+                if subchild_tag == "Tags":
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                elif subchild_tag == "Infos":
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                elif subchild_tag == "Scan":
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                elif subchild_tag == "CustomMix":
+                    print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
+                elif subchild_tag == "Link":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
                 elif subchild_tag == "Poi":
                     i = i + 1
