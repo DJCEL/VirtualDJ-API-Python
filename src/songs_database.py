@@ -224,6 +224,7 @@ class VirtualDJSongsDatabase:
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
                     song.Tags_Author = subchild_attrib.get("Author")
                     song.Tags_Title = subchild_attrib.get("Title")
+                    song.Tags_Remix = subchild_attrib.get("Remix")
                 elif subchild_tag == "Infos":
                     print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
                     song.Infos_SongLength =  _to_float(subchild_attrib.get("SongLength"))
