@@ -28,13 +28,15 @@
     <InterpreterReference Include="Global|PythonCore|3.14" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\songs_database.py" />
+    <Compile Include="src\client\songs_database.py" />
+    <Compile Include="src\client\__init__.py" />
     <Compile Include="src\main.py" />
-    <Compile Include="src\config.py" />
-    <Compile Include="src\client.py" />
+    <Compile Include="src\client\config.py" />
+    <Compile Include="src\client\client.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
+    <Folder Include="src\client\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.17'
+__version__ = '1.0.18'
 
 import httpx
 import asyncio
@@ -14,8 +14,8 @@ import subprocess
 import platform
 
 
-from config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
-from config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC
+from .config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT, VDJ_NETWORK_CONTROL_DEBUG
+from .config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC
 
 logger = logging.getLogger(__name__)
 
@@ -68,11 +68,12 @@ class VirtualDJClient:
         encoded_vdjscript = encodeURI(vdj_script)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
-        if self._client is None:
-             self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
-
         try:
-            response = await self._client.get(vdj_url_full, headers=headers)
+            client = self._client
+            if client  is None:
+                 client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
+
+            response = await client.get(vdj_url_full, headers=headers)
             status_code = response.status_code
             if status_code == 200:
                 encoding = response.encoding
@@ -98,6 +99,7 @@ class VirtualDJClient:
                 status = "error"
                 result = f"{response.text}"
                 return {"status": status, "status_code": status_code, "result": result}
+
         except httpx.ConnectError:
             status = "error"
             status_code = -1
@@ -154,7 +156,6 @@ class VirtualDJClient:
             result_final = result.get("result", "Unknown error")
             _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
-
     #------------------------------------------------------------------------------------
     async def send_async(self, vdj_script: str) -> bool:
         return await self._execute_vdj_script(vdj_script)

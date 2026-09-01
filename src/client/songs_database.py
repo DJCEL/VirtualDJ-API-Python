@@ -5,11 +5,13 @@ import os
 import platform
 import xml.etree.ElementTree as ET
 from typing import Optional, Any, Union
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
+import sqlite3
+from contextlib import closing
 
-__version__ = '1.0.7'
+__version__ = '1.0.8'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -117,14 +119,12 @@ class VdjSong:
     Scan: Optional[VdjSongScan] = None
     Poi: Optional[list[VdjSongPoi]] = None
     CustomMix: Optional[str] = None
-    Link: Optional[VdjSongScanLink] = None
+    Link: Optional[VdjSongLink] = None
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase:
     XML_DATABASE_NAME = "database.xml"
     SQLITE_EXTRA_DB = "extra.db"
     SQLITE_CACHE_DB = "cache.db"
-    SQLITE_EXTRA_DB_TABLES = ["lyrics","related_tracks","track_data"]
-    SQLITE_CACHE_DB_TABLES = ["waveforms"]
     #------------------------------------------------------------------------------------
     def get_local_database_list(self) -> list[Path]:
         system = platform.system()
@@ -295,3 +295,25 @@ class VirtualDJSongsDatabase:
                     print(f"child_tag < {child_tag} > not defined")
        
             return song
+    #------------------------------------------------------------------------------------
+    def read_local_sqlite_database(self, database_path: Union[str,Path]) -> list[dict]:
+        SQLITE_EXTRA_DB_TABLES = ["lyrics","related_tracks","track_data"]
+        SQLITE_CACHE_DB_TABLES = "waveforms"
+
+
+        table = SQLITE_CACHE_DB_TABLES
+
+        sql_script = f"SELECT * FROM {table}"
+
+        result_list = []
+
+        try:
+           with closing(sqlite3.connect(database_path)) as connection:
+               with closing(connection.cursor()) as cursor:
+                    rows = cursor.execute(sql_script).fetchall()
+                    for row in rows:
+                        result_list.append(dict(row))
+        except Exception as e:
+            print(f"Failed to query the sqlite database with { table }")
+
+        return result_list
