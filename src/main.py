@@ -4,7 +4,6 @@ from rich.console import Console
 
 from client import VirtualDJClient
 from songs_database import VirtualDJSongsDatabase
-#from songs_database import VdjSong, VdjSongTags, VdjSongInfos, VdjSongPoi, VdjSongScan, VdjSongLink
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
