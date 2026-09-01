@@ -114,7 +114,7 @@ class VdjSong:
     Tags: Optional[VdjSongTags] = None
     Infos: Optional[VdjSongInfos] = None
     Comment: Optional[str] = None
-    Infos: Optional[VdjSongScan] = None
+    Scan: Optional[VdjSongScan] = None
     Poi: Optional[list[VdjSongPoi]] = None
     CustomMix: Optional[str] = None
     Link: Optional[VdjSongScanLink] = None
@@ -226,6 +226,8 @@ class VirtualDJSongsDatabase:
                     tags.Year = _to_int(child_attrib.get("Year"))
                     tags.Genre = child_attrib.get("Genre")
                     tags.Bpm = _to_float(child_attrib.get("Bpm"))
+                    if not tags.Bpm is None and tags.Bpm !=0:
+                        tags.Bpm = 1 / tags.Bpm * 60
                     tags.Key = child_attrib.get("Key")
                     tags.Album = child_attrib.get("Album")
                     tags.Composer = child_attrib.get("Composer")
@@ -242,7 +244,7 @@ class VirtualDJSongsDatabase:
                     song.Tags = tags
                 elif child_tag == "Infos":
                     infos = VdjSongInfos()
-                    infos.SongLegth =  _to_float(child_attrib.get("SongLength"))
+                    infos.SongLength =  _to_float(child_attrib.get("SongLength"))
                     infos.LastModified = _to_int(child_attrib.get("LastModified"))
                     infos.FirstSeen = _to_int(child_attrib.get("FirstSeen"))
                     infos.FirstPlay = _to_int(child_attrib.get("FirstPlay"))
@@ -260,6 +262,8 @@ class VirtualDJSongsDatabase:
                     scan.Version = _to_int(child_attrib.get("Version"))
                     scan.Flag = _to_int(child_attrib.get("Flag"))
                     scan.Bpm = _to_float(child_attrib.get("Bpm"))
+                    if not scan.Bpm is None and scan.Bpm !=0:
+                        scan.Bpm = 1 / scan.Bpm * 60
                     scan.Key = child_attrib.get("Key")
                     scan.Phase = child_attrib.get("Phase")
                     song.Scan = scan
