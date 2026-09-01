@@ -2,7 +2,7 @@ import sys
 import os
 from rich.console import Console
 
-from client import VirtualDJClient, VirtualDJSongsDatabase
+from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
@@ -174,6 +174,9 @@ def main():
             n = len(songs_database)
             song_n = songs_database[n - 1]
             console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
+        #elif (file_extension.lower() == ".db"):
+            #songsDB.read_local_sqlite_database(db_path)
+
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":

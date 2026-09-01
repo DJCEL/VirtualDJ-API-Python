@@ -297,15 +297,26 @@ class VirtualDJSongsDatabase:
             return song
     #------------------------------------------------------------------------------------
     def read_local_sqlite_database(self, database_path: Union[str,Path]) -> list[dict]:
-        SQLITE_EXTRA_DB_TABLES = ["lyrics","related_tracks","track_data"]
-        SQLITE_CACHE_DB_TABLES = "waveforms"
+        database_name = os.path.basename(database_path)
 
+        
+        if database_name == "extra_db.db":
+            tables_list = ["lyrics","related_tracks","track_data"]
+        elif database_name == "cache.db":
+            tables_list = ["waveforms"]
+        else:
+            tables_list = []
 
-        table = SQLITE_CACHE_DB_TABLES
-
-        sql_script = f"SELECT * FROM {table}"
 
         result_list = []
+
+
+        if len(tables_list) == 0:
+            return result_list
+
+        table = tables_list[0]
+
+        sql_script = f"SELECT * FROM {table}"
 
         try:
            with closing(sqlite3.connect(database_path)) as connection:
