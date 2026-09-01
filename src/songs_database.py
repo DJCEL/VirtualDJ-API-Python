@@ -267,7 +267,7 @@ class VirtualDJSongsDatabase:
                     scan.Key = child_attrib.get("Key")
                     scan.AudioSig = child_attrib.get("AudioSig")
                     scan.Flag = _to_int(child_attrib.get("Flag"))
-                    scan.Beatgrid = child_attrib.get("BeatGrid")
+                    scan.BeatGrid = child_attrib.get("BeatGrid")
                     song.Scan = scan
                 elif child_tag == "CustomMix":
                     song.CustomMix = child_attrib.get("CustomMix")
