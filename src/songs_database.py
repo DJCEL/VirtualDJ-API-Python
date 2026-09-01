@@ -230,16 +230,17 @@ class VirtualDJSongsDatabase:
                 elif subchild_tag == "Poi":
                     i = i + 1
                     #print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                name = subchild_attrib.get("Name"),
-                pos = _to_float(attrib.get("Pos")),
-                type = subchild_attrib.get("Type"),
-                point = subchild_attrib.get("Point"),
-                num = _to_int(subchild_attrib.get("Num")),
-                bpm = _to_float(subchild_attrib.get("Bpm")),
-                phrase = _to_int(subchild_attrib.get("Phrase")),
-                size = _to_float(subchild_attrib.get("Size")),
-                slot = _to_int(subchild_attrib.get("Slot)"))
-                Poi = VdjPoi(name=name,pos=pos)
+                Poi = VdjPoi(
+                    name = subchild_attrib.get("Name"),
+                    pos = _to_float(attrib.get("Pos")),
+                    type = subchild_attrib.get("Type"),
+                    point = subchild_attrib.get("Point"),
+                    num = _to_int(subchild_attrib.get("Num")),
+                    bpm = _to_float(subchild_attrib.get("Bpm")),
+                    phrase = _to_int(subchild_attrib.get("Phrase")),
+                    size = _to_float(subchild_attrib.get("Size")),
+                    slot = _to_int(subchild_attrib.get("Slot)"))
+                )
                 song.Poi = poi_list.append(Poi)
                 elif subchild_tag  == "Comment":
                     #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
