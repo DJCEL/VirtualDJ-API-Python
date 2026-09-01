@@ -188,14 +188,11 @@ class VirtualDJSongsDatabase:
             print(f"Not a VirtualDJ database file: {database_path}")
             return []
 
-
-        
         songs_list = root.findall(".//Song")        
         songs_list_count = len(songs_list)
 
         print(f"VirtualDJ database reading => {root_attrib}")
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
-
 
         return [self._parse_song(song, filepath_only) for song in songs_list]
     #------------------------------------------------------------------------------------
@@ -270,11 +267,7 @@ class VirtualDJSongsDatabase:
                     scan.Key = child_attrib.get("Key")
                     scan.AudioSig = child_attrib.get("AudioSig")
                     scan.Flag = _to_int(child_attrib.get("Flag"))
-                    _beatgrid = child_attrib.get("BeatGrid")
-                    if _beatgrid is None:
-                        scan.Beatgrid = None
-                    else:
-                        scan.BeatGrid = _beatgrid
+                    scan.Beatgrid = child_attrib.get("BeatGrid")
                     song.Scan = scan
                 elif child_tag == "CustomMix":
                     song.CustomMix = child_attrib.get("CustomMix")
