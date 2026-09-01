@@ -98,7 +98,7 @@ class VdjSongScan:
     Key: Optional[str] = None
     AudioSig: Optional[str] = None
     Flag: Optional[int] = None
-    Beatgrid: Optional[list[str]] = None
+    BeatGrid: Optional[str] = None
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongLink:
@@ -260,12 +260,21 @@ class VirtualDJSongsDatabase:
                 elif child_tag == "Scan":
                     scan = VdjSongScan()
                     scan.Version = _to_int(child_attrib.get("Version"))
-                    scan.Flag = _to_int(child_attrib.get("Flag"))
                     scan.Bpm = _to_float(child_attrib.get("Bpm"))
                     if not scan.Bpm is None and scan.Bpm !=0:
                         scan.Bpm = 1 / scan.Bpm * 60
-                    scan.Key = child_attrib.get("Key")
                     scan.Phase = child_attrib.get("Phase")
+                    scan.AltBpm = _to_float(child_attrib.get("AltBpm"))
+                    scan.Rigid = _to_float(child_attrib.get("Rigid"))
+                    scan.Volume = _to_float(child_attrib.get("Volume"))
+                    scan.Key = child_attrib.get("Key")
+                    scan.AudioSig = child_attrib.get("AudioSig")
+                    scan.Flag = _to_int(child_attrib.get("Flag"))
+                    _beatgrid = child_attrib.get("BeatGrid")
+                    if _beatgrid is None:
+                        scan.Beatgrid = None
+                    else:
+                        scan.BeatGrid = _beatgrid
                     song.Scan = scan
                 elif child_tag == "CustomMix":
                     song.CustomMix = child_attrib.get("CustomMix")
