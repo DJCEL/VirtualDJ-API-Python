@@ -36,12 +36,12 @@ class VdjPoi:
         size: Optional[float] = None
         slot: Optional[int] = None
         #------------------------------------------------------------------------------------
-        class PoiType(str, Enum):
+        class VdjPoiType(str, Enum):
             AUTOMIX = "automix"
             BEATGRID = "beatgrid"
             REMIX = "remix"
         #------------------------------------------------------------------------------------
-        class PoiPoint(str, Enum):
+        class VdjPoiPoint(str, Enum):
             REAL_START = "realStart"
             REAL_END = "realEnd"
             FADE_START = "fadeStart"
