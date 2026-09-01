@@ -244,6 +244,7 @@ class VirtualDJSongsDatabase:
                     #print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
                 elif subchild_tag  == "Comment":
                     #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
+                    song.Comment = subchild_attrib.get("Comment")
                 else:
                     print(f"subchild_tag < {subchild_tag} > not defined")
        
