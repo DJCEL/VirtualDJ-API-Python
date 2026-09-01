@@ -173,8 +173,8 @@ class VirtualDJSongsDatabase:
             return []
 
 
-        xmlTag_Song = "Song"
-        songs_list = root.findall(".//" +  xmlTag_Song)        
+        
+        songs_list = root.findall(".//Song")        
         songs_list_count = len(songs_list)
 
         print(f"VirtualDJ database reading => {root_attrib}")
