@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum
 
-__version__ = '1.0.6'
+__version__ = '1.0.7'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -223,11 +223,37 @@ class VirtualDJSongsDatabase:
                     tags = VdjSongTags()
                     tags.Author = child_attrib.get("Author")
                     tags.Title = child_attrib.get("Title")
+                    tags.Year = _to_int(child_attrib.get("Year"))
+                    tags.Genre = child_attrib.get("Genre")
+                    tags.Bpm = _to_float(child_attrib.get("Bpm"))
+                    tags.Key = child_attrib.get("Key")
+                    tags.Album = child_attrib.get("Album")
+                    tags.Composer = child_attrib.get("Composer")
+                    tags.Label = child_attrib.get("Label")
+                    tags.TrackNumber = child_attrib.get("TrackNumber")
                     tags.Remix = child_attrib.get("Remix")
+                    tags.Stars = _to_int(child_attrib.get("Stars"))
+                    tags.Remixer = child_attrib.get("Remixer")
+                    tags.Grouping = child_attrib.get("Grouping")
+                    tags.User1 = child_attrib.get("User1")
+                    tags.User2 = child_attrib.get("User2")
+                    tags.Internal = child_attrib.get("Internal")
+                    tags.Flag = _to_int(child_attrib.get("Flag"))
                     song.Tags = tags
                 elif child_tag == "Infos":
                     infos = VdjSongInfos()
                     infos.SongLegth =  _to_float(child_attrib.get("SongLength"))
+                    infos.LastModified = _to_int(child_attrib.get("LastModified"))
+                    infos.FirstSeen = _to_int(child_attrib.get("FirstSeen"))
+                    infos.FirstPlay = _to_int(child_attrib.get("FirstPlay"))
+                    infos.LastPlay = _to_int(child_attrib.get("LastPlay"))
+                    infos.PlayCount = _to_int(child_attrib.get("PlayCount"))
+                    infos.Bitrate = _to_int(child_attrib.get("Bitrate"))
+                    infos.Cover = _to_int(child_attrib.get("Cover"))
+                    infos.Color = _to_int(child_attrib.get("Color"))
+                    infos.Corrupted = _to_int(child_attrib.get("Corrupted"))
+                    infos.Gain = _to_int(child_attrib.get("Gain"))
+                    infos.UserColor = child_attrib.get("UserColor")
                     song.Infos = infos
                 elif child_tag == "Scan":
                     scan = VdjSongScan()
@@ -241,6 +267,9 @@ class VirtualDJSongsDatabase:
                     song.CustomMix = child_attrib.get("CustomMix")
                 elif child_tag == "Link":
                     link = VdjSongLink()
+                    link.NetSearch = child_attrib.get("NetSearch")
+                    link.Cover = child_attrib.get("Cover")
+                    link.clouddriveId = child_attrib.get("clouddriveId")
                     song.Link = link
                 elif child_tag == "Poi":
                     poi = VdjSongPoi()
