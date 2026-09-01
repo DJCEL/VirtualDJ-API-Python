@@ -25,83 +25,99 @@ def _to_int(value: Optional[str]) -> Optional[int]:
         return None
 #------------------------------------------------------------------------------------
 @dataclass
-class VdjPoi:
-        name: Optional[str] = None
-        pos: Optional[float] = None
-        type: Optional[str] = None
-        point: Optional[str] = None
-        num: Optional[int] = None
-        bpm: Optional[float] = None
-        phrase: Optional[int] = None
-        size: Optional[float] = None
-        slot: Optional[int] = None
-        #------------------------------------------------------------------------------------
-        class VdjPoiType(str, Enum):
-            AUTOMIX = "automix"
-            BEATGRID = "beatgrid"
-            REMIX = "remix"
-        #------------------------------------------------------------------------------------
-        class VdjPoiPoint(str, Enum):
-            REAL_START = "realStart"
-            REAL_END = "realEnd"
-            FADE_START = "fadeStart"
-            FADE_END = "fadeEnd"
-            CUT_START = "cutStart"
-            CUT_END = "cutEnd"
-            TEMPO_START = "tempoStart"
-            TEMPO_END = "tempoEnd"
+class VdjSongPoi:
+    Name: Optional[str] = None
+    Pos: Optional[float] = None
+    Type: Optional[str] = None
+    Point: Optional[str] = None
+    Num: Optional[int] = None
+    Bpm: Optional[float] = None
+    Phrase: Optional[int] = None
+    Size: Optional[float] = None
+    Slot: Optional[int] = None
+    #------------------------------------------------------------------------------------
+    class VdjSongPoiType(str, Enum):
+        AUTOMIX = "automix"
+        BEATGRID = "beatgrid"
+        REMIX = "remix"
+    #------------------------------------------------------------------------------------
+    class VdjSongPoiPoint(str, Enum):
+        REAL_START = "realStart"
+        REAL_END = "realEnd"
+        FADE_START = "fadeStart"
+        FADE_END = "fadeEnd"
+        CUT_START = "cutStart"
+        CUT_END = "cutEnd"
+        TEMPO_START = "tempoStart"
+        TEMPO_END = "tempoEnd"
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjSongTags:
+    Author: Optional[str] = None
+    Title: Optional[str] = None
+    Year: Optional[int] = None
+    Genre: Optional[str] = None
+    Bpm: Optional[float] = None
+    Key: Optional[str] = None
+    Album: Optional[str] = None
+    Composer: Optional[str] = None
+    Label: Optional[str] = None
+    TrackNumber: Optional[str] = None
+    Remix: Optional[str] = None
+    Stars: Optional[int] = None
+    Remixer: Optional[str] = None
+    Grouping: Optional[str] = None
+    User1: Optional[str] = None
+    User2: Optional[str] = None
+    Internal: Optional[str] = None
+    Flag: Optional[int] = None
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjSongInfos:
+    SongLength: Optional[float] = None
+    LastModified: Optional[int] = None
+    FirstSeen: Optional[int] = None
+    FirstPlay: Optional[int] = None
+    LastPlay: Optional[int] = None
+    PlayCount: Optional[int] = None
+    Bitrate: Optional[int] = None
+    Cover: Optional[int] = None
+    Color: Optional[int] = None
+    Corrupted: Optional[int] = None
+    Gain: Optional[int] = None
+    UserColor: Optional[str] = None
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjSongScan:
+    Version: Optional[int] = None
+    Bpm: Optional[float] = None
+    Phase: Optional[float] = None
+    AltBpm: Optional[float] = None
+    Rigid: Optional[float] = None
+    Volume: Optional[float] = None
+    Key: Optional[str] = None
+    AudioSig: Optional[str] = None
+    Flag: Optional[int] = None
+    Beatgrid: Optional[list[str]] = None
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjSongLink:
+    NetSearch: Optional[str] = None
+    Cover: Optional[str] = None
+    clouddriveId: Optional[str] = None
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSong:
-       FilePath: Union[str,Path]
-       Flag: int
-       FileSize: Optional[int] = None
-       Tags_Author: Optional[str] = None
-       Tags_Title: Optional[str] = None
-       Tags_Year: Optional[int] = None
-       Tags_Genre: Optional[str] = None
-       Tags_Bpm: Optional[float] = None
-       Tags_Key: Optional[str] = None
-       Tags_Album: Optional[str] = None
-       Tags_Composer: Optional[str] = None
-       Tags_Label: Optional[str] = None
-       Tags_TrackNumber: Optional[str] = None
-       Tags_Remix: Optional[str] = None
-       Tags_Stars: Optional[int] = None
-       Tags_Remixer: Optional[str] = None
-       Tags_Grouping: Optional[str] = None
-       Tags_User1: Optional[str] = None
-       Tags_User2: Optional[str] = None
-       Tags_Internal: Optional[str] = None
-       Tags_Flag: Optional[int] = None
-       Infos_SongLength: Optional[float] = None
-       Infos_LastModified: Optional[int] = None
-       Infos_FirstSeen: Optional[int] = None
-       Infos_FirstPlay: Optional[int] = None
-       Infos_LastPlay: Optional[int] = None
-       Infos_PlayCount: Optional[int] = None
-       Infos_Bitrate: Optional[int] = None
-       Infos_Cover: Optional[int] = None
-       Infos_Color: Optional[int] = None
-       Infos_Corrupted: Optional[int] = None
-       Infos_Gain: Optional[int] = None
-       Infos_UserColor: Optional[str] = None
-       Comment: Optional[str] = None
-       Scan_Version: Optional[int] = None
-       Scan_Bpm: Optional[float] = None
-       Scan_Phase: Optional[float] = None
-       Scan_AltBpm: Optional[float] = None
-       Scan_Rigid: Optional[float] = None
-       Scan_Volume: Optional[float] = None
-       Scan_Key: Optional[str] = None
-       Scan_AudioSig: Optional[str] = None
-       Scan_Flag: Optional[int] = None
-       Scan_Beatgrid: Optional[list[str]] = None
-       Poi: Optional[list[VdjPoi]] = None
-       CustomMix: Optional[str] = None
-       Link_NetSearch: Optional[str] = None
-       Link_Cover: Optional[str] = None
-       Link_clouddriveId: Optional[str] = None
+    FilePath: Union[str]
+    Flag: int
+    FileSize: Optional[int] = None
+    Tags: Optional[VdjSongTags] = None
+    Infos: Optional[VdjSongInfos] = None
+    Comment: Optional[str] = None
+    Infos: Optional[VdjSongScan] = None
+    Poi: Optional[list[VdjSongPoi]] = None
+    CustomMix: Optional[str] = None
+    Link: Optional[VdjSongScanLink] = None
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase:
     XML_DATABASE_NAME = "database.xml"
@@ -155,7 +171,7 @@ class VirtualDJSongsDatabase:
         drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
         return drives_Windows
     #------------------------------------------------------------------------------------
-    def read_local_xml_database(self, database_path: Union[str,Path], read_all_songs: bool = False) -> list[VdjSong]:
+    def read_local_xml_database(self, database_path: Union[str,Path], read_all_data: bool = False) -> list[VdjSong]:
         try:
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
@@ -180,72 +196,67 @@ class VirtualDJSongsDatabase:
         print(f"VirtualDJ database reading => {root_attrib}")
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
 
-        if not read_all_songs:
-            return []
 
-        id = 0
-    
-        return [self._parse_song(id, song) for song in songs_list]
+        return [self._parse_song(song, read_all_data) for song in songs_list]
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _parse_song(id:int, song_el: ET.Element) -> VdjSong:
+    def _parse_song(song_el: ET.Element, read_all_data: bool = False) -> VdjSong:
             song_el_tag = song_el.tag
             song_el_attrib = song_el.attrib
             song_el_text = song_el.text
-            id = id + 1
-            #print(song_el_tag + str(id)+ ": " + str(song_el_attrib))
             song = VdjSong(
                 FilePath = song_el_attrib.get("FilePath"),
                 Flag = _to_int(song_el_attrib.get("Flag"))
             )
-
             song.FileSize = _to_int(song_el_attrib.get("FileSize"))
+
+            if not read_all_data:
+                return song
 
             poi_list = []
 
-            i = 0
-            for subchild in song_el:
-                subchild_tag = subchild.tag
-                subchild_attrib = subchild.attrib
-                subchild_text = subchild.text
-                if subchild_tag == "Tags":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                    song.Tags_Author = subchild_attrib.get("Author")
-                    song.Tags_Title = subchild_attrib.get("Title")
-                    song.Tags_Remix = subchild_attrib.get("Remix")
-                elif subchild_tag == "Infos":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                    song.Infos_SongLength =  _to_float(subchild_attrib.get("SongLength"))
-                elif subchild_tag == "Scan":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                    song.Scan_Version =  _to_int(subchild_attrib.get("Version"))
-                    song.Scan_Flag =  _to_int(subchild_attrib.get("Flag"))
-                    song.Scan_Bpm =  _to_float(subchild_attrib.get("Bpm"))
-                    song.Scan_Key =  subchild_attrib.get("Key")
-                    song.Scan_Phase =  subchild_attrib.get("Phase")
-                elif subchild_tag == "CustomMix":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                elif subchild_tag == "Link":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_attrib))
-                elif subchild_tag == "Poi":
-                    i = i + 1
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                    poi = VdjPoi(
-                        name = subchild_attrib.get("Name"),
-                        pos = _to_float(attrib.get("Pos")),
-                        type = subchild_attrib.get("Type"),
-                        point = subchild_attrib.get("Point"),
-                        num = _to_int(subchild_attrib.get("Num")),
-                        bpm = _to_float(subchild_attrib.get("Bpm")),
-                        phrase = _to_int(subchild_attrib.get("Phrase")),
-                        size = _to_float(subchild_attrib.get("Size")),
-                        slot = _to_int(subchild_attrib.get("Slot)"))
-                    )
+            for child in song_el:
+                child_tag = child.tag
+                child_attrib = child.attrib
+                child_text = child.text
+                if child_tag == "Tags":
+                    tags = VdjSongTags()
+                    tags.Author = child_attrib.get("Author")
+                    tags.Title = child_attrib.get("Title")
+                    tags.Remix = child_attrib.get("Remix")
+                    song.Tags = tags
+                elif child_tag == "Infos":
+                    infos = VdjSongInfos()
+                    infos.SongLegth =  _to_float(child_attrib.get("SongLength"))
+                    song.Infos = infos
+                elif child_tag == "Scan":
+                    scan = VdjSongScan()
+                    scan.Version = _to_int(child_attrib.get("Version"))
+                    scan.Flag = _to_int(child_attrib.get("Flag"))
+                    scan.Bpm = _to_float(child_attrib.get("Bpm"))
+                    scan.Key = child_attrib.get("Key")
+                    scan.Phase = child_attrib.get("Phase")
+                    song.Scan = scan
+                elif child_tag == "CustomMix":
+                    song.CustomMix = child_attrib.get("CustomMix")
+                elif child_tag == "Link":
+                    link = VdjSongLink()
+                    song.Link = link
+                elif child_tag == "Poi":
+                    poi = VdjSongPoi()
+                    poi.Name = child_attrib.get("Name"),
+                    poi.Pos = _to_float(child_attrib.get("Pos")),
+                    poi.Type = child_attrib.get("Type"),
+                    poi.Point = child_attrib.get("Point"),
+                    poi.Num = _to_int(child_attrib.get("Num")),
+                    poi.Bpm = _to_float(child_attrib.get("Bpm")),
+                    poi.Phrase = _to_int(child_attrib.get("Phrase")),
+                    poi.Size = _to_float(child_attrib.get("Size")),
+                    poi.Slot = _to_int(child_attrib.get("Slot)"))
                     song.Poi = poi_list.append(poi)
-                elif subchild_tag  == "Comment":
-                    #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
-                    song.Comment = subchild_attrib.get("Comment")
+                elif child_tag  == "Comment":
+                    song.Comment = child_attrib.get("Comment")
                 else:
-                    print(f"subchild_tag < {subchild_tag} > not defined")
+                    print(f"child_tag < {child_tag} > not defined")
        
             return song

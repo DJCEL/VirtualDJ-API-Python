@@ -4,6 +4,7 @@ from rich.console import Console
 
 from client import VirtualDJClient
 from songs_database import VirtualDJSongsDatabase
+#from songs_database import VdjSong, VdjSongTags, VdjSongInfos, VdjSongPoi, VdjSongScan, VdjSongLink
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
@@ -169,7 +170,12 @@ def main():
         console.print(f"VirtualDJ database reading => {db_path}")
         file_extension = os.path.splitext(db_path)[1]
         if (file_extension.lower() == ".xml"):
-            songs_database = songsDB.read_local_xml_database(db_path, read_all_songs=False)
+            songs_database = songsDB.read_local_xml_database(db_path, read_all_data=False)
+            song_1 = songs_database[0]
+            console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
+            n = len(songs_database)
+            song_n = songs_database[n - 1]
+            console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
