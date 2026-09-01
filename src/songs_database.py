@@ -230,7 +230,7 @@ class VirtualDJSongsDatabase:
                 elif subchild_tag == "Poi":
                     i = i + 1
                     #print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
-                Poi = VdjPoi(
+                    Poi = VdjPoi(
                     name = subchild_attrib.get("Name"),
                     pos = _to_float(attrib.get("Pos")),
                     type = subchild_attrib.get("Type"),
@@ -241,7 +241,7 @@ class VirtualDJSongsDatabase:
                     size = _to_float(subchild_attrib.get("Size")),
                     slot = _to_int(subchild_attrib.get("Slot)"))
                 )
-                song.Poi = poi_list.append(Poi)
+                    song.Poi = poi_list.append(Poi)
                 elif subchild_tag  == "Comment":
                     #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
                     song.Comment = subchild_attrib.get("Comment")
