@@ -50,20 +50,6 @@ class VdjPoi:
             CUT_END = "cutEnd"
             TEMPO_START = "tempoStart"
             TEMPO_END = "tempoEnd"
-        #------------------------------------------------------------------------------------
-        @classmethod
-        def from_xml(cls, attrib: dict) -> Any:
-            return cls(
-                name = attrib.get("Name"),
-                pos = _to_float(attrib.get("Pos")),
-                type = attrib.get("Type"),
-                point = attrib.get("Point"),
-                num = _to_int(attrib.get("Num")),
-                bpm = _to_float(attrib.get("Bpm")),
-                phrase = _to_int(attrib.get("Phrase")),
-                size = _to_float(attrib.get("Size")),
-                slot = _to_int(attrib.get("Slot)")),
-            )
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSong:
@@ -213,7 +199,9 @@ class VirtualDJSongsDatabase:
                 Flag = _to_int(song_el_attrib.get("Flag"))
             )
 
-            song.FileSize = _to_int(song_el_attrib.get("FileSize")),
+            song.FileSize = _to_int(song_el_attrib.get("FileSize"))
+
+            poi_list = []
 
             i = 0
             for subchild in song_el:
@@ -242,6 +230,17 @@ class VirtualDJSongsDatabase:
                 elif subchild_tag == "Poi":
                     i = i + 1
                     #print(song_el_tag + str(id) + "_" + subchild_tag + str(i) + ": " + str(subchild_attrib))
+                name = subchild_attrib.get("Name"),
+                pos = _to_float(attrib.get("Pos")),
+                type = subchild_attrib.get("Type"),
+                point = subchild_attrib.get("Point"),
+                num = _to_int(subchild_attrib.get("Num")),
+                bpm = _to_float(subchild_attrib.get("Bpm")),
+                phrase = _to_int(subchild_attrib.get("Phrase")),
+                size = _to_float(subchild_attrib.get("Size")),
+                slot = _to_int(subchild_attrib.get("Slot)"))
+                Poi = VdjPoi(name=name,pos=pos)
+                song.Poi = poi_list.append(Poi)
                 elif subchild_tag  == "Comment":
                     #print(song_el_tag + str(id) + "_" + subchild_tag + ": " + str(subchild_text))
                     song.Comment = subchild_attrib.get("Comment")
