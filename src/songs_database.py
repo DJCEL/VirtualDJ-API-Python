@@ -53,7 +53,7 @@ class VdjPoi:
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSong:
-       FilePath: str
+       FilePath: Union[str,Path]
        Flag: int
        FileSize: Optional[int] = None
        Tags_Author: Optional[str] = None
