@@ -169,7 +169,7 @@ def main():
         console.print(f"VirtualDJ database reading => {db_path}")
         file_extension = os.path.splitext(db_path)[1]
         if (file_extension.lower() == ".xml"):
-            songs_database = songsDB.read_local_xml_database(db_path, read_all_data=True)
+            songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
             song_1 = songs_database[0]
             console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
             n = len(songs_database)

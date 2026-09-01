@@ -171,7 +171,7 @@ class VirtualDJSongsDatabase:
         drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
         return drives_Windows
     #------------------------------------------------------------------------------------
-    def read_local_xml_database(self, database_path: Union[str,Path], read_all_data: bool = False) -> list[VdjSong]:
+    def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
         try:
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
@@ -197,10 +197,10 @@ class VirtualDJSongsDatabase:
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
 
 
-        return [self._parse_song(song, read_all_data) for song in songs_list]
+        return [self._parse_song(song, filepath_only) for song in songs_list]
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _parse_song(song_el: ET.Element, read_all_data: bool = False) -> VdjSong:
+    def _parse_song(song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
             song_el_tag = song_el.tag
             song_el_attrib = song_el.attrib
             song_el_text = song_el.text
@@ -210,7 +210,7 @@ class VirtualDJSongsDatabase:
             )
             song.FileSize = _to_int(song_el_attrib.get("FileSize"))
 
-            if not read_all_data:
+            if filepath_only:
                 return song
 
             poi_list = []
