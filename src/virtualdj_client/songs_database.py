@@ -296,21 +296,26 @@ class VirtualDJSongsDatabase:
        
             return song
     #------------------------------------------------------------------------------------
-    def read_local_sqlite_database(self, database_path: Union[str,Path]) -> list[dict]:
-        database_name = os.path.basename(database_path)
+    def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
-      
         if database_name == "extra_db.db":
-            # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
-            # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
-            # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
-            sql_script1 = "SELECT lid, xml FROM lyrics"
-            sql_script2 = "SELECT id,sid1,sid2 FROM related_tracks"
-            sql_script3 = "SELECT id,sid,file,filesize,artist,title,remix FROM track_data"
-            sql_script = sql_script1
+            if table_name == "lyrics":
+                # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
+                sql_script = "SELECT lid,xml FROM lyrics"
+            elif table_name == "related_tracks":
+                # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
+                sql_script = "SELECT id,sid1,sid2 FROM related_tracks"
+            elif table_name == "track_data":
+                # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
+                sql_script = "SELECT id,sid,file,filesize,artist,title,remix FROM track_data"
+            else:
+                sql_script = ""
         elif database_name == "cache.db":
-            # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
-            sql_script = "SELECT id,filepath,filename,filesize,type,version,valuesPerSecond,waveform FROM waveforms"
+            if table_name == "waveform" or table_name is None:
+                # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
+                sql_script = "SELECT id,filepath,filename,filesize,type,version,valuesPerSecond,waveform FROM waveforms"
+            else:
+                sql_script = ""
         else:
             sql_script = ""
 
@@ -320,6 +325,8 @@ class VirtualDJSongsDatabase:
 
         if sql_script == "":
             return result_list
+
+        print(sql_script)
 
         try:
            with sqlite3.connect(database_path) as connection:
