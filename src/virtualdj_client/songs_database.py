@@ -11,7 +11,7 @@ from enum import Enum
 import sqlite3
 from contextlib import closing
 
-__version__ = '1.0.8'
+__version__ = '1.0.9'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -302,8 +302,12 @@ class VirtualDJSongsDatabase:
         
         if database_name == "extra_db.db":
             tables_list = ["lyrics","related_tracks","track_data"]
+            # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
+            # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
+            # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
         elif database_name == "cache.db":
             tables_list = ["waveforms"]
+            # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
         else:
             tables_list = []
 
