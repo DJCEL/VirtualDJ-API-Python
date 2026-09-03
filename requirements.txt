@@ -1,8 +1,3 @@
-httpx
-asyncio
 rich
+httpx
 psutil
-urllib3
-subprocess
-platform
-

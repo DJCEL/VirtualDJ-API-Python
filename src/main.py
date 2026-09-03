@@ -42,6 +42,46 @@ def main():
     vdj_build = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {vdj_build}")
 
+    # test 2a
+    vdj_script = "deck 1 play_pause & loop 4 & crossfader -5%"
+    result2a = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2a}")
+
+    # test 2b
+    vdj_script = "sync"
+    result2b = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2b}")
+
+    # test 2c
+    vdj_script = "deck right play_button"
+    result2c = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2c}")
+
+    # test 2d
+    vdj_script = "play_pause"
+    result2d = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2d}")
+
+    # test 2e
+    vdj_script = "loop 8"
+    result2e = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2e}")
+
+    # test 2f
+    vdj_script = "none"
+    result2f = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2f}")
+
+    # test 2g
+    vdj_script = "search 'guetta'"
+    result2g = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2g}")
+
+    # test 2h
+    vdj_script = "nothing"
+    result2h = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
+
     # test 1a
     vdj_script = "get_browsed_title_artist"
     result1a = client.get(vdj_script)
@@ -112,45 +152,7 @@ def main():
     result1n = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1n}")
 
-    # test 2a
-    vdj_script = "deck 1 play_pause & loop 4 & crossfader -5%"
-    result2a = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2a}")
-
-    # test 2b
-    vdj_script = "sync"
-    result2b = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2b}")
-
-    # test 2c
-    vdj_script = "deck right play_button"
-    result2c = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2c}")
-
-    # test 2d
-    vdj_script = "play_pause"
-    result2d = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2d}")
-
-    # test 2e
-    vdj_script = "loop 8"
-    result2e = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2e}")
-
-    # test 2f
-    vdj_script = "none"
-    result2f = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2f}")
-
-    # test 2g
-    vdj_script = "search 'guetta'"
-    result2g = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2g}")
-
-    # test 2h
-    vdj_script = "nothing"
-    result2h = client.send(vdj_script)
-    console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
+    
 
 
     # Close VirtualDJ
@@ -169,13 +171,18 @@ def main():
         file_extension = os.path.splitext(db_path)[1]
         if (file_extension.lower() == ".xml"):
             songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
-            song_1 = songs_database[0]
-            console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
             n = len(songs_database)
-            song_n = songs_database[n - 1]
-            console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
-        #elif (file_extension.lower() == ".db"):
-            #songsDB.read_local_sqlite_database(db_path)
+            if n >= 1:
+                song_1 = songs_database[0]
+                console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
+                song_n = songs_database[n - 1]
+                console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
+        elif (file_extension.lower() == ".db"):
+            result_list = songsDB.read_local_sqlite_database(db_path)
+            n = len(result_list)
+            if n >= 1:
+                song_1 = result_list[0]
+                console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
 
 
 #------------------------------------------------------------------------------------------------------------------------------------

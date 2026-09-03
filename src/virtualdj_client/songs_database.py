@@ -299,36 +299,38 @@ class VirtualDJSongsDatabase:
     def read_local_sqlite_database(self, database_path: Union[str,Path]) -> list[dict]:
         database_name = os.path.basename(database_path)
 
-        
+      
         if database_name == "extra_db.db":
-            tables_list = ["lyrics","related_tracks","track_data"]
             # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
             # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
             # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
+            sql_script1 = "SELECT lid, xml FROM lyrics"
+            sql_script2 = "SELECT id,sid1,sid2 FROM related_tracks"
+            sql_script3 = "SELECT id,sid,file,filesize,artist,title,remix FROM track_data"
+            sql_script = sql_script1
         elif database_name == "cache.db":
-            tables_list = ["waveforms"]
             # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
+            sql_script = "SELECT id,filepath,filename,filesize,type,version,valuesPerSecond,waveform FROM waveforms"
         else:
-            tables_list = []
+            sql_script = ""
 
 
         result_list = []
 
 
-        if len(tables_list) == 0:
+        if sql_script == "":
             return result_list
 
-        table = tables_list[0]
-
-        sql_script = f"SELECT * FROM {table}"
-
         try:
-           with closing(sqlite3.connect(database_path)) as connection:
+           with sqlite3.connect(database_path) as connection:
+               connection.row_factory = sqlite3.Row
                with closing(connection.cursor()) as cursor:
                     rows = cursor.execute(sql_script).fetchall()
                     for row in rows:
-                        result_list.append(dict(row))
+                        value = dict(row)
+                        result_list.append(value)
+
         except Exception as e:
-            print(f"Failed to query the sqlite database with { table }")
+            print(f"Failed to query the sqlite database: ", str(e))
 
         return result_list

@@ -4,9 +4,9 @@ VirtualDJ HTTP API client using the Network Control plugin
 __version__ = '1.0.18'
 
 import httpx
+import psutil
 import asyncio
 from typing import Any, Literal
-import psutil
 from urllib.parse import quote as encodeURI
 import logging
 import os
