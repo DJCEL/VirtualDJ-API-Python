@@ -178,27 +178,29 @@ def main():
                 song_n = songs_database[n - 1]
                 console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
         elif (file_extension == ".db"):
-            result_list1 = songsDB.read_local_sqlite_database(db_path,"extra_db.db","lyrics")
-            n1 = len(result_list1)
-            if n1 >= 1:
-                song_1 = result_list1[0]
-                console.print(f"VirtualDJ database reading => First song of the list of lyrics = {song_1}")
-            result_list2 = songsDB.read_local_sqlite_database(db_path,"extra_db.db","related_tracks")
-            n2 = len(result_list2)
-            if n2 >= 1:
-                song_2 = result_list2[0]
-                console.print(f"VirtualDJ database reading => First song of the list of related tracks = {song_2}")
-            result_list3 = songsDB.read_local_sqlite_database(db_path,"extra_db.db","track_data")
-            n3 = len(result_list3)
-            if n3 >= 1:
-                song_3 = result_list3[0]
-                console.print(f"VirtualDJ database reading => First song of the list of track data = {song_3}")
-            result_list4 = songsDB.read_local_sqlite_database(db_path,"cache.db","waveform")
-            n4 = len(result_list4)
-            if n4 >= 1:
-                song_4 = result_list4[0]
-                console.print(f"VirtualDJ database reading => First song of the list of waveform = {song_4}")
-
+            database_name = os.path.basename(db_path)
+            if database_name == "cache.db":
+                result_list4 = songsDB.read_local_sqlite_database(db_path,database_name,"waveform")
+                n4 = len(result_list4)
+                if n4 >= 1:
+                    waveform = result_list4[0]
+                    console.print(f"VirtualDJ database reading => First song of the list of waveform = {waveform}")
+            elif database_name == "extra.db":
+                lyrics_list = songsDB.read_local_sqlite_database(db_path,database_name,"lyrics")
+                n1 = len(lyrics_list)
+                if n1 >= 1:
+                    lyrics = lyrics_list[0]
+                    console.print(f"VirtualDJ database reading => First song of the list of lyrics = {lyrics}")
+                result_list2 = songsDB.read_local_sqlite_database(db_path,database_name,"related_tracks")
+                n2 = len(result_list2)
+                if n2 >= 1:
+                    song_2 = result_list2[0]
+                    console.print(f"VirtualDJ database reading => First song of the list of related tracks = {song_2}")
+                result_list3 = songsDB.read_local_sqlite_database(db_path,database_name,"track_data")
+                n3 = len(result_list3)
+                if n3 >= 1:
+                    song_3 = result_list3[0]
+                    console.print(f"VirtualDJ database reading => First song of the list of track data = {song_3}")
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

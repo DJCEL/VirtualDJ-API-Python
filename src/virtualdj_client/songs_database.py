@@ -298,7 +298,7 @@ class VirtualDJSongsDatabase:
     #------------------------------------------------------------------------------------
     def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
-        if database_name == "extra_db.db":
+        if database_name == "extra.db":
             if table_name == "lyrics":
                 # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
                 sql_script = "SELECT lid,xml FROM lyrics"
