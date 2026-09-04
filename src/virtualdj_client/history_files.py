@@ -8,7 +8,7 @@ __version__ = '1.0.0'
 
 class VirtualDJHistoryFile():
     TRACKLIST_FILENAME = "tracklist.txt"
-    FILES_EXTENSION = ".m3u"
+    OTHER_FILES_EXTENSION = ".m3u"
 
     def get_local_history_files(self):
         system = platform.system()
