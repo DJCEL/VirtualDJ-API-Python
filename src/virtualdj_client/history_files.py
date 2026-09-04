@@ -15,10 +15,10 @@ class VirtualDJHistoryFile():
         if system == "Windows":
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
-                history_folder = os.path.join(local_appdata, 'History'
+                history_folder = os.path.join(local_appdata, 'History')
                 self.read_tracklist_file(history_folder)
 
-    def read_tracklist_file(self,history_folder:str):
+    def read_tracklist_file(self, history_folder:str):
         history_path = os.path.join(history_folder, self.TRACKLIST_FILENAME)
         if os.path.exists(history_path):
             with open(history_path,"r", encoding="utf-8") as file:
