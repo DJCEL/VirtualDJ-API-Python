@@ -110,7 +110,7 @@ class VdjSongLink:
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSong:
-    FilePath: Union[str]
+    FilePath: Union[str,Path]
     Flag: int
     FileSize: Optional[int] = None
     Tags: Optional[VdjSongTags] = None
