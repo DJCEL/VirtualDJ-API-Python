@@ -2,7 +2,6 @@
 # VirtualDJ History
 #------------------------------------------------------------------------------------
 import os
-from pathlib import Path
 import platform
 
 __version__ = '1.0.0'
