@@ -28,10 +28,11 @@
     <InterpreterReference Include="Global|PythonCore|3.14" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\virtualdj_client\history.py" />
     <Compile Include="src\virtualdj_client\songs_database.py" />
     <Compile Include="src\virtualdj_client\__init__.py" />
     <Compile Include="src\main.py" />
-    <Compile Include="src\virtualdj_client\config.py" />
+    <Compile Include="src\virtualdj_client\client_config.py" />
     <Compile Include="src\virtualdj_client\client.py" />
   </ItemGroup>
   <ItemGroup>
