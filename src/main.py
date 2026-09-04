@@ -2,7 +2,7 @@ import sys
 import os
 from rich.console import Console
 
-from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase
+from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
