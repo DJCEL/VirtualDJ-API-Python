@@ -246,7 +246,13 @@ class VirtualDJClient:
 
         is_vdj_connected = self.is_connected()
         if is_vdj_connected == True:
-            # TODO: Bypass the VirtualDJ security at exit if (force_close == True)
+            vdj_script = 'setting "loadSecurity"'
+            result = self.get(vdj_script)
+            if result in ['on','silent']:
+                 print("VirtualDJ => loadSecurity option is activated")
+                 # TODO: Bypass the VirtualDJ security at exit if (force_close == True)
+
+            # Close VirtualDJ
             vdj_script = "close"
             result = self.send(vdj_script)
             if result == True:

@@ -37,6 +37,16 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
         return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
     except ValueError:
         return None
+
+#------------------------------------------------------------------------------------
+def _to_bpm(value: Optional[str]) -> Optional[float]:
+    try:
+        Bpm = float(value) if value is not None else None
+        if not Bpm is None and Bpm !=0:
+            Bpm = 1 / Bpm * 60
+        return Bpm
+    except ValueError:
+        return None
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongPoi:
@@ -287,11 +297,9 @@ class VirtualDJSongsDatabase:
                 elif child_tag == "Scan":
                     scan = VdjSongScan()
                     scan.Version = _to_int(child_attrib.get("Version"))
-                    scan.Bpm = _to_float(child_attrib.get("Bpm"))
-                    if not scan.Bpm is None and scan.Bpm !=0:
-                        scan.Bpm = 1 / scan.Bpm * 60
+                    scan.Bpm = _to_bpm(child_attrib.get("Bpm"))
                     scan.Phase = _to_float(child_attrib.get("Phase"))
-                    scan.AltBpm = _to_float(child_attrib.get("AltBpm"))
+                    scan.AltBpm = _to_bpm(child_attrib.get("AltBpm"))
                     scan.Rigid = _to_float(child_attrib.get("Rigid"))
                     scan.Volume = _to_float(child_attrib.get("Volume"))
                     scan.Key = child_attrib.get("Key")

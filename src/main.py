@@ -152,7 +152,10 @@ def main():
     result1n = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1n}")
 
-    
+    # test 1o
+    vdj_script = 'setting "loadSecurity"'
+    result1o = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1o}")
 
 
     # Close VirtualDJ
