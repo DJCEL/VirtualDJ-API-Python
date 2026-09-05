@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------------
 import os
 import platform
+from tkinter import N
 import xml.etree.ElementTree as ET
 from typing import Optional, Any, Union
 from dataclasses import dataclass
@@ -27,10 +28,14 @@ def _to_int(value: Optional[str]) -> Optional[int]:
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
-def _to_datetime(value: Optional[int]) -> Optional[datetime]:
+def _to_strftime(value: Optional[str]) -> Optional[str]:
+    date_value = _to_int(value)
+    if date_value is None:
+        return None
+
     try:
-        date_time = datetime.fromtimestamp(value) if value is not None else None
-        return date_time
+        date_time = datetime.fromtimestamp(date_value)
+        return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
@@ -88,10 +93,10 @@ class VdjSongTags:
 @dataclass
 class VdjSongInfos:
     SongLength: Optional[float] = None
-    LastModified: Optional[int] = None
-    FirstSeen: Optional[int] = None
-    FirstPlay: Optional[int] = None
-    LastPlay: Optional[int] = None
+    LastModified: Optional[str] = None
+    FirstSeen: Optional[str] = None
+    FirstPlay: Optional[str] = None
+    LastPlay: Optional[str] = None
     PlayCount: Optional[int] = None
     Bitrate: Optional[int] = None
     Cover: Optional[int] = None
@@ -114,7 +119,7 @@ class VdjSongScan:
     BeatGrid: Optional[str] = None
     #------------------------------------------------------------------------------------
     class VdjSongScanFlag(int, Enum):
-        FLAG1 = 32768
+        FLAG1 = 32768 # [0x8000]
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongLink:
@@ -268,10 +273,10 @@ class VirtualDJSongsDatabase:
                 elif child_tag == "Infos":
                     infos = VdjSongInfos()
                     infos.SongLength =  _to_float(child_attrib.get("SongLength"))
-                    infos.LastModified = _to_int(child_attrib.get("LastModified"))
-                    infos.FirstSeen = _to_int(child_attrib.get("FirstSeen"))
-                    infos.FirstPlay = _to_int(child_attrib.get("FirstPlay"))
-                    infos.LastPlay = _to_int(child_attrib.get("LastPlay"))
+                    infos.LastModified = _to_strftime(child_attrib.get("LastModified"))
+                    infos.FirstSeen = _to_strftime(child_attrib.get("FirstSeen"))
+                    infos.FirstPlay = _to_strftime(child_attrib.get("FirstPlay"))
+                    infos.LastPlay = _to_strftime(child_attrib.get("LastPlay"))
                     infos.PlayCount = _to_int(child_attrib.get("PlayCount"))
                     infos.Bitrate = _to_int(child_attrib.get("Bitrate"))
                     infos.Cover = _to_int(child_attrib.get("Cover"))
