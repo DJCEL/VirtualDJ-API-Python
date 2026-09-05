@@ -117,8 +117,8 @@ class VdjSongLink:
 @dataclass
 class VdjSong:
     FilePath: Union[str,Path]
-    Flag: int
-    FileSize: Optional[int] = None
+    Flag: Optional[int] = None
+    FileSize: int = None
     Tags: Optional[VdjSongTags] = None
     Infos: Optional[VdjSongInfos] = None
     Comment: Optional[str] = None
@@ -128,7 +128,7 @@ class VdjSong:
     Link: Optional[VdjSongLink] = None
     #------------------------------------------------------------------------------------
     class VdjSongFlag(int, Enum):
-        HIDDEN_FROM_SEARCH = 1   # [0x01]
+        HIDDEN_FROM_SEARCH = 1  # [0x01]
         FILE_NOT_FOUND = 16  # [0x10]
         KARAOKE_FILE = 32  # [0x20]
         VIDEO_FILE = 64  # [0x40]
