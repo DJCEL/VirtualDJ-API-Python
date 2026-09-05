@@ -32,7 +32,6 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
     date_value = _to_int(value)
     if date_value is None:
         return None
-
     try:
         date_time = datetime.fromtimestamp(date_value)
         return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
