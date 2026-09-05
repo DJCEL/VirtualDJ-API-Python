@@ -179,13 +179,13 @@ def main():
                 console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
         elif (file_extension == ".db"):
             database_name = os.path.basename(db_path)
-            if database_name == "cache.db":
+            if database_name == songsDB.SQLITE_CACHE_DB":
                 result_list4 = songsDB.read_local_sqlite_database(db_path,database_name,"waveform")
                 n4 = len(result_list4)
                 if n4 >= 1:
                     waveform = result_list4[0]
                     console.print(f"VirtualDJ database reading => First song of the list of waveform = {waveform}")
-            elif database_name == "extra.db":
+            elif database_name == songsDB.SQLITE_EXTRA_DB:
                 lyrics_list = songsDB.read_local_sqlite_database(db_path,database_name,"lyrics")
                 n1 = len(lyrics_list)
                 if n1 >= 1:
