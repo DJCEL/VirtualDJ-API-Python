@@ -120,6 +120,13 @@ class VdjSong:
     Poi: Optional[list[VdjSongPoi]] = None
     CustomMix: Optional[str] = None
     Link: Optional[VdjSongLink] = None
+    #------------------------------------------------------------------------------------
+    class VdjSongFlag(str, Enum):
+        HIDDEN_FROM_SEARCH = 1   # (bit0) [0x01]
+        FILE_NOT_FOUND = 16  # (bit4) [0x10]
+        KARAOKE_FILE = 32  # (bit5) [0x20]
+        VIDEO_FILE = 64  # (bit6) [0x40]
+        NETSEARCH_FILE = 256 # (bit8) [0x100]
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase:
     XML_DATABASE_NAME = "database.xml"
