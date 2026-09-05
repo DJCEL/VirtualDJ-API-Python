@@ -121,7 +121,7 @@ class VdjSong:
     CustomMix: Optional[str] = None
     Link: Optional[VdjSongLink] = None
     #------------------------------------------------------------------------------------
-    class VdjSongFlag(str, Enum):
+    class VdjSongFlag(int, Enum):
         HIDDEN_FROM_SEARCH = 1   # [0x01]
         FILE_NOT_FOUND = 16  # [0x10]
         KARAOKE_FILE = 32  # [0x20]
