@@ -39,7 +39,7 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
         return None
 
 #------------------------------------------------------------------------------------
-def _to_bpm(value: Optional[str], digit: int = 2) -> Optional[float]:
+def _to_bpm(value: Optional[str], digit: int = 3) -> Optional[float]:
     try:
         bpm = float(value) if value is not None else None
         if bpm is not None and bpm !=0:
@@ -74,6 +74,7 @@ class VdjSongPoi:
         AUTOMIX = "automix"
         BEATGRID = "beatgrid"
         REMIX = "remix"
+        CUE = "cue"
     #------------------------------------------------------------------------------------
     class VdjSongPoiPoint(str, Enum):
         REAL_START = "realStart"
