@@ -6,7 +6,7 @@ import platform
 
 __version__ = '1.0.0'
 
-class VirtualDJHistoryFile():
+class VirtualDJHistoryFiles():
     TRACKLIST_FILENAME = "tracklist.txt"
     OTHER_FILES_EXTENSION = ".m3u"
 
