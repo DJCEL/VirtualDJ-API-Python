@@ -249,7 +249,9 @@ class VirtualDJSongsDatabase:
         print(f"VirtualDJ database reading => {root_attrib}")
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
 
-        return [self._parse_song(song, filepath_only) for song in songs_list]
+        VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
+
+        return VdjSong_list
     #------------------------------------------------------------------------------------
     @staticmethod
     def _parse_song(song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
