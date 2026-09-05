@@ -1,5 +1,12 @@
 # Changelog
 
+
+## 1.0.18 (2026-09-04)
+
+* Add songs database support (database.xml, extra.db, cache.db)
+* Add history file reader (tracklist.txt)
+* more support for mac
+
 ## 1.0.10 (2026-08-29)
 
 * Add Open/Close VirtualDJ app
