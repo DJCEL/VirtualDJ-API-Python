@@ -171,36 +171,43 @@ def main():
         database_name = os.path.basename(db_path)
         file_extension = os.path.splitext(db_path)[1]
         if (file_extension == ".xml"):
-            songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
-            n = len(songs_database)
-            if n >= 1:
-                song_1 = songs_database[0]
-                console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
-                song_n = songs_database[n - 1]
-                console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
+            if database_name == songsDB.XML_DATABASE_NAME:
+                songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
+                n = len(songs_database)
+                if n >= 1:
+                    song_1 = songs_database[0]
+                    console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
+                    song_n = songs_database[n - 1]
+                    console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
         elif (file_extension == ".db"):
             if database_name == songsDB.SQLITE_CACHE_DB:
-                result_list4 = songsDB.read_local_sqlite_database(db_path,database_name,"waveform")
-                n4 = len(result_list4)
-                if n4 >= 1:
-                    waveform = result_list4[0]
-                    console.print(f"VirtualDJ database reading => First song of the list of waveform = {waveform}")
+                table_name = "waveform"
+                result_list = songsDB.read_local_sqlite_database(db_path,database_name,"waveform")
+                n = len(result_list)
+                if n >= 1:
+                    item_1 = result_list[0]
+                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
             elif database_name == songsDB.SQLITE_EXTRA_DB:
-                lyrics_list = songsDB.read_local_sqlite_database(db_path,database_name,"lyrics")
-                n1 = len(lyrics_list)
-                if n1 >= 1:
-                    lyrics = lyrics_list[0]
-                    console.print(f"VirtualDJ database reading => First song of the list of lyrics = {lyrics}")
-                result_list2 = songsDB.read_local_sqlite_database(db_path,database_name,"related_tracks")
-                n2 = len(result_list2)
-                if n2 >= 1:
-                    song_2 = result_list2[0]
-                    console.print(f"VirtualDJ database reading => First song of the list of related tracks = {song_2}")
-                result_list3 = songsDB.read_local_sqlite_database(db_path,database_name,"track_data")
-                n3 = len(result_list3)
-                if n3 >= 1:
-                    song_3 = result_list3[0]
-                    console.print(f"VirtualDJ database reading => First song of the list of track data = {song_3}")
+                table_name = "lyrics"
+                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+                n = len(result_list)
+                if n >= 1:
+                    item_1 = result_list[0]
+                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+
+                table_name = "related_tracks"
+                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+                n = len(result_list)
+                if n >= 1:
+                    item_1 = result_list[0]
+                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+
+                table_name = "track_data"
+                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+                n = len(result_list)
+                if n >= 1:
+                    item_1 = result_list[0]
+                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
