@@ -3,9 +3,9 @@
 
 ## 1.1.0 (2026-09-05)
 
-* Add songs database support (database.xml, extra.db, cache.db)
-* Add history file reader (tracklist.txt)
-* more support for mac
+* Support of songs database (database.xml, extra.db, cache.db)
+* Support of history file (tracklist.txt)
+* more support for mac (not yet finished)
 
 ## 1.0.10 (2026-08-29)
 
