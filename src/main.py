@@ -82,6 +82,12 @@ def main():
     result2h = client.send(vdj_script)
     console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
 
+    # test 2i
+    filepath = "D:\\Music\\xxxx.mp3"
+    vdj_script = f"deck right load '{filepath}'"
+    result2i = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2i}")
+    
     # test 1a
     vdj_script = "get_browsed_title_artist"
     result1a = client.get(vdj_script)
