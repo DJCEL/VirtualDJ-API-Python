@@ -4,14 +4,14 @@ from rich.console import Console
 
 from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles
 
+#console = Console(file=sys.stderr)
+console = Console()
+
 #------------------------------------------------------------------------------------------------------------------------------------
-def main():
+def control_VirtualDJ():
     print("#######################################################")
     print("#  Control VirtualDJ with the Network Control plugin  #")
     print("#######################################################")
-
-    #console = Console(file=sys.stderr)
-    console = Console()
 
     # Initialize VirtualDJ client
     client = VirtualDJClient()
@@ -82,11 +82,26 @@ def main():
     result2h = client.send(vdj_script)
     console.print(f"VirtualDJ script send < {vdj_script} > => {result2h}")
 
-    # test 2i
+    # test 2i (update with your own filepath)
     filepath = "D:\\Music\\xxxx.mp3"
     vdj_script = f"deck right load '{filepath}'"
     result2i = client.send(vdj_script)
     console.print(f"VirtualDJ script send < {vdj_script} > => {result2i}")
+
+    # test 2j
+    vdj_script = "browser_scroll +1"
+    result2j = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2j}")
+
+    # test 2k
+    vdj_script = "save_config"
+    result2k = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2k}")
+
+    # test 2l
+    vdj_script = "saveregistryconfig"
+    result2l = client.send(vdj_script)
+    console.print(f"VirtualDJ script send < {vdj_script} > => {result2l}")
     
     # test 1a
     vdj_script = "get_browsed_title_artist"
@@ -152,22 +167,47 @@ def main():
     vdj_script = "get_browsed_folder_scrollpos"
     result1m = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1m}")
-
+    
     # test 1n
-    vdj_script = "deck left has_stems"
+    vdj_script = "get_browsed_scrollsize"
     result1n = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1n}")
 
     # test 1o
-    vdj_script = 'setting "loadSecurity"'
+    vdj_script = "get_browsed_scrollpos"
     result1o = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1o}")
+
+    # test 1p
+    vdj_script = "file_count"
+    result1p = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1p}")
+
+    # test 1q
+    vdj_script = "deck left has_stems"
+    result1q = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1q}")
+
+    # test 1r
+    vdj_script = 'setting "loadSecurity"'
+    result1r = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1r}")
+
+    # test 1s
+    vdj_script = 'setting "checkUpdates"'
+    result1s = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1s}")
 
 
     # Close VirtualDJ
     #console.print(f"VirtualDJ closing...")
     #client.close_app()
 
+#------------------------------------------------------------------------------------------------------------------------------------
+def read_VirtualDJ_database():
+    print("##############################")
+    print("#  Read VirtualDJ database   #")
+    print("##############################")
 
     # Initialize VirtualDJ Songs database
     songsDB = VirtualDJSongsDatabase()
@@ -214,6 +254,12 @@ def main():
             if n >= 1:
                 item_1 = result_list[0]
                 console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+
+#------------------------------------------------------------------------------------------------------------------------------------
+def main():
+   control_VirtualDJ()
+   #read_VirtualDJ_database()
+
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
