@@ -13,7 +13,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime
 
-__version__ = '1.0.11'
+__version__ = '1.0.12'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -291,7 +291,7 @@ class VirtualDJSongsDatabase:
                     scan.Bpm = _to_float(child_attrib.get("Bpm"))
                     if not scan.Bpm is None and scan.Bpm !=0:
                         scan.Bpm = 1 / scan.Bpm * 60
-                    scan.Phase = child_attrib.get("Phase")
+                    scan.Phase = _to_float(child_attrib.get("Phase"))
                     scan.AltBpm = _to_float(child_attrib.get("AltBpm"))
                     scan.Rigid = _to_float(child_attrib.get("Rigid"))
                     scan.Volume = _to_float(child_attrib.get("Volume"))
