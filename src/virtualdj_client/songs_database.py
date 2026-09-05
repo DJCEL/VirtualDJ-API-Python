@@ -347,5 +347,6 @@ class VirtualDJSongsDatabase:
                         result.append(value)
         except Exception as e:
             print(f"Failed to query the sqlite database: ", str(e))
+            result = []
 
         return result
