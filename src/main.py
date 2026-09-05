@@ -182,7 +182,7 @@ def main():
         elif (file_extension == ".db"):
             if database_name == songsDB.SQLITE_CACHE_DB:
                 table_name = "waveform"
-                result_list = songsDB.read_local_sqlite_database(db_path,database_name,"waveform")
+                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
                 n = len(result_list)
                 if n >= 1:
                     item_1 = result_list[0]
