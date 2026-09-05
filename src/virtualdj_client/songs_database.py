@@ -13,7 +13,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.12'
+__version__ = '1.0.13'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -69,12 +69,16 @@ class VdjSongPoi:
     Phrase: Optional[int] = None
     Size: Optional[float] = None
     Slot: Optional[int] = None
+    Action: Optional[str] = None
+    Color: Optional[int] = None
     #------------------------------------------------------------------------------------
     class VdjSongPoiType(str, Enum):
         AUTOMIX = "automix"
         BEATGRID = "beatgrid"
         REMIX = "remix"
         CUE = "cue"
+        ACTION = "action"
+        LOOP = "loop"
     #------------------------------------------------------------------------------------
     class VdjSongPoiPoint(str, Enum):
         REAL_START = "realStart"
