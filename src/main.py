@@ -198,6 +198,11 @@ def control_VirtualDJ():
     result1s = client.get(vdj_script)
     console.print(f"VirtualDJ script get < {vdj_script} > => {result1s}")
 
+    # test 1t
+    vdj_script = "get_decks"
+    result1t = client.get(vdj_script)
+    console.print(f"VirtualDJ script get < {vdj_script} > => {result1t}")
+
 
     # Close VirtualDJ
     #console.print(f"VirtualDJ closing...")
