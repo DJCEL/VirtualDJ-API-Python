@@ -181,28 +181,28 @@ def main():
                     console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
         elif (file_extension == ".db"):
             if database_name == songsDB.SQLITE_CACHE_DB:
-                table_name = "waveform"
+                table_name = songsDB.SQLITE_CACHE_DB_WAVEFORMS
                 result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
                 n = len(result_list)
                 if n >= 1:
                     item_1 = result_list[0]
                     console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
             elif database_name == songsDB.SQLITE_EXTRA_DB:
-                table_name = "lyrics"
+                table_name = songsDB.SQLITE_EXTRA_DB_LYRICS
                 result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
                 n = len(result_list)
                 if n >= 1:
                     item_1 = result_list[0]
                     console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 
-                table_name = "related_tracks"
+                table_name = songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS
                 result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
                 n = len(result_list)
                 if n >= 1:
                     item_1 = result_list[0]
                     console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 
-                table_name = "track_data"
+                table_name = songsDB.SQLITE_EXTRA_DB_TRACK_DATA
                 result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
                 n = len(result_list)
                 if n >= 1:

@@ -11,7 +11,7 @@ from enum import Enum
 import sqlite3
 from contextlib import closing
 
-__version__ = '1.0.9'
+__version__ = '1.0.10'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -123,8 +123,13 @@ class VdjSong:
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase:
     XML_DATABASE_NAME = "database.xml"
-    SQLITE_EXTRA_DB = "extra.db"
     SQLITE_CACHE_DB = "cache.db"
+    SQLITE_CACHE_DB_WAVEFORMS = "waveforms"
+    SQLITE_EXTRA_DB = "extra.db"
+    SQLITE_EXTRA_DB_LYRICS = "lyrics"
+    SQLITE_EXTRA_DB_RELATED_TRACKS = "related_tracks"
+    SQLITE_EXTRA_DB_TRACK_DATA = "track_data"
+
     #------------------------------------------------------------------------------------
     def get_local_database_list(self) -> list[Path]:
         system = platform.system()
@@ -298,22 +303,23 @@ class VirtualDJSongsDatabase:
     #------------------------------------------------------------------------------------
     def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
-        if database_name == "extra.db":
-            if table_name == "lyrics":
-                # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
-                sql_script = "SELECT lid,xml FROM lyrics"
-            elif table_name == "related_tracks":
-                # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
-                sql_script = "SELECT id,sid1,sid2 FROM related_tracks"
-            elif table_name == "track_data":
-                # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
-                sql_script = "SELECT id,sid,file,filesize,artist,title,remix FROM track_data"
+        
+        if database_name == self.SQLITE_CACHE_DB:
+            if table_name == self.SQLITE_CACHE_DB_WAVEFORMS:
+                # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
+                sql_script = f"SELECT * FROM {table_name}"
             else:
                 sql_script = ""
-        elif database_name == "cache.db":
-            if table_name == "waveform" or table_name is None:
-                # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
-                sql_script = "SELECT id,filepath,filename,filesize,type,version,valuesPerSecond,waveform FROM waveforms"
+        elif database_name == self.SQLITE_EXTRA_DB:
+            if table_name == self.SQLITE_EXTRA_DB_LYRICS:
+                # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
+                sql_script = f"SELECT * FROM {table_name}"
+            elif table_name == self.SQLITE_EXTRA_DB_RELATED_TRACKS:
+                # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
+                sql_script = f"SELECT * FROM {table_name}"
+            elif table_name == self.SQLITE_EXTRA_DB_TRACK_DATA:
+                # track_data: id[INTEGER,PRIMARY_KEY], sid[INTEGER], file[TEXT], filesize[INTEGER], artist[TEXT], title[TEXT], remix[TEXT]
+                sql_script = f"SELECT * FROM {table_name}"
             else:
                 sql_script = ""
         else:
