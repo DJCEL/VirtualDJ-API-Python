@@ -41,10 +41,10 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
 #------------------------------------------------------------------------------------
 def _to_bpm(value: Optional[str]) -> Optional[float]:
     try:
-        Bpm = float(value) if value is not None else None
-        if not Bpm is None and Bpm !=0:
-            Bpm = 1 / Bpm * 60
-        return Bpm
+        bpm = float(value) if value is not None else None
+        if not bpm is None and bpm !=0:
+            bpm = 1 / bpm * 60
+        return bpm
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
