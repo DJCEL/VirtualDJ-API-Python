@@ -62,7 +62,7 @@ def _to_songlength(value: Optional[str]) -> Optional[str]:
 class VdjSongPoi:
     Name: Optional[str] = None
     Pos: Optional[float] = None
-    Type: Optional[str] = None
+    Type: str = None
     Point: Optional[str] = None
     Num: Optional[int] = None
     Bpm: Optional[float] = None
