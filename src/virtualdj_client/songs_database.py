@@ -11,7 +11,7 @@ from pathlib import Path
 from enum import Enum
 import sqlite3
 from contextlib import closing
-from datetime import datetime
+from datetime import datetime,timedelta
 
 __version__ = '1.0.12'
  
@@ -39,12 +39,22 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
         return None
 
 #------------------------------------------------------------------------------------
-def _to_bpm(value: Optional[str]) -> Optional[float]:
+def _to_bpm(value: Optional[str], digit: int = 2) -> Optional[float]:
     try:
         bpm = float(value) if value is not None else None
-        if not bpm is None and bpm !=0:
-            bpm = 1 / bpm * 60
+        if bpm is not None and bpm !=0:
+            bpm = round(1 / bpm * 60, digit)
         return bpm
+    except ValueError:
+        return None
+#------------------------------------------------------------------------------------
+def _to_songlength(value: Optional[str]) -> Optional[str]:
+    try:
+        seconds = float(value) if value is not None else None
+        if seconds is None:
+            return None
+        songlength = str(timedelta(seconds=seconds))
+        return songlength
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
@@ -101,7 +111,7 @@ class VdjSongTags:
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongInfos:
-    SongLength: Optional[float] = None
+    SongLength: Optional[str] = None
     LastModified: Optional[str] = None
     FirstSeen: Optional[str] = None
     FirstPlay: Optional[str] = None
@@ -262,9 +272,7 @@ class VirtualDJSongsDatabase:
                     tags.Title = child_attrib.get("Title")
                     tags.Year = _to_int(child_attrib.get("Year"))
                     tags.Genre = child_attrib.get("Genre")
-                    tags.Bpm = _to_float(child_attrib.get("Bpm"))
-                    if not tags.Bpm is None and tags.Bpm !=0:
-                        tags.Bpm = 1 / tags.Bpm * 60
+                    tags.Bpm = _to_bpm(child_attrib.get("Bpm"))
                     tags.Key = child_attrib.get("Key")
                     tags.Album = child_attrib.get("Album")
                     tags.Composer = child_attrib.get("Composer")
@@ -281,7 +289,7 @@ class VirtualDJSongsDatabase:
                     song.Tags = tags
                 elif child_tag == "Infos":
                     infos = VdjSongInfos()
-                    infos.SongLength =  _to_float(child_attrib.get("SongLength"))
+                    infos.SongLength =  _to_songlength(child_attrib.get("SongLength"))
                     infos.LastModified = _to_strftime(child_attrib.get("LastModified"))
                     infos.FirstSeen = _to_strftime(child_attrib.get("FirstSeen"))
                     infos.FirstPlay = _to_strftime(child_attrib.get("FirstPlay"))
