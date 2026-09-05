@@ -169,45 +169,42 @@ def main():
     for db_path in database_list:
         console.print(f"VirtualDJ database reading => {db_path}")
         database_name = os.path.basename(db_path)
-        file_extension = os.path.splitext(db_path)[1]
-        if (file_extension == ".xml"):
-            if database_name == songsDB.XML_DATABASE_NAME:
-                songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
-                n = len(songs_database)
-                if n >= 1:
-                    song_1 = songs_database[0]
-                    console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
-                    song_n = songs_database[n - 1]
-                    console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
-        elif (file_extension == ".db"):
-            if database_name == songsDB.SQLITE_CACHE_DB:
-                table_name = songsDB.SQLITE_CACHE_DB_WAVEFORMS
-                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-                n = len(result_list)
-                if n >= 1:
-                    item_1 = result_list[0]
-                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
-            elif database_name == songsDB.SQLITE_EXTRA_DB:
-                table_name = songsDB.SQLITE_EXTRA_DB_LYRICS
-                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-                n = len(result_list)
-                if n >= 1:
-                    item_1 = result_list[0]
-                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+        if (database_name == songsDB.XML_DATABASE_NAME):
+            songs_database = songsDB.read_local_xml_database(db_path, filepath_only=False)
+            n = len(songs_database)
+            if n >= 1:
+                song_1 = songs_database[0]
+                console.print(f"VirtualDJ database reading => First song of the list = {song_1}")
+                song_n = songs_database[n - 1]
+                console.print(f"VirtualDJ database reading => Last song of the list = {song_n}")
+        elif (database_name == songsDB.SQLITE_CACHE_DB):
+            table_name = songsDB.SQLITE_CACHE_DB_WAVEFORMS
+            result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            if n >= 1:
+                item_1 = result_list[0]
+                console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+        elif (database_name == songsDB.SQLITE_EXTRA_DB):
+            table_name = songsDB.SQLITE_EXTRA_DB_LYRICS
+            result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            if n >= 1:
+                item_1 = result_list[0]
+                console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 
-                table_name = songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS
-                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-                n = len(result_list)
-                if n >= 1:
-                    item_1 = result_list[0]
-                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+            table_name = songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS
+            result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            if n >= 1:
+                item_1 = result_list[0]
+                console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 
-                table_name = songsDB.SQLITE_EXTRA_DB_TRACK_DATA
-                result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-                n = len(result_list)
-                if n >= 1:
-                    item_1 = result_list[0]
-                    console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+            table_name = songsDB.SQLITE_EXTRA_DB_TRACK_DATA
+            result_list = songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            if n >= 1:
+                item_1 = result_list[0]
+                console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
