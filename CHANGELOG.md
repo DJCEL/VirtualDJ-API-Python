@@ -1,7 +1,7 @@
 # Changelog
 
 
-## 1.0.19 (2026-09-05)
+## 1.1.0 (2026-09-05)
 
 * Add songs database support (database.xml, extra.db, cache.db)
 * Add history file reader (tracklist.txt)
