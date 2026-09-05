@@ -1,4 +1,4 @@
-__version__ = "1.0.1"
+__version__ = "1.0.18"
 
 from .client import VirtualDJClient, VDJError
 from .songs_database import VirtualDJSongsDatabase
