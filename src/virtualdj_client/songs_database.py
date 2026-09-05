@@ -75,7 +75,7 @@ class VdjSongTags:
     Flag: Optional[int] = None
     #------------------------------------------------------------------------------------
     class VdjSongTagsFlag(int, Enum):
-        FLAG1 = 0
+        FLAG1 = 1
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongInfos:
@@ -106,7 +106,7 @@ class VdjSongScan:
     BeatGrid: Optional[str] = None
     #------------------------------------------------------------------------------------
     class VdjSongScanFlag(int, Enum):
-        FLAG1 = 0
+        FLAG1 = 32768
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongLink:
