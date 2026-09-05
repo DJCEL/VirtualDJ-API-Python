@@ -303,7 +303,6 @@ class VirtualDJSongsDatabase:
     #------------------------------------------------------------------------------------
     def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
-        
         if database_name == self.SQLITE_CACHE_DB:
             if table_name == self.SQLITE_CACHE_DB_WAVEFORMS:
                 # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
@@ -326,14 +325,18 @@ class VirtualDJSongsDatabase:
             sql_script = ""
 
 
-        result_list = []
-
-
         if sql_script == "":
-            return result_list
+            return []
 
+        result_list = []
         print(sql_script)
+        result_list = self._sqlite_query(database_path, sql_script)
 
+        return result_list
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _sqlite_query(database_path, sql_script) -> list[dict]:
+        result = []
         try:
            with sqlite3.connect(database_path) as connection:
                connection.row_factory = sqlite3.Row
@@ -341,9 +344,8 @@ class VirtualDJSongsDatabase:
                     rows = cursor.execute(sql_script).fetchall()
                     for row in rows:
                         value = dict(row)
-                        result_list.append(value)
-
+                        result.append(value)
         except Exception as e:
             print(f"Failed to query the sqlite database: ", str(e))
 
-        return result_list
+        return result
