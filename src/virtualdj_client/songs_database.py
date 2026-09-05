@@ -10,19 +10,27 @@ from pathlib import Path
 from enum import Enum
 import sqlite3
 from contextlib import closing
+from datetime import datetime
 
-__version__ = '1.0.10'
+__version__ = '1.0.11'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
     try:
-        return float(value) if value  is not None else None
+        return float(value) if value is not None else None
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
 def _to_int(value: Optional[str]) -> Optional[int]:
     try:
-        return int(value) if value  is not None else None
+        return int(value) if value is not None else None
+    except ValueError:
+        return None
+#------------------------------------------------------------------------------------
+def _to_datetime(value: Optional[int]) -> Optional[datetime]:
+    try:
+        date_time = datetime.fromtimestamp(value) if value is not None else None
+        return date_time
     except ValueError:
         return None
 #------------------------------------------------------------------------------------
