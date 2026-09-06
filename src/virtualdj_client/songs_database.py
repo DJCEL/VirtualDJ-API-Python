@@ -179,7 +179,6 @@ class VirtualDJSongsDatabase:
     SQLITE_EXTRA_DB_LYRICS = "lyrics"
     SQLITE_EXTRA_DB_RELATED_TRACKS = "related_tracks"
     SQLITE_EXTRA_DB_TRACK_DATA = "track_data"
-
     #------------------------------------------------------------------------------------
     def get_local_database_list(self) -> list[Path]:
         system = platform.system()

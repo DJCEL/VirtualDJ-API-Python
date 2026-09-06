@@ -9,16 +9,16 @@ __version__ = '1.0.0'
 class VirtualDJHistoryFiles():
     TRACKLIST_FILENAME = "tracklist.txt"
     OTHER_FILES_EXTENSION = ".m3u"
-
+    #------------------------------------------------------------------------------------
     def get_local_history_files(self):
         system = platform.system()
         if system == "Windows":
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
-                history_folder = os.path.join(local_appdata, 'History')
-                self.read_tracklist_file(history_folder)
+                history_folder = os.path.join(local_appdata, "VirtualDJ", 'History')
+                self._read_tracklist_file(history_folder)
 
-    def read_tracklist_file(self, history_folder:str):
+    def _read_tracklist_file(self, history_folder:str):
         history_path = os.path.join(history_folder, self.TRACKLIST_FILENAME)
         if os.path.exists(history_path):
             with open(history_path,"r", encoding="utf-8") as file:

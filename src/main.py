@@ -259,10 +259,21 @@ def read_VirtualDJ_database():
             if n >= 1:
                 item_1 = result_list[0]
                 console.print(f"VirtualDJ database reading => First item of {table_name} = {item_1}")
+#------------------------------------------------------------------------------------------------------------------------------------
+def read_VirtualDJ_history_files():
+    print("#############################")
+    print("#  Read VirtualDJ history   #")
+    print("#############################")
+
+    # Initialize VirtualDJ Songs database
+    history_files = VirtualDJHistoryFiles()
+
+    history_files.get_local_history_files()
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
-   read_VirtualDJ_database()
+   #read_VirtualDJ_database()
+   #read_VirtualDJ_history_files()
    control_VirtualDJ()
 
 #------------------------------------------------------------------------------------------------------------------------------------
