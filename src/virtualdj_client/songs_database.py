@@ -251,7 +251,7 @@ class VirtualDJSongsDatabase:
     @staticmethod
     def _darwin_drive_roots() -> list[Path]:
         volumes_path = Path("/Volumes")
-        if not volumes_path.exists:
+        if not volumes_path.exists():
             return []
         drives_darwin = [volume for volume in volumes_path.iterdir() if volume.is_dir()]
         return drives_darwin
