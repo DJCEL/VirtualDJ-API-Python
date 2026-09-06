@@ -1,3 +1,4 @@
 # AGENTS.md file
 
-TODO
+## 1. Coding Conventions
+* Compatible code with Python>=3.14 only
