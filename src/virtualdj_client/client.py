@@ -6,7 +6,7 @@ __version__ = '1.0.18'
 import httpx
 import psutil
 import asyncio
-from typing import Any, Literal
+from typing import Literal
 from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
 import logging
@@ -92,74 +92,74 @@ class VirtualDJClient:
                         ext_result = result[0:6]
                         bErr = (ext_result.lower() == "error:")
                     status = "error" if bErr else "ok"
-                    return {"status": status, "status_code": status_code, "result": result}
+                    return VDJResponse(status=status, status_code=status_code, result=result)
                 else:
                     bErr = (result.lower() != "true")
                     status = "error" if bErr else "ok"
-                    return {"status": status, "status_code": status_code,"result": result}
+                    return VDJResponse(status=status, status_code=status_code, result=result)
             elif status_code == 401:
                 status = "error"
                 result = "Authentication failed - check password"
-                return {"status": status, "status_code": status_code, "result": result}
+                return VDJResponse(status=status, status_code=status_code, result=result)
             else:
                 status = "error"
                 result = f"{response.text}"
-                return {"status": status, "status_code": status_code, "result": result}
+                return VDJResponse(status=status, status_code=status_code, result=result)
 
         except httpx.ConnectError:
             status = "error"
             status_code = -1
             result = "HTTP Connection error"
-            return {"status": status,"status_code": status_code, "result": result}
+            return VDJResponse(status=status, status_code=status_code, result=result)
         except httpx.TimeoutException:
             status = "error"
             status_code = -2
             result = "HTTP timeout"
-            return {"status": status, "status_code": status_code, "result": result}
+            return VDJResponse(status=status, status_code=status_code, result=result)
         except httpx.HTTPError as e:
             status = "error"
             status_code = -3
             result = f"{e} It could be a problem of password too."
-            return {"status": status, "status_code": status_code, "result": result}
+            return VDJResponse(status=status, status_code=status_code, result=result)
         except Exception as e:
             status = "error"
             status_code = -4
             result = str(e)
-            return {"status": status, "status_code": status_code, "result": result}
+            return VDJResponse(status=status, status_code=status_code, result=result)
     #------------------------------------------------------------------------------------
     async def _query(self, vdj_script: str) -> VDJResponse:
         """ Query VirtualDJ with a vdj_script """
-        result = await self._send_vdj_request(vdj_script, is_query=True)
-        return result
+        vdj_response = await self._send_vdj_request(vdj_script, is_query=True)
+        return vdj_response
     #------------------------------------------------------------------------------------       
     async def _execute(self, vdj_script: str) -> VDJResponse:
         """ Send command to VirtualDJ with a vdj_script """
-        result = await self._send_vdj_request(vdj_script)
-        return result
+        vdj_response = await self._send_vdj_request(vdj_script)
+        return vdj_response
     #------------------------------------------------------------------------------------
     async def _query_vdj_script(self, vdj_script: str) -> str:
         """ Query VirtualDJ with a vdj_script """
-        result = await self._query(vdj_script)
-        bRes = (result.get("status") == "ok")
+        vdj_response = await self._query(vdj_script)
+        bRes = (vdj_response.status == "ok")
         if (bRes == True):
-            result_final = result.get("result", "")
+            result_final = vdj_response.result 
             return result_final
         else:
-            status_code = result.get("status_code")
-            result_final = result.get("result", "Unknown error")
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
             _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return f"Failed to query < {vdj_script} >: {result_final}"            
     #------------------------------------------------------------------------------------
     async def _execute_vdj_script(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """
-        result = await self._execute(vdj_script)
-        bRes = (result.get("status") == "ok")
+        vdj_response = await self._execute(vdj_script)
+        bRes = (vdj_response.status == "ok")
         if (bRes == True):
-            bRes2 = (result.get("result", "").lower() == "true")
+            bRes2 = (vdj_response.result.lower() == "true")
             return bRes2
         else:
-            status_code = result.get("status_code")
-            result_final = result.get("result", "Unknown error")
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
             _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
     #------------------------------------------------------------------------------------
@@ -276,11 +276,11 @@ class VirtualDJClient:
             return False
 
         vdj_script = "get_version"
-        result = await self._query(vdj_script)
-        bRes = (result.get("status") == "ok")
+        vdj_response = await self._query(vdj_script)
+        bRes = (vdj_response.status == "ok")
         if bRes == False:
-            status_code = result.get("status_code")
-            result_final = result.get("result", "Unknown error")
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
             _SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
         else:
