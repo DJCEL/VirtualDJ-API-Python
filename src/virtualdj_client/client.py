@@ -7,6 +7,7 @@ import httpx
 import psutil
 import asyncio
 from typing import Any, Literal
+from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
 import logging
 import os
@@ -39,6 +40,12 @@ class VDJError(Exception):
     """VirtualDJ operation error"""
     pass
 #------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VDJResponse:
+    status: Literal["ok","error"]
+    status_code: int
+    result: str
+#------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient:
     def __init__(self):
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
@@ -60,7 +67,7 @@ class VirtualDJClient:
             headers["Authorization"] = f"Bearer {VDJ_NETWORK_CONTROL_PASSWORD}"
         return headers
     #------------------------------------------------------------------------------------
-    async def _send_vdj_request(self, vdj_script: str, is_query: bool = False) -> dict[str, Any]:
+    async def _send_vdj_request(self, vdj_script: str, is_query: bool = False) -> VDJResponse:
         """ Send command via HTTP Network Control plugin """
         vdj_endpoint = "query" if is_query else "execute"
         headers = self._get_headers()
@@ -69,11 +76,10 @@ class VirtualDJClient:
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
         try:
-            client = self._client
-            if client  is None:
-                 client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
+            if self._client  is None:
+                 self.client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
 
-            response = await client.get(vdj_url_full, headers=headers)
+            response = await self.client.get(vdj_url_full, headers=headers)
             status_code = response.status_code
             if status_code == 200:
                 encoding = response.encoding
@@ -121,12 +127,12 @@ class VirtualDJClient:
             result = str(e)
             return {"status": status, "status_code": status_code, "result": result}
     #------------------------------------------------------------------------------------
-    async def _query(self, vdj_script: str) -> dict[str, Any]:
+    async def _query(self, vdj_script: str) -> VDJResponse:
         """ Query VirtualDJ with a vdj_script """
         result = await self._send_vdj_request(vdj_script, is_query=True)
         return result
     #------------------------------------------------------------------------------------       
-    async def _execute(self, vdj_script: str) -> dict[str, Any]:
+    async def _execute(self, vdj_script: str) -> VDJResponse:
         """ Send command to VirtualDJ with a vdj_script """
         result = await self._send_vdj_request(vdj_script)
         return result

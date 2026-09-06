@@ -13,7 +13,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.13'
+__version__ = '1.0.14'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -332,16 +332,17 @@ class VirtualDJSongsDatabase:
                     song.Link = link
                 elif child_tag == "Poi":
                     poi = VdjSongPoi()
-                    poi.Name = child_attrib.get("Name"),
-                    poi.Pos = _to_float(child_attrib.get("Pos")),
-                    poi.Type = child_attrib.get("Type"),
-                    poi.Point = child_attrib.get("Point"),
-                    poi.Num = _to_int(child_attrib.get("Num")),
-                    poi.Bpm = _to_float(child_attrib.get("Bpm")),
-                    poi.Phrase = _to_int(child_attrib.get("Phrase")),
-                    poi.Size = _to_float(child_attrib.get("Size")),
-                    poi.Slot = _to_int(child_attrib.get("Slot)"))
-                    song.Poi = poi_list.append(poi)
+                    poi.Name = child_attrib.get("Name")
+                    poi.Pos = _to_float(child_attrib.get("Pos"))
+                    poi.Type = child_attrib.get("Type")
+                    poi.Point = child_attrib.get("Point")
+                    poi.Num = _to_int(child_attrib.get("Num"))
+                    poi.Bpm = _to_float(child_attrib.get("Bpm"))
+                    poi.Phrase = _to_int(child_attrib.get("Phrase"))
+                    poi.Size = _to_float(child_attrib.get("Size"))
+                    poi.Slot = _to_int(child_attrib.get("Slot"))
+                    poi_list.append(poi)
+                    song.Poi = poi_list
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
                 else:
