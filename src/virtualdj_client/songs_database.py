@@ -215,7 +215,8 @@ class VirtualDJSongsDatabase:
             return database_list_noduplicates
 
         elif system == "Darwin":
-            docs_path = os.path.expanduser('~/Documents')
+            docs_path_old = os.path.expanduser('~/Documents')
+            docs_path = os.path.expanduser('~/Library/Application Support')
             if docs_path:
                 main_XMLdatabase_path = os.path.join(docs_path, 'VirtualDJ', self.XML_DATABASE_NAME)
                 if os.path.exists(main_XMLdatabase_path):
@@ -253,7 +254,10 @@ class VirtualDJSongsDatabase:
     #------------------------------------------------------------------------------------
     @staticmethod
     def _darwin_drive_roots() -> list[Path]:
-        drives_darwin = os.listdir('/Volumes')
+        volumes_path = Path("/Volumes")
+        if not volumes_path.exists:
+            return []
+        drives_darwin = [volume for volume in volumes_path.iterdir() if volume.is_dir()]
         return drives_darwin
     #------------------------------------------------------------------------------------
     def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
