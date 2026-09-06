@@ -77,9 +77,9 @@ class VirtualDJClient:
 
         try:
             if self._client  is None:
-                 self.client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
+                 self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
 
-            response = await self.client.get(vdj_url_full, headers=headers)
+            response = await self._client.get(vdj_url_full, headers=headers)
             status_code = response.status_code
             if status_code == 200:
                 encoding = response.encoding
