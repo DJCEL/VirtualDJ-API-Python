@@ -22,6 +22,7 @@ class VirtualDJHistoryFiles():
     def _get_virtualdj_home() -> Path:
         system = platform.system()
         if system == "Windows":
+            # vdj_home_old = "C:\\Users\\<username>\\Documents\\VirtualDJ"
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
                 vdj_home = os.path.join(local_appdata,'VirtualDJ')
