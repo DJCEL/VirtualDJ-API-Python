@@ -62,7 +62,7 @@ def _to_songlength(value: Optional[str]) -> Optional[str]:
 class VdjSongPoi:
     Name: Optional[str] = None
     Pos: Optional[float] = None
-    Type: str = None
+    Type: str
     Point: Optional[str] = None
     Num: Optional[int] = None
     Bpm: Optional[float] = None
@@ -342,7 +342,7 @@ class VirtualDJSongsDatabase:
                     poi.Size = _to_float(child_attrib.get("Size"))
                     poi.Slot = _to_int(child_attrib.get("Slot"))
                     poi_list.append(poi)
-                    song.Poi = poi_list
+                    song.Poi = poi_list or None
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
                 else:
