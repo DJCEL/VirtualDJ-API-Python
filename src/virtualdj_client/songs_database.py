@@ -227,14 +227,34 @@ class VirtualDJSongsDatabase:
                 if os.path.exists(main_SQLite2database_path):
                     database_list.append(main_SQLite2database_path)
 
-            return database_list
+            drives_Darwin = self._darwin_drive_roots()
+            for drive in drives_Darwin:
+                external_XMLdatabase_path = os.path.join(drive,'VirtualDJ', self.XML_DATABASE_NAME)
+                if os.path.exists(external_XMLdatabase_path):
+                    database_list.append(external_XMLdatabase_path)
+                external_SQLite1database_path = os.path.join(drive,'VirtualDJ', self.SQLITE_EXTRA_DB)
+                if os.path.exists(external_SQLite1database_path):
+                    database_list.append(external_SQLite1database_path)
+                external_SQLite2database_path = os.path.join(drive,'VirtualDJ', 'Cache', self.SQLITE_CACHE_DB)
+                if os.path.exists(external_SQLite2database_path):
+                    database_list.append(external_SQLite2database_path)
 
-        return database_list
+            database_list_noduplicates = list(dict.fromkeys(database_list))
+
+            return database_list_noduplicates
+
+        else:
+            return database_list
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
         drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
         return drives_Windows
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _darwin_drive_roots() -> list[Path]:
+        drives_darwin = os.listdir('/Volumes')
+        return drives_darwin
     #------------------------------------------------------------------------------------
     def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
         try:
