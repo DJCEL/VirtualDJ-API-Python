@@ -3,7 +3,6 @@
 #------------------------------------------------------------------------------------
 import os
 import platform
-from tkinter import N
 import xml.etree.ElementTree as ET
 from typing import Optional, Any, Union
 from dataclasses import dataclass
@@ -40,6 +39,7 @@ def _to_strftime(value: Optional[str]) -> Optional[str]:
 
 #------------------------------------------------------------------------------------
 def _to_bpm(value: Optional[str], digit: int = 3) -> Optional[float]:
+    """ Conversion of the Bpm from the VirtualDJ format """
     try:
         bpm = float(value) if value is not None else None
         if bpm is not None and bpm !=0:
@@ -342,11 +342,13 @@ class VirtualDJSongsDatabase:
                     poi.Size = _to_float(child_attrib.get("Size"))
                     poi.Slot = _to_int(child_attrib.get("Slot"))
                     poi_list.append(poi)
-                    song.Poi = poi_list or None
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
                 else:
                     print(f"child_tag < {child_tag} > not defined")
+            
+            # We add Poi list outside of the loop
+            song.Poi = poi_list or None
        
             return song
     #------------------------------------------------------------------------------------
