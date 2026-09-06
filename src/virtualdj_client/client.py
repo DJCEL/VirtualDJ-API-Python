@@ -141,7 +141,7 @@ class VirtualDJClient:
         """ Query VirtualDJ with a vdj_script """
         vdj_response = await self._query(vdj_script)
         bRes = (vdj_response.status == "ok")
-        if (bRes == True):
+        if bRes:
             result_final = vdj_response.result 
             return result_final
         else:
@@ -154,7 +154,7 @@ class VirtualDJClient:
         """ Execute a vdj_script and return status """
         vdj_response = await self._execute(vdj_script)
         bRes = (vdj_response.status == "ok")
-        if (bRes == True):
+        if bRes:
             bRes2 = (vdj_response.result.lower() == "true")
             return bRes2
         else:
