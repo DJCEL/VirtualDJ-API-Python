@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 (2026-09-06)
+
+* Fixes for Poi
+* new class VDJResponse
 
 ## 1.1.0 (2026-09-05)
 
