@@ -4,4 +4,4 @@
 * Compatible code with Python>=3.14 only
 
 ## 2. Testing instructions
-Run `main.py` file
+Run `src/main.py` file
