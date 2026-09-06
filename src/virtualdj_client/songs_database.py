@@ -215,17 +215,20 @@ class VirtualDJSongsDatabase:
     #------------------------------------------------------------------------------------
     @staticmethod
     def _get_virtualdj_home() -> Path:
-        vdj_home = ""
         system = platform.system()
         if system == "Windows":
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
                 vdj_home = os.path.join(local_appdata,'VirtualDJ')
+                return vdj_home
+            else:
+                return Path()
         elif system == "Darwin":
-            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ""
+            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
             vdj_home = Path.home() / "Library" / "Application Support" / "VirtualDJ"
-
-        return vdj_home
+            return vdj_home
+        else:
+            return Path()
     #------------------------------------------------------------------------------------
     def _get_virtualdj_home_ext_list(self) -> list[Path]:
         vdj_home_ext_list : list[Path]= []

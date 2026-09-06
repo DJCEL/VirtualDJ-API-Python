@@ -19,18 +19,21 @@ class VirtualDJHistoryFiles():
             self._read_tracklist_file(history_folder)
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _get_virtualdj_home():
-        vdj_home = ""
+    def _get_virtualdj_home() -> Path:
         system = platform.system()
         if system == "Windows":
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
                 vdj_home = os.path.join(local_appdata,'VirtualDJ')
+                return vdj_home
+            else:
+                return Path()
         elif system == "Darwin":
-            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ""
+            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
             vdj_home = Path.home() / "Library" / "Application Support" / "VirtualDJ"
-
-        return vdj_home
+            return vdj_home
+        else:
+            return Path()
     #------------------------------------------------------------------------------------
     def _read_tracklist_file(self, history_folder:str):
         history_path = os.path.join(history_folder, self.TRACKLIST_FILENAME)
