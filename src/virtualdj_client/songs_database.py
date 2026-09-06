@@ -13,7 +13,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.14'
+__version__ = '1.0.15'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -62,7 +62,7 @@ def _to_songlength(value: Optional[str]) -> Optional[str]:
 class VdjSongPoi:
     Name: Optional[str] = None
     Pos: Optional[float] = None
-    Type: str
+    Type: Optional[str] = None
     Point: Optional[str] = None
     Num: Optional[int] = None
     Bpm: Optional[float] = None
@@ -155,7 +155,7 @@ class VdjSongLink:
 class VdjSong:
     FilePath: Union[str,Path]
     Flag: Optional[int] = None
-    FileSize: int = None
+    FileSize: Optional[int] = None
     Tags: Optional[VdjSongTags] = None
     Infos: Optional[VdjSongInfos] = None
     Comment: Optional[str] = None
