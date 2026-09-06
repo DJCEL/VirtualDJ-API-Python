@@ -184,7 +184,7 @@ class VirtualDJSongsDatabase:
         database_list : list[Path]= []
 
         vdj_home = self._get_virtualdj_home()
-
+        #if vdj_home is not None:
         main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
         if os.path.exists(main_XMLdatabase_path):
             database_list.append(main_XMLdatabase_path)
@@ -214,22 +214,20 @@ class VirtualDJSongsDatabase:
         return database_list_noduplicates
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _get_virtualdj_home() -> Path:
+    def _get_virtualdj_home() -> Optional[Path]:
         system = platform.system()
         if system == "Windows":
             # vdj_home_old = "C:\\Users\\<username>\\Documents\\VirtualDJ"
             local_appdata = os.getenv('LOCALAPPDATA')
-            if local_appdata:
-                vdj_home = os.path.join(local_appdata,'VirtualDJ')
-                return vdj_home
+            if not local_appdata:
+                return None
             else:
-                return Path()
+                return os.path.join(local_appdata,'VirtualDJ')
         elif system == "Darwin":
             # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
-            vdj_home = Path.home() / "Library" / "Application Support" / "VirtualDJ"
-            return vdj_home
+            return Path.home() / "Library" / "Application Support" / "VirtualDJ"
         else:
-            return Path()
+            return None
     #------------------------------------------------------------------------------------
     def _get_virtualdj_home_ext_list(self) -> list[Path]:
         vdj_home_ext_list : list[Path]= []
