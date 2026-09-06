@@ -272,9 +272,9 @@ def read_VirtualDJ_history_files():
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
-   #read_VirtualDJ_database()
+   read_VirtualDJ_database()
    #read_VirtualDJ_history_files()
-   control_VirtualDJ()
+   #control_VirtualDJ()
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":

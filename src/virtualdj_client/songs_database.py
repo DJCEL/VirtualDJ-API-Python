@@ -12,7 +12,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.16'
+__version__ = '1.0.17'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -181,73 +181,67 @@ class VirtualDJSongsDatabase:
     SQLITE_EXTRA_DB_TRACK_DATA = "track_data"
     #------------------------------------------------------------------------------------
     def get_local_database_list(self) -> list[Path]:
-        system = platform.system()
         database_list : list[Path]= []
 
+        vdj_home = self._get_virtualdj_home()
+
+        main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
+        if os.path.exists(main_XMLdatabase_path):
+            database_list.append(main_XMLdatabase_path)
+        main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
+        if os.path.exists(main_SQLite1database_path):
+            database_list.append(main_SQLite1database_path)
+        main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
+        if os.path.exists(main_SQLite2database_path):
+            database_list.append(main_SQLite2database_path)
+
+
+        vdj_home_ext_list = self._get_virtualdj_home_ext_list()
+
+        for vdj_home_ext in vdj_home_ext_list:
+            external_XMLdatabase_path = os.path.join(vdj_home_ext, self.XML_DATABASE_NAME)
+            if os.path.exists(external_XMLdatabase_path):
+                database_list.append(external_XMLdatabase_path)
+            external_SQLite1database_path = os.path.join(vdj_home_ext, self.SQLITE_EXTRA_DB)
+            if os.path.exists(external_SQLite1database_path):
+                database_list.append(external_SQLite1database_path)
+            external_SQLite2database_path = os.path.join(vdj_home_ext, 'Cache', self.SQLITE_CACHE_DB)
+            if os.path.exists(external_SQLite2database_path):
+                database_list.append(external_SQLite2database_path)
+
+        database_list_noduplicates = list(dict.fromkeys(database_list))
+
+        return database_list_noduplicates
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _get_virtualdj_home() -> Path:
+        vdj_home = ""
+        system = platform.system()
         if system == "Windows":
             local_appdata = os.getenv('LOCALAPPDATA')
             if local_appdata:
                 vdj_home = os.path.join(local_appdata,'VirtualDJ')
-                main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
-                if os.path.exists(main_XMLdatabase_path):
-                    database_list.append(main_XMLdatabase_path)
-                main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
-                if os.path.exists(main_SQLite1database_path):
-                    database_list.append(main_SQLite1database_path)
-                main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
-                if os.path.exists(main_SQLite2database_path):
-                    database_list.append(main_SQLite2database_path)
+        elif system == "Darwin":
+            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ""
+            vdj_home = Path.home() / "Library" / "Application Support" / "VirtualDJ"
 
+        return vdj_home
+    #------------------------------------------------------------------------------------
+    def _get_virtualdj_home_ext_list(self) -> list[Path]:
+        vdj_home_ext_list : list[Path]= []
+        system = platform.system()
+        if system == "Windows":
             drives_Windows = self._windows_drive_roots()
             for drive in drives_Windows:
                 vdj_home_ext = os.path.join(drive + "\\",'VirtualDJ')
-                external_XMLdatabase_path = os.path.join(vdj_home_ext, self.XML_DATABASE_NAME)
-                if os.path.exists(external_XMLdatabase_path):
-                    database_list.append(external_XMLdatabase_path)
-                external_SQLite1database_path = os.path.join(vdj_home_ext, self.SQLITE_EXTRA_DB)
-                if os.path.exists(external_SQLite1database_path):
-                    database_list.append(external_SQLite1database_path)
-                external_SQLite2database_path = os.path.join(vdj_home_ext, 'Cache', self.SQLITE_CACHE_DB)
-                if os.path.exists(external_SQLite2database_path):
-                    database_list.append(external_SQLite2database_path)
-
-            database_list_noduplicates = list(dict.fromkeys(database_list))
-
-            return database_list_noduplicates
-
+                vdj_home_ext_list.append(vdj_home_ext)
         elif system == "Darwin":
-            vdj_home_old = os.path.expanduser('~/Documents/VirtualDJ')
-            vdj_home = os.path.expanduser('~/Library/Application Support/VirtualDJ')
-            if vdj_home:
-                main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
-                if os.path.exists(main_XMLdatabase_path):
-                    database_list.append(main_XMLdatabase_path)
-                main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
-                if os.path.exists(main_SQLite1database_path):
-                    database_list.append(main_SQLite1database_path)
-                main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
-                if os.path.exists(main_SQLite2database_path):
-                    database_list.append(main_SQLite2database_path)
-
             drives_Darwin = self._darwin_drive_roots()
             for drive in drives_Darwin:
-                vdj_home_ext = os.path.join(drive, 'VirtualDJ')
-                external_XMLdatabase_path = os.path.join(vdj_home_ext, self.XML_DATABASE_NAME)
-                if os.path.exists(external_XMLdatabase_path):
-                    database_list.append(external_XMLdatabase_path)
-                external_SQLite1database_path = os.path.join(vdj_home_ext, self.SQLITE_EXTRA_DB)
-                if os.path.exists(external_SQLite1database_path):
-                    database_list.append(external_SQLite1database_path)
-                external_SQLite2database_path = os.path.join(vdj_home_ext, 'Cache', self.SQLITE_CACHE_DB)
-                if os.path.exists(external_SQLite2database_path):
-                    database_list.append(external_SQLite2database_path)
+                vdj_home_ext = os.path.join(drive, "VirtualDJ")
+                vdj_home_ext_list.append(vdj_home_ext)
 
-            database_list_noduplicates = list(dict.fromkeys(database_list))
-
-            return database_list_noduplicates
-
-        else:
-            return database_list
+        return vdj_home_ext_list
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
