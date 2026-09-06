@@ -12,7 +12,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.15'
+__version__ = '1.0.16'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -215,7 +215,18 @@ class VirtualDJSongsDatabase:
             return database_list_noduplicates
 
         elif system == "Darwin":
-            # Path.home() / "Library" / 
+            docs_path = os.path.expanduser('~/Documents')
+            if docs_path:
+                main_XMLdatabase_path = os.path.join(docs_path, 'VirtualDJ', self.XML_DATABASE_NAME)
+                if os.path.exists(main_XMLdatabase_path):
+                    database_list.append(main_XMLdatabase_path)
+                main_SQLite1database_path = os.path.join(docs_path,'VirtualDJ', self.SQLITE_EXTRA_DB)
+                if os.path.exists(main_SQLite1database_path):
+                    database_list.append(main_SQLite1database_path)
+                main_SQLite2database_path = os.path.join(docs_path,'VirtualDJ', 'Cache', self.SQLITE_CACHE_DB)
+                if os.path.exists(main_SQLite2database_path):
+                    database_list.append(main_SQLite2database_path)
+
             return database_list
 
         return database_list
