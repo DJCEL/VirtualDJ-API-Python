@@ -251,13 +251,14 @@ class VirtualDJClient:
            print("VirtualDJ => loadSecurity option is activated")
            return True
         else:
+           print("VirtualDJ => loadSecurity option is disable")
            return False  
     #------------------------------------------------------------------------------------
     def disable_loadSecurity(self):
         vdj_script = 'setting "loadSecurity" off'
         result = self.send(vdj_script)
         if result == True:
-            print("VirtualDJ => loadSecurity option is disable")
+            print("VirtualDJ => loadSecurity option is now disable")
     #------------------------------------------------------------------------------------
     def close_app(self, force_close: bool = False) -> bool:
         """ Close VirtuaDJ """
