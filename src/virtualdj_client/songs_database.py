@@ -4,7 +4,7 @@
 import os
 import platform
 import xml.etree.ElementTree as ET
-from typing import Optional, Any, Union
+from typing import Optional, Union
 from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
@@ -12,7 +12,7 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.17'
+__version__ = '1.0.18'
  
 #------------------------------------------------------------------------------------
 def _to_float(value: Optional[str]) -> Optional[float]:
@@ -184,16 +184,16 @@ class VirtualDJSongsDatabase:
         database_list : list[Path]= []
 
         vdj_home = self._get_virtualdj_home()
-        #if vdj_home is not None:
-        main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
-        if os.path.exists(main_XMLdatabase_path):
-            database_list.append(main_XMLdatabase_path)
-        main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
-        if os.path.exists(main_SQLite1database_path):
-            database_list.append(main_SQLite1database_path)
-        main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
-        if os.path.exists(main_SQLite2database_path):
-            database_list.append(main_SQLite2database_path)
+        if vdj_home is not None:
+            main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
+            if os.path.exists(main_XMLdatabase_path):
+                database_list.append(main_XMLdatabase_path)
+            main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
+            if os.path.exists(main_SQLite1database_path):
+                database_list.append(main_SQLite1database_path)
+            main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
+            if os.path.exists(main_SQLite2database_path):
+                database_list.append(main_SQLite2database_path)
 
 
         vdj_home_ext_list = self._get_virtualdj_home_ext_list()

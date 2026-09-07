@@ -4,8 +4,9 @@
 import os
 import platform
 from pathlib import Path
+from typing import Optional
 
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 
 class VirtualDJHistoryFiles():
     TRACKLIST_FILENAME = "tracklist.txt"
@@ -13,28 +14,26 @@ class VirtualDJHistoryFiles():
     #------------------------------------------------------------------------------------
     def get_local_history_files(self):
         vdj_home = self._get_virtualdj_home()
-       
-        if os.path.exists(vdj_home):
-            history_folder = os.path.join(vdj_home, 'History')
-            self._read_tracklist_file(history_folder)
+        if vdj_home is not None:
+            if os.path.exists(vdj_home):
+                history_folder = os.path.join(vdj_home, 'History')
+                self._read_tracklist_file(history_folder)
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _get_virtualdj_home() -> Path:
+    def _get_virtualdj_home() -> Optional[Path]:
         system = platform.system()
         if system == "Windows":
             # vdj_home_old = "C:\\Users\\<username>\\Documents\\VirtualDJ"
             local_appdata = os.getenv('LOCALAPPDATA')
-            if local_appdata:
-                vdj_home = os.path.join(local_appdata,'VirtualDJ')
-                return vdj_home
+            if not local_appdata:
+                return None
             else:
-                return Path()
+                return os.path.join(local_appdata,'VirtualDJ')
         elif system == "Darwin":
             # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
-            vdj_home = Path.home() / "Library" / "Application Support" / "VirtualDJ"
-            return vdj_home
+            return Path.home() / "Library" / "Application Support" / "VirtualDJ"
         else:
-            return Path()
+            return None
     #------------------------------------------------------------------------------------
     def _read_tracklist_file(self, history_folder:str):
         history_path = os.path.join(history_folder, self.TRACKLIST_FILENAME)
