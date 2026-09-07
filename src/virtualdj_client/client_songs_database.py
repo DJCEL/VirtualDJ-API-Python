@@ -1,8 +1,9 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
+__version__ = '1.0.18'
+
 import os
-import platform
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
 from dataclasses import dataclass
@@ -12,51 +13,11 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-__version__ = '1.0.18'
- 
-#------------------------------------------------------------------------------------
-def _to_float(value: Optional[str]) -> Optional[float]:
-    try:
-        return float(value) if value is not None else None
-    except ValueError:
-        return None
-#------------------------------------------------------------------------------------
-def _to_int(value: Optional[str]) -> Optional[int]:
-    try:
-        return int(value) if value is not None else None
-    except ValueError:
-        return None
-#------------------------------------------------------------------------------------
-def _to_strftime(value: Optional[str]) -> Optional[str]:
-    date_value = _to_int(value)
-    if date_value is None:
-        return None
-    try:
-        date_time = datetime.fromtimestamp(date_value)
-        return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
-    except ValueError:
-        return None
+from .client_utils import VirtualDJClientUtils
+from .client_config import VDJ_XML_DATABASE_NAME
+from .client_config import VDJ_SQLITE_CACHE_DB, VDJ_SQLITE_CACHE_DB_WAVEFORMS, VDJ_FOLDER_CACHE
+from .client_config import VDJ_SQLITE_EXTRA_DB, VDJ_SQLITE_EXTRA_DB_LYRICS, VDJ_SQLITE_EXTRA_DB_RELATED_TRACKS, VDJ_SQLITE_EXTRA_DB_TRACK_DATA
 
-#------------------------------------------------------------------------------------
-def _to_bpm(value: Optional[str], digit: int = 3) -> Optional[float]:
-    """ Conversion of the Bpm from the VirtualDJ format """
-    try:
-        bpm = float(value) if value is not None else None
-        if bpm is not None and bpm !=0:
-            bpm = round(1 / bpm * 60, digit)
-        return bpm
-    except ValueError:
-        return None
-#------------------------------------------------------------------------------------
-def _to_songlength(value: Optional[str]) -> Optional[str]:
-    try:
-        seconds = float(value) if value is not None else None
-        if seconds is None:
-            return None
-        songlength = str(timedelta(seconds=seconds))
-        return songlength
-    except ValueError:
-        return None
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSongPoi:
@@ -171,19 +132,24 @@ class VdjSong:
         VIDEO_FILE = 64  # [0x40]
         NETSEARCH_FILE = 256 # [0x100]
 #------------------------------------------------------------------------------------ 
-class VirtualDJSongsDatabase:
-    XML_DATABASE_NAME = "database.xml"
-    SQLITE_CACHE_DB = "cache.db"
-    SQLITE_CACHE_DB_WAVEFORMS = "waveforms"
-    SQLITE_EXTRA_DB = "extra.db"
-    SQLITE_EXTRA_DB_LYRICS = "lyrics"
-    SQLITE_EXTRA_DB_RELATED_TRACKS = "related_tracks"
-    SQLITE_EXTRA_DB_TRACK_DATA = "track_data"
+class VirtualDJSongsDatabase():
+    @classmethod
+    def __init__(self):
+        self.vdj_utils = VirtualDJClientUtils()
+        self.XML_DATABASE_NAME = VDJ_XML_DATABASE_NAME
+        self.SQLITE_CACHE_DB = VDJ_SQLITE_CACHE_DB
+        self.SQLITE_CACHE_DB_WAVEFORMS = VDJ_SQLITE_CACHE_DB_WAVEFORMS
+        self.FOLDER_CACHE = VDJ_FOLDER_CACHE
+        self.SQLITE_EXTRA_DB = VDJ_SQLITE_EXTRA_DB
+        self.SQLITE_EXTRA_DB_LYRICS = VDJ_SQLITE_EXTRA_DB_LYRICS
+        self.SQLITE_EXTRA_DB_RELATED_TRACKS = VDJ_SQLITE_EXTRA_DB_RELATED_TRACKS
+        self.SQLITE_EXTRA_DB_TRACK_DATA = VDJ_SQLITE_EXTRA_DB_TRACK_DATA
     #------------------------------------------------------------------------------------
+    @classmethod
     def get_local_database_list(self) -> list[Path]:
         database_list : list[Path]= []
 
-        vdj_home = self._get_virtualdj_home()
+        vdj_home = self.vdj_utils.get_virtualdj_home()
         if vdj_home is not None:
             main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
             if os.path.exists(main_XMLdatabase_path):
@@ -191,13 +157,12 @@ class VirtualDJSongsDatabase:
             main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
             if os.path.exists(main_SQLite1database_path):
                 database_list.append(main_SQLite1database_path)
-            main_SQLite2database_path = os.path.join(vdj_home, 'Cache', self.SQLITE_CACHE_DB)
+            main_SQLite2database_path = os.path.join(vdj_home, self.FOLDER_CACHE, self.SQLITE_CACHE_DB)
             if os.path.exists(main_SQLite2database_path):
                 database_list.append(main_SQLite2database_path)
 
 
-        vdj_home_ext_list = self._get_virtualdj_home_ext_list()
-
+        vdj_home_ext_list = self.vdj_utils.get_virtualdj_home_ext_list()
         for vdj_home_ext in vdj_home_ext_list:
             external_XMLdatabase_path = os.path.join(vdj_home_ext, self.XML_DATABASE_NAME)
             if os.path.exists(external_XMLdatabase_path):
@@ -205,7 +170,7 @@ class VirtualDJSongsDatabase:
             external_SQLite1database_path = os.path.join(vdj_home_ext, self.SQLITE_EXTRA_DB)
             if os.path.exists(external_SQLite1database_path):
                 database_list.append(external_SQLite1database_path)
-            external_SQLite2database_path = os.path.join(vdj_home_ext, 'Cache', self.SQLITE_CACHE_DB)
+            external_SQLite2database_path = os.path.join(vdj_home_ext, self.FOLDER_CACHE, self.SQLITE_CACHE_DB)
             if os.path.exists(external_SQLite2database_path):
                 database_list.append(external_SQLite2database_path)
 
@@ -213,51 +178,7 @@ class VirtualDJSongsDatabase:
 
         return database_list_noduplicates
     #------------------------------------------------------------------------------------
-    @staticmethod
-    def _get_virtualdj_home() -> Optional[Path]:
-        system = platform.system()
-        if system == "Windows":
-            # vdj_home_old = "C:\\Users\\<username>\\Documents\\VirtualDJ"
-            local_appdata = os.getenv('LOCALAPPDATA')
-            if not local_appdata:
-                return None
-            else:
-                return os.path.join(local_appdata,'VirtualDJ')
-        elif system == "Darwin":
-            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
-            return Path.home() / "Library" / "Application Support" / "VirtualDJ"
-        else:
-            return None
-    #------------------------------------------------------------------------------------
-    def _get_virtualdj_home_ext_list(self) -> list[Path]:
-        vdj_home_ext_list : list[Path]= []
-        system = platform.system()
-        if system == "Windows":
-            drives_Windows = self._windows_drive_roots()
-            for drive in drives_Windows:
-                vdj_home_ext = os.path.join(drive + "\\",'VirtualDJ')
-                vdj_home_ext_list.append(vdj_home_ext)
-        elif system == "Darwin":
-            drives_Darwin = self._darwin_drive_roots()
-            for drive in drives_Darwin:
-                vdj_home_ext = os.path.join(drive, "VirtualDJ")
-                vdj_home_ext_list.append(vdj_home_ext)
-
-        return vdj_home_ext_list
-    #------------------------------------------------------------------------------------
-    @staticmethod
-    def _windows_drive_roots() -> list[Path]:
-        drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
-        return drives_Windows
-    #------------------------------------------------------------------------------------
-    @staticmethod
-    def _darwin_drive_roots() -> list[Path]:
-        volumes_path = Path("/Volumes")
-        if not volumes_path.exists():
-            return []
-        drives_darwin = [volume for volume in volumes_path.iterdir() if volume.is_dir()]
-        return drives_darwin
-    #------------------------------------------------------------------------------------
+    @classmethod
     def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
         try:
             tree = ET.parse(database_path)
@@ -286,15 +207,63 @@ class VirtualDJSongsDatabase:
         return VdjSong_list
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _parse_song(song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
+    def _to_float(value: Optional[str]) -> Optional[float]:
+        try:
+            return float(value) if value is not None else None
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _to_int(value: Optional[str]) -> Optional[int]:
+        try:
+            return int(value) if value is not None else None
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @classmethod
+    def _to_strftime(self, value: Optional[str]) -> Optional[str]:
+        date_value = self._to_int(value)
+        if date_value is None:
+            return None
+        try:
+            date_time = datetime.fromtimestamp(date_value)
+            return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
+        except ValueError:
+            return None
+
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _to_bpm(value: Optional[str], digit: int = 3) -> Optional[float]:
+        """ Conversion of the Bpm from the VirtualDJ format """
+        try:
+            bpm = float(value) if value is not None else None
+            if bpm is not None and bpm !=0:
+                bpm = round(1 / bpm * 60, digit)
+            return bpm
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _to_songlength(value: Optional[str]) -> Optional[str]:
+        try:
+            seconds = float(value) if value is not None else None
+            if seconds is None:
+                return None
+            songlength = str(timedelta(seconds=seconds))
+            return songlength
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @classmethod
+    def _parse_song(self, song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
             song_el_tag = song_el.tag
             song_el_attrib = song_el.attrib
             song_el_text = song_el.text
             song = VdjSong(
                 FilePath = song_el_attrib.get("FilePath"),
-                Flag = _to_int(song_el_attrib.get("Flag"))
+                Flag = self._to_int(song_el_attrib.get("Flag"))
             )
-            song.FileSize = _to_int(song_el_attrib.get("FileSize"))
+            song.FileSize = self._to_int(song_el_attrib.get("FileSize"))
 
             if filepath_only:
                 return song
@@ -309,49 +278,49 @@ class VirtualDJSongsDatabase:
                     tags = VdjSongTags()
                     tags.Author = child_attrib.get("Author")
                     tags.Title = child_attrib.get("Title")
-                    tags.Year = _to_int(child_attrib.get("Year"))
+                    tags.Year = self._to_int(child_attrib.get("Year"))
                     tags.Genre = child_attrib.get("Genre")
-                    tags.Bpm = _to_bpm(child_attrib.get("Bpm"))
+                    tags.Bpm = self._to_bpm(child_attrib.get("Bpm"))
                     tags.Key = child_attrib.get("Key")
                     tags.Album = child_attrib.get("Album")
                     tags.Composer = child_attrib.get("Composer")
                     tags.Label = child_attrib.get("Label")
                     tags.TrackNumber = child_attrib.get("TrackNumber")
                     tags.Remix = child_attrib.get("Remix")
-                    tags.Stars = _to_int(child_attrib.get("Stars"))
+                    tags.Stars = self._to_int(child_attrib.get("Stars"))
                     tags.Remixer = child_attrib.get("Remixer")
                     tags.Grouping = child_attrib.get("Grouping")
                     tags.User1 = child_attrib.get("User1")
                     tags.User2 = child_attrib.get("User2")
                     tags.Internal = child_attrib.get("Internal")
-                    tags.Flag = _to_int(child_attrib.get("Flag"))
+                    tags.Flag = self._to_int(child_attrib.get("Flag"))
                     song.Tags = tags
                 elif child_tag == "Infos":
                     infos = VdjSongInfos()
-                    infos.SongLength =  _to_songlength(child_attrib.get("SongLength"))
-                    infos.LastModified = _to_strftime(child_attrib.get("LastModified"))
-                    infos.FirstSeen = _to_strftime(child_attrib.get("FirstSeen"))
-                    infos.FirstPlay = _to_strftime(child_attrib.get("FirstPlay"))
-                    infos.LastPlay = _to_strftime(child_attrib.get("LastPlay"))
-                    infos.PlayCount = _to_int(child_attrib.get("PlayCount"))
-                    infos.Bitrate = _to_int(child_attrib.get("Bitrate"))
-                    infos.Cover = _to_int(child_attrib.get("Cover"))
-                    infos.Color = _to_int(child_attrib.get("Color"))
-                    infos.Corrupted = _to_int(child_attrib.get("Corrupted"))
-                    infos.Gain = _to_int(child_attrib.get("Gain"))
+                    infos.SongLength =  self._to_songlength(child_attrib.get("SongLength"))
+                    infos.LastModified = self._to_strftime(child_attrib.get("LastModified"))
+                    infos.FirstSeen = self._to_strftime(child_attrib.get("FirstSeen"))
+                    infos.FirstPlay = self._to_strftime(child_attrib.get("FirstPlay"))
+                    infos.LastPlay = self._to_strftime(child_attrib.get("LastPlay"))
+                    infos.PlayCount = self._to_int(child_attrib.get("PlayCount"))
+                    infos.Bitrate = self._to_int(child_attrib.get("Bitrate"))
+                    infos.Cover = self._to_int(child_attrib.get("Cover"))
+                    infos.Color = self._to_int(child_attrib.get("Color"))
+                    infos.Corrupted = self._to_int(child_attrib.get("Corrupted"))
+                    infos.Gain = self._to_int(child_attrib.get("Gain"))
                     infos.UserColor = child_attrib.get("UserColor")
                     song.Infos = infos
                 elif child_tag == "Scan":
                     scan = VdjSongScan()
-                    scan.Version = _to_int(child_attrib.get("Version"))
-                    scan.Bpm = _to_bpm(child_attrib.get("Bpm"))
-                    scan.Phase = _to_float(child_attrib.get("Phase"))
-                    scan.AltBpm = _to_bpm(child_attrib.get("AltBpm"))
-                    scan.Rigid = _to_float(child_attrib.get("Rigid"))
-                    scan.Volume = _to_float(child_attrib.get("Volume"))
+                    scan.Version = self._to_int(child_attrib.get("Version"))
+                    scan.Bpm = self._to_bpm(child_attrib.get("Bpm"))
+                    scan.Phase = self._to_float(child_attrib.get("Phase"))
+                    scan.AltBpm = self._to_bpm(child_attrib.get("AltBpm"))
+                    scan.Rigid = self._to_float(child_attrib.get("Rigid"))
+                    scan.Volume = self._to_float(child_attrib.get("Volume"))
                     scan.Key = child_attrib.get("Key")
                     scan.AudioSig = child_attrib.get("AudioSig")
-                    scan.Flag = _to_int(child_attrib.get("Flag"))
+                    scan.Flag = self._to_int(child_attrib.get("Flag"))
                     scan.BeatGrid = child_attrib.get("BeatGrid")
                     song.Scan = scan
                 elif child_tag == "CustomMix":
@@ -365,14 +334,14 @@ class VirtualDJSongsDatabase:
                 elif child_tag == "Poi":
                     poi = VdjSongPoi()
                     poi.Name = child_attrib.get("Name")
-                    poi.Pos = _to_float(child_attrib.get("Pos"))
+                    poi.Pos = self._to_float(child_attrib.get("Pos"))
                     poi.Type = child_attrib.get("Type")
                     poi.Point = child_attrib.get("Point")
-                    poi.Num = _to_int(child_attrib.get("Num"))
-                    poi.Bpm = _to_float(child_attrib.get("Bpm"))
-                    poi.Phrase = _to_int(child_attrib.get("Phrase"))
-                    poi.Size = _to_float(child_attrib.get("Size"))
-                    poi.Slot = _to_int(child_attrib.get("Slot"))
+                    poi.Num = self._to_int(child_attrib.get("Num"))
+                    poi.Bpm = self._to_float(child_attrib.get("Bpm"))
+                    poi.Phrase = self._to_int(child_attrib.get("Phrase"))
+                    poi.Size = self._to_float(child_attrib.get("Size"))
+                    poi.Slot = self._to_int(child_attrib.get("Slot"))
                     poi_list.append(poi)
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
@@ -384,6 +353,7 @@ class VirtualDJSongsDatabase:
        
             return song
     #------------------------------------------------------------------------------------
+    @classmethod
     def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
         if database_name == self.SQLITE_CACHE_DB:

@@ -4,7 +4,6 @@ from rich.console import Console
 
 from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles
 
-#console = Console(file=sys.stderr)
 console = Console()
 
 #------------------------------------------------------------------------------------------------------------------------------------
