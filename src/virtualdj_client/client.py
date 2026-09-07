@@ -226,7 +226,7 @@ class VirtualDJClient:
         is_vdj_connected = self.is_connected()
         if is_vdj_connected == True:
             is_vdj_security = self.get_loadSecurity()
-            if is_vdj_security == True & force_close:
+            if is_vdj_security and force_close:
                 self.disable_loadSecurity()
 
             # Close VirtualDJ
