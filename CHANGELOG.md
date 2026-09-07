@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 (2026-09-08)
+
+* Cleaning of code
+
 ## 1.1.1 (2026-09-06)
 
 * Fixes for Poi
