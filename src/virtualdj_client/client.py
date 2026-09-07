@@ -1,11 +1,11 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.18'
+__version__ = '1.0.19'
 
 import httpx
 import asyncio
-from typing import Literal
+from typing import Optional,Literal
 from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
 
@@ -13,6 +13,11 @@ from .client_utils import VirtualDJClientUtils
 from .client_config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 
 #------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VDJDeck:
+    name: Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master'] = None
+    id: int = None
+#------------------------------------------------------------------------------------
 @dataclass
 class VDJResponse:
     status: Literal["ok","error"]
@@ -162,10 +167,6 @@ class VirtualDJClient:
         return asyncio.run(self.get_async(vdj_script))
     #------------------------------------------------------------------------------------
     # VirtualDJ script tools
-    #------------------------------------------------------------------------------------
-    class VDJDeck:
-        name : Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master']
-        id : int
     #------------------------------------------------------------------------------------
     @staticmethod
     def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
