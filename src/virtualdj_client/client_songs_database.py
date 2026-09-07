@@ -342,6 +342,8 @@ class VirtualDJSongsDatabase():
                     poi.Phrase = self._to_int(child_attrib.get("Phrase"))
                     poi.Size = self._to_float(child_attrib.get("Size"))
                     poi.Slot = self._to_int(child_attrib.get("Slot"))
+                    poi.Action = child_attrib.get("Action")
+                    poi.Color = self._to_int(child_attrib.get("Color"))
                     poi_list.append(poi)
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
