@@ -217,7 +217,6 @@ class VirtualDJSongsDatabase():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    @classmethod
     def _to_strftime(self, value: Optional[str]) -> Optional[str]:
         date_value = self._to_int(value)
         if date_value is None:
