@@ -1,6 +1,7 @@
 import sys
 import os
 from rich.console import Console
+import argparse
 
 from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles
 
@@ -269,11 +270,28 @@ def read_VirtualDJ_history_files():
 
     history_files.get_local_history_files()
 
+
+#------------------------------------------------------------------------------------------------------------------------------------
+def get_main_params():
+    parser = argparse.ArgumentParser(description="VirtualDJ-API")
+
+    parser.add_argument("-db", "--database", action="store_true", help="Read the VirtualDJ database")
+    parser.add_argument("-ht", "--history", action="store_true", help="Read the VirtualDJ History files")
+
+    args = parser.parse_args()
+
+    return args
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
-   #read_VirtualDJ_database()
-   #read_VirtualDJ_history_files()
-   control_VirtualDJ()
+    args = get_main_params()
+
+    if args.database:
+        read_VirtualDJ_database()
+
+    if args.history:
+        read_VirtualDJ_history_files()
+
+    control_VirtualDJ()
 
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
