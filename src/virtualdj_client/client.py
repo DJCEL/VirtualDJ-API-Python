@@ -25,31 +25,26 @@ class VDJResponse:
     result: str
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient:
-    @classmethod
     def __init__(self):
         self.vdj_utils = VirtualDJClientUtils()
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
     #------------------------------------------------------------------------------------
-    @classmethod
     async def __aenter__(self):
         self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
         return self
     #------------------------------------------------------------------------------------
-    @classmethod
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if self._client:
             await self._client.aclose()
             self._client = None
     #------------------------------------------------------------------------------------
-    @classmethod
     def _get_headers(self) -> dict[str, str]:
         headers = {"Content-Type": "text/plain"}
         if VDJ_NETWORK_CONTROL_PASSWORD:
             headers["Authorization"] = f"Bearer {VDJ_NETWORK_CONTROL_PASSWORD}"
         return headers
     #------------------------------------------------------------------------------------
-    @classmethod
     async def _send_vdj_request(self, vdj_script: str, is_query: bool = False) -> VDJResponse:
         """ Send command via HTTP Network Control plugin """
         vdj_endpoint = "query" if is_query else "execute"
@@ -110,19 +105,16 @@ class VirtualDJClient:
             result = str(e)
             return VDJResponse(status=status, status_code=status_code, result=result)
     #------------------------------------------------------------------------------------
-    @classmethod
     async def _query(self, vdj_script: str) -> VDJResponse:
         """ Query VirtualDJ with a vdj_script """
         vdj_response = await self._send_vdj_request(vdj_script, is_query=True)
         return vdj_response
-    #------------------------------------------------------------------------------------ 
-    @classmethod      
+    #------------------------------------------------------------------------------------    
     async def _execute(self, vdj_script: str) -> VDJResponse:
         """ Send command to VirtualDJ with a vdj_script """
         vdj_response = await self._send_vdj_request(vdj_script)
         return vdj_response
     #------------------------------------------------------------------------------------
-    @classmethod
     async def _query_vdj_script(self, vdj_script: str) -> str:
         """ Query VirtualDJ with a vdj_script """
         vdj_response = await self._query(vdj_script)
@@ -136,7 +128,6 @@ class VirtualDJClient:
             self.vdj_utils.SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return f"Failed to query < {vdj_script} >: {result_final}"            
     #------------------------------------------------------------------------------------
-    @classmethod
     async def _execute_vdj_script(self, vdj_script: str) -> bool:
         """ Execute a vdj_script and return status """
         vdj_response = await self._execute(vdj_script)
@@ -150,19 +141,15 @@ class VirtualDJClient:
             self.vdj_utils.SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
     #------------------------------------------------------------------------------------
-    @classmethod
     async def send_async(self, vdj_script: str) -> bool:
         return await self._execute_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
-    @classmethod
     async def get_async(self, vdj_script: str) -> str:
         return await self._query_vdj_script(vdj_script)
     #------------------------------------------------------------------------------------
-    @classmethod
     def send(self, vdj_script: str) -> bool:
         return asyncio.run(self.send_async(vdj_script))
     #------------------------------------------------------------------------------------
-    @classmethod
     def get(self, vdj_script: str) -> str:
         return asyncio.run(self.get_async(vdj_script))
     #------------------------------------------------------------------------------------
@@ -180,12 +167,10 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
-    @classmethod
     def is_app_running(self) -> bool:
         """ Check if VirtualDJ software is running """
         return self.vdj_utils.is_virtualdj_running()
     #------------------------------------------------------------------------------------
-    @classmethod
     def open_app(self) -> bool:
         """ Open VirtuaDJ """
         is_vdj_running = self.is_app_running()
@@ -195,7 +180,6 @@ class VirtualDJClient:
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
     #------------------------------------------------------------------------------------
-    @classmethod
     def get_loadSecurity(self) -> bool:
         vdj_script = 'setting "loadSecurity"'
         result = self.get(vdj_script)
@@ -208,7 +192,6 @@ class VirtualDJClient:
            self.vdj_utils.SaveClientLog("VirtualDJ => loadSecurity option is disable")
            return False  
     #------------------------------------------------------------------------------------
-    @classmethod
     def disable_loadSecurity(self):
         vdj_script = 'setting "loadSecurity" off'
         result = self.send(vdj_script)
@@ -216,7 +199,6 @@ class VirtualDJClient:
             print("VirtualDJ => loadSecurity option is now disable")
             self.vdj_utils.SaveClientLog("VirtualDJ => loadSecurity option is now disable")
     #------------------------------------------------------------------------------------
-    @classmethod
     def close_app(self, force_close: bool = False) -> bool:
         """ Close VirtuaDJ """
         is_vdj_running = self.is_app_running()
@@ -240,7 +222,6 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
-    @classmethod
     async def _is_virtualdj_connected(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
         is_vdj_running = self.is_app_running()
@@ -258,11 +239,9 @@ class VirtualDJClient:
         else:
             return True
     #------------------------------------------------------------------------------------
-    @classmethod
     async def is_connected_async(self) -> bool:
         return await self._is_virtualdj_connected()
     #------------------------------------------------------------------------------------
-    @classmethod
     def is_connected(self) -> bool:
         return asyncio.run(self.is_connected_async()) 
     
