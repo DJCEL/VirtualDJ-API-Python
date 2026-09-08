@@ -5,13 +5,13 @@ __version__ = '1.0.4'
 
 from pathlib import Path
 
-from .client_utils import VirtualDJClientUtils
+from .client_utils import VirtualDJUtils
 from .client_config import VDJ_FOLDER_HISTORY, VDJ_TRACKLIST_FILENAME
 
 #------------------------------------------------------------------------------------
 class VirtualDJHistoryFiles():
     def __init__(self):
-        self.vdj_utils = VirtualDJClientUtils()
+        self.vdj_utils = VirtualDJUtils()
         self.FOLDER_HISTORY = VDJ_FOLDER_HISTORY
         self.TRACKLIST_FILENAME = VDJ_TRACKLIST_FILENAME
         self.OTHER_FILES_EXTENSION = ".m3u"

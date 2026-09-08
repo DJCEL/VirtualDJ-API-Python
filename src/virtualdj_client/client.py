@@ -9,7 +9,7 @@ from typing import Optional,Literal
 from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
 
-from .client_utils import VirtualDJClientUtils
+from .client_utils import VirtualDJUtils
 from .client_config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ class VDJResponse:
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient:
     def __init__(self):
-        self.vdj_utils = VirtualDJClientUtils()
+        self.vdj_utils = VirtualDJUtils()
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
     #------------------------------------------------------------------------------------

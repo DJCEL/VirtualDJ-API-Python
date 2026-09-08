@@ -12,10 +12,8 @@ import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
-from .client_utils import VirtualDJClientUtils
-from .client_config import VDJ_XML_DATABASE_NAME
-from .client_config import VDJ_SQLITE_CACHE_DB, VDJ_SQLITE_CACHE_DB_WAVEFORMS, VDJ_FOLDER_CACHE
-from .client_config import VDJ_SQLITE_EXTRA_DB, VDJ_SQLITE_EXTRA_DB_LYRICS, VDJ_SQLITE_EXTRA_DB_RELATED_TRACKS, VDJ_SQLITE_EXTRA_DB_TRACK_DATA
+from .client_utils import VirtualDJUtils
+from .client_config import VDJ_XML_DATABASE_NAME, VDJ_SQLITE_CACHE_DB, VDJ_SQLITE_CACHE_DB_WAVEFORMS, VDJ_FOLDER_CACHE, VDJ_SQLITE_EXTRA_DB, VDJ_SQLITE_EXTRA_DB_LYRICS, VDJ_SQLITE_EXTRA_DB_RELATED_TRACKS, VDJ_SQLITE_EXTRA_DB_TRACK_DATA
 
 #------------------------------------------------------------------------------------
 @dataclass
@@ -133,7 +131,7 @@ class VdjSong:
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
     def __init__(self):
-        self.vdj_utils = VirtualDJClientUtils()
+        self.vdj_utils = VirtualDJUtils()
         self.XML_DATABASE_NAME = VDJ_XML_DATABASE_NAME
         self.SQLITE_CACHE_DB = VDJ_SQLITE_CACHE_DB
         self.SQLITE_CACHE_DB_WAVEFORMS = VDJ_SQLITE_CACHE_DB_WAVEFORMS

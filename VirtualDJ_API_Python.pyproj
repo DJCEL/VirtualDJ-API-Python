@@ -28,6 +28,7 @@
     <InterpreterReference Include="Global|PythonCore|3.14" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\virtualdj_client\client_settings.py" />
     <Compile Include="src\virtualdj_client\client_utils.py" />
     <Compile Include="src\virtualdj_client\client_history_files.py" />
     <Compile Include="src\virtualdj_client\client_songs_database.py" />

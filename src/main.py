@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles
+from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 
@@ -214,10 +214,7 @@ def read_VirtualDJ_database():
     print("#  Read VirtualDJ database   #")
     print("##############################")
 
-    # Initialize VirtualDJ Songs database
     songsDB = VirtualDJSongsDatabase()
-
-    # List of VirtualDJ local database
     database_list = songsDB.get_local_database_list()
     console.print(f"VirtualDJ database list => {database_list}")
     for db_path in database_list:
@@ -265,11 +262,24 @@ def read_VirtualDJ_history_files():
     print("#  Read VirtualDJ history   #")
     print("#############################")
 
-    # Initialize VirtualDJ Songs database
-    history_files = VirtualDJHistoryFiles()
 
+    history_files = VirtualDJHistoryFiles()
     history_files.get_local_history_files()
 
+#------------------------------------------------------------------------------------------------------------------------------------
+def read_VirtualDJ_settings():
+    print("#############################")
+    print("#  Read VirtualDJ settings  #")
+    print("#############################")
+
+    settings = VirtualDJSettings()
+
+    settings_path_list = settings.get_local_settings_path_list()
+    console.print(f"VirtualDJ settings path list => {settings_path_list}")
+    for settings_path in settings_path_list:
+        console.print(f"VirtualDJ settings path reading => {settings_path}")
+        result = settings.read_local_xml_settings(settings_path)
+        console.print(result)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def client_main_params():
@@ -278,6 +288,7 @@ def client_main_params():
     parser.add_argument("-d","--disable", action="store_true", help="Does not load the control of VirtualDJ")
     parser.add_argument("-db", "--database", action="store_true", help="Read the VirtualDJ database")
     parser.add_argument("-ht", "--history", action="store_true", help="Read the VirtualDJ History files")
+    parser.add_argument("-st", "--settings", action="store_true", help="Read the VirtualDJ Settings")
 
     args = parser.parse_args()
 
@@ -292,6 +303,9 @@ def client_main():
     if args.history:
         read_VirtualDJ_history_files()
 
+    if args.settings:
+        read_VirtualDJ_settings()
+
     if not args.disable:
         control_VirtualDJ()
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -299,6 +313,7 @@ def main():
     #sys.argv = ["main.py", "--help"]
     #sys.argv = ["main.py", "--disable", "--database"]
     #sys.argv = ["main.py", "--disable", "--history"]
+    #sys.argv = ["main.py", "--disable", "--settings"]
     client_main()
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
