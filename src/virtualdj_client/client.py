@@ -237,7 +237,8 @@ class VirtualDJClient:
             self.vdj_utils.SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
         else:
-            return True #------------------------------------------------------------------------------------
+            return True 
+#------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
         return asyncio.run(self.is_connected_async()) 
     
