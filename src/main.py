@@ -272,9 +272,10 @@ def read_VirtualDJ_history_files():
 
 
 #------------------------------------------------------------------------------------------------------------------------------------
-def get_main_params():
+def client_main_params():
     parser = argparse.ArgumentParser(description="VirtualDJ-API")
 
+    parser.add_argument("-d","--disable", action="store_true", help="Does not load the control of VirtualDJ")
     parser.add_argument("-db", "--database", action="store_true", help="Read the VirtualDJ database")
     parser.add_argument("-ht", "--history", action="store_true", help="Read the VirtualDJ History files")
 
@@ -282,8 +283,8 @@ def get_main_params():
 
     return args
 #------------------------------------------------------------------------------------------------------------------------------------
-def main():
-    args = get_main_params()
+def client_main():
+    args = client_main_params()
 
     if args.database:
         read_VirtualDJ_database()
@@ -291,8 +292,14 @@ def main():
     if args.history:
         read_VirtualDJ_history_files()
 
-    control_VirtualDJ()
-
+    if not args.disable:
+        control_VirtualDJ()
+#------------------------------------------------------------------------------------------------------------------------------------
+def main():
+    #sys.argv = ["main.py", "--help"]
+    #sys.argv = ["main.py", "--disable", "--database"]
+    #sys.argv = ["main.py", "--disable", "--history"]
+    client_main()
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
