@@ -19,14 +19,12 @@ logger = logging.getLogger(__name__)
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientUtils:
-    @classmethod
     def __init__(self):
         self.LOG_FOLDER = './log'
         self.LOG_FILENAME = 'client.log'
 
         self._CreateClientLog()
     #------------------------------------------------------------------------------------
-    @classmethod
     def _CreateClientLog(self):
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
@@ -34,12 +32,10 @@ class VirtualDJClientUtils:
                 os.makedirs(self.LOG_FOLDER)
             logging.basicConfig(filename=filepath, level=logging.INFO)
     #------------------------------------------------------------------------------------
-    @classmethod
     def SaveClientLog(self, msg):
         if VDJ_CLIENT_DEBUG:
             logger.info(msg)
     #------------------------------------------------------------------------------------
-    @classmethod
     def get_virtualdj_home(self) -> Optional[Path]:
         system = platform.system()
         if system == "Windows":
@@ -55,7 +51,6 @@ class VirtualDJClientUtils:
         else:
             return None
     #------------------------------------------------------------------------------------
-    @classmethod
     def get_virtualdj_home_ext_list(self) -> list[Path]:
         vdj_home_ext_list : list[Path]= []
         system = platform.system()
@@ -85,7 +80,6 @@ class VirtualDJClientUtils:
         drives_darwin = [volume for volume in volumes_path.iterdir() if volume.is_dir()]
         return drives_darwin
     #------------------------------------------------------------------------------------
-    @classmethod
     def is_virtualdj_running(self) -> bool:
         """ Check if VirtualDJ software is running """
         bRes = False
@@ -96,7 +90,6 @@ class VirtualDJClientUtils:
 
         return bRes
     #------------------------------------------------------------------------------------
-    @classmethod
     def launch_virtualdj_software(self) -> bool:
         """ Launch VirtualDJ software """
         system = platform.system()
