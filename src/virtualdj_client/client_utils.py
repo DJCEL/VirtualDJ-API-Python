@@ -30,11 +30,24 @@ class VirtualDJClientUtils:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
                 os.makedirs(self.LOG_FOLDER)
+            
+            """
+            FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+            file_handler = logging.FileHander(filename=filepath)
+            file_handler.setLevel(logging.INFO)
+            formatter = logging.Formatter(FORMAT)
+            file_handler.setFormatter(formatter)
+            logging.addHandler(file_handler)
+            """
+
             logging.basicConfig(filename=filepath, level=logging.INFO)
     #------------------------------------------------------------------------------------
     def SaveClientLog(self, msg):
         if VDJ_CLIENT_DEBUG:
             logger.info(msg)
+    #------------------------------------------------------------------------------------
+    def CloseClientLog():
+        logging.shutdown()
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_list(self) -> list[Path]:
         system = platform.system()
