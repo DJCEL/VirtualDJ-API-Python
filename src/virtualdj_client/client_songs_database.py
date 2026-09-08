@@ -217,11 +217,12 @@ class VirtualDJSongsDatabase():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    def _to_strftime(self, value: Optional[str]) -> Optional[str]:
-        date_value = self._to_int(value)
-        if date_value is None:
-            return None
+    @staticmethod
+    def _to_strftime(value: Optional[str]) -> Optional[str]:
         try:
+            date_value = int(value) if value is not None else None
+            if date_value is None:
+                return None
             date_time = datetime.fromtimestamp(date_value)
             return date_time.strftime("%Y/%m/%d %H:%M:%S%z")
         except ValueError:
