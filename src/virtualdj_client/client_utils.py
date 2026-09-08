@@ -2,7 +2,7 @@
 # VirtualDJ - Folders structure
 #------------------------------------------------------------------------------------
 
-__version__ = '1.0.0'
+__version__ = '1.0.2'
 
 import os
 import platform
@@ -36,40 +36,51 @@ class VirtualDJClientUtils:
         if VDJ_CLIENT_DEBUG:
             logger.info(msg)
     #------------------------------------------------------------------------------------
-    def get_virtualdj_home(self) -> Optional[Path]:
+    def get_virtualdj_home_list(self) -> list[Path]:
         system = platform.system()
         if system == "Windows":
-            # vdj_home_old = "C:\\Users\\<username>\\Documents\\VirtualDJ"
+            main_folder_list = [ 
+                Path.home() / "Documents",
+            ]
             local_appdata = os.getenv('LOCALAPPDATA')
-            if not local_appdata:
-                return None
-            else:
-                return os.path.join(local_appdata,'VirtualDJ')
+            if local_appdata:
+               main_folder_list.append(Path(local_appdata))
         elif system == "Darwin":
-            # vdj_home_old = Path.home() / "Documents" / "VirtualDJ"
-            return Path.home() / "Library" / "Application Support" / "VirtualDJ"
+            main_folder_list = [ 
+                Path.home() / "Documents",
+                Path.home() / "Library" / "Application Support",
+            ]
         else:
-            return None
+            return []
+
+        vdj_home_list: list[Path] = []
+        for main_folder in main_folder_list:
+            vdj_home = Path(main_folder) / "VirtualDJ"
+            if vdj_home.exists():
+                vdj_home_list.append(vdj_home)
+
+        return vdj_home_list
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_ext_list(self) -> list[Path]:
-        vdj_home_ext_list : list[Path]= []
         system = platform.system()
         if system == "Windows":
-            drives_Windows = self._windows_drive_roots()
-            for drive in drives_Windows:
-                vdj_home_ext = os.path.join(drive + "\\",'VirtualDJ')
-                vdj_home_ext_list.append(vdj_home_ext)
+            drives = self._windows_drive_roots()
         elif system == "Darwin":
-            drives_Darwin = self._darwin_drive_roots()
-            for drive in drives_Darwin:
-                vdj_home_ext = os.path.join(drive, "VirtualDJ")
+            drives = self._darwin_drive_roots()
+        else:
+            return []
+        
+        vdj_home_ext_list: list[Path] = []
+        for drive in drives:
+            vdj_home_ext = Path(drive) / "VirtualDJ"
+            if vdj_home_ext.exists():
                 vdj_home_ext_list.append(vdj_home_ext)
 
         return vdj_home_ext_list
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
-        drives_Windows = [ chr(x) + ":" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+        drives_Windows = [ chr(x) + ":\\" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
         return drives_Windows
     #------------------------------------------------------------------------------------
     @staticmethod

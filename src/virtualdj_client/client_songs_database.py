@@ -1,9 +1,8 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.18'
+__version__ = '1.0.19'
 
-import os
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
 from dataclasses import dataclass
@@ -147,57 +146,64 @@ class VirtualDJSongsDatabase():
     def get_local_database_list(self) -> list[Path]:
         database_list : list[Path]= []
 
-        vdj_home = self.vdj_utils.get_virtualdj_home()
-        if vdj_home is not None:
-            main_XMLdatabase_path = os.path.join(vdj_home, self.XML_DATABASE_NAME)
-            if os.path.exists(main_XMLdatabase_path):
+        vdj_home_list = self.vdj_utils.get_virtualdj_home_list()
+        for vdj_home in vdj_home_list:
+            main_XMLdatabase_path = vdj_home / self.XML_DATABASE_NAME
+            if main_XMLdatabase_path.exists():
                 database_list.append(main_XMLdatabase_path)
-            main_SQLite1database_path = os.path.join(vdj_home, self.SQLITE_EXTRA_DB)
-            if os.path.exists(main_SQLite1database_path):
+            main_SQLite1database_path = vdj_home / self.SQLITE_EXTRA_DB
+            if main_SQLite1database_path.exists():
                 database_list.append(main_SQLite1database_path)
-            main_SQLite2database_path = os.path.join(vdj_home, self.FOLDER_CACHE, self.SQLITE_CACHE_DB)
-            if os.path.exists(main_SQLite2database_path):
+            main_SQLite2database_path = vdj_home / self.FOLDER_CACHE / self.SQLITE_CACHE_DB
+            if main_SQLite2database_path.exists():
                 database_list.append(main_SQLite2database_path)
 
 
         vdj_home_ext_list = self.vdj_utils.get_virtualdj_home_ext_list()
         for vdj_home_ext in vdj_home_ext_list:
-            external_XMLdatabase_path = os.path.join(vdj_home_ext, self.XML_DATABASE_NAME)
-            if os.path.exists(external_XMLdatabase_path):
+            external_XMLdatabase_path = vdj_home_ext / self.XML_DATABASE_NAME
+            if external_XMLdatabase_path.exists():
                 database_list.append(external_XMLdatabase_path)
-            external_SQLite1database_path = os.path.join(vdj_home_ext, self.SQLITE_EXTRA_DB)
-            if os.path.exists(external_SQLite1database_path):
+            external_SQLite1database_path = vdj_home_ext / self.SQLITE_EXTRA_DB
+            if external_SQLite1database_path.exists():
                 database_list.append(external_SQLite1database_path)
-            external_SQLite2database_path = os.path.join(vdj_home_ext, self.FOLDER_CACHE, self.SQLITE_CACHE_DB)
-            if os.path.exists(external_SQLite2database_path):
+            external_SQLite2database_path = vdj_home_ext / self.FOLDER_CACHE/ self.SQLITE_CACHE_DB
+            if external_SQLite2database_path.exists():
                 database_list.append(external_SQLite2database_path)
 
         database_list_noduplicates = list(dict.fromkeys(database_list))
 
         return database_list_noduplicates
     #------------------------------------------------------------------------------------
-    def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
+    def read_local_xml_database(self, database_path: Path, filepath_only: bool = True) -> list[VdjSong]:
         try:
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
-            print(f"Invalid VirtualDJ XML database: {database_path}")
+            print(f"VirtualDJ database reading {database_path} => Invalid XML file")
+            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Invalid XML file")
             return []
         except OSError as exc:
-            print(f"Cannot read database: {database_path}")
+            print(f"VirtualDJ database reading {database_path} => Cannot read database")
+            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Cannot read database")
             return []
 
         root = tree.getroot()
         root_tag = root.tag
         root_attrib = root.attrib
         if root_tag != "VirtualDJ_Database":
-            print(f"Not a VirtualDJ database file: {database_path}")
+            print(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
+            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
             return []
 
         songs_list = root.findall(".//Song")        
         songs_list_count = len(songs_list)
 
         print(f"VirtualDJ database reading => {root_attrib}")
+        self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => {root_attrib}")
+
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
+        self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
+
 
         VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
 
@@ -345,13 +351,14 @@ class VirtualDJSongsDatabase():
                     song.Comment = child_attrib.get("Comment")
                 else:
                     print(f"child_tag < {child_tag} > not defined")
+                    self.vdj_utils.SaveClientLog(f"child_tag < {child_tag} > not defined")
             
             # We add Poi list outside of the loop
             song.Poi = poi_list or None
        
             return song
     #------------------------------------------------------------------------------------
-    def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
+    def read_local_sqlite_database(self, database_path: Path, database_name: str, table_name: str) -> list[dict]:
 
         if database_name == self.SQLITE_CACHE_DB:
             if table_name == self.SQLITE_CACHE_DB_WAVEFORMS:
@@ -384,8 +391,7 @@ class VirtualDJSongsDatabase():
 
         return result_list
     #------------------------------------------------------------------------------------
-    @staticmethod
-    def _sqlite_query(database_path, sql_script) -> list[dict]:
+    def _sqlite_query(self, database_path: Path, sql_script) -> list[dict]:
         result = []
         try:
            with sqlite3.connect(database_path) as connection:
@@ -397,6 +403,7 @@ class VirtualDJSongsDatabase():
                         result.append(value)
         except Exception as e:
             print(f"Failed to query the sqlite database: ", str(e))
+            self.vdj_utils.SaveClientLog(f"Failed to query the sqlite database: ", str(e))
             result = []
 
         return result

@@ -1,7 +1,7 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.19'
+__version__ = '1.0.20'
 
 import httpx
 import asyncio
@@ -180,9 +180,9 @@ class VirtualDJClient:
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
     #------------------------------------------------------------------------------------
-    def get_loadSecurity(self) -> bool:
+    async def get_loadSecurity_async(self) -> bool:
         vdj_script = 'setting "loadSecurity"'
-        result = self.get(vdj_script)
+        result = await self.get_async(vdj_script)
         if result in ['on','silent']:
            print("VirtualDJ => loadSecurity option is activated")
            self.vdj_utils.SaveClientLog("VirtualDJ => loadSecurity option is activated")
@@ -190,14 +190,20 @@ class VirtualDJClient:
         else:
            print("VirtualDJ => loadSecurity option is disable")
            self.vdj_utils.SaveClientLog("VirtualDJ => loadSecurity option is disable")
-           return False  
+           return False
     #------------------------------------------------------------------------------------
-    def disable_loadSecurity(self):
+    def get_loadSecurity(self) -> bool:
+        return asyncio.run(self.get_loadSecurity_async())
+    #------------------------------------------------------------------------------------
+    async def disable_loadSecurity_async(self):
         vdj_script = 'setting "loadSecurity" off'
-        result = self.send(vdj_script)
+        result = await self.send_async(vdj_script)
         if result == True:
             print("VirtualDJ => loadSecurity option is now disable")
             self.vdj_utils.SaveClientLog("VirtualDJ => loadSecurity option is now disable")
+    #------------------------------------------------------------------------------------
+    def disable_loadSecurity(self):
+        return asyncio.run(self.disable_loadSecurity_async())
     #------------------------------------------------------------------------------------
     def close_app(self, force_close: bool = False) -> bool:
         """ Close VirtuaDJ """
