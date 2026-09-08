@@ -133,7 +133,6 @@ class VdjSong:
         NETSEARCH_FILE = 256 # [0x100]
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
-    @classmethod
     def __init__(self):
         self.vdj_utils = VirtualDJClientUtils()
         self.XML_DATABASE_NAME = VDJ_XML_DATABASE_NAME
@@ -145,7 +144,6 @@ class VirtualDJSongsDatabase():
         self.SQLITE_EXTRA_DB_RELATED_TRACKS = VDJ_SQLITE_EXTRA_DB_RELATED_TRACKS
         self.SQLITE_EXTRA_DB_TRACK_DATA = VDJ_SQLITE_EXTRA_DB_TRACK_DATA
     #------------------------------------------------------------------------------------
-    @classmethod
     def get_local_database_list(self) -> list[Path]:
         database_list : list[Path]= []
 
@@ -178,7 +176,6 @@ class VirtualDJSongsDatabase():
 
         return database_list_noduplicates
     #------------------------------------------------------------------------------------
-    @classmethod
     def read_local_xml_database(self, database_path: Union[str,Path], filepath_only: bool = True) -> list[VdjSong]:
         try:
             tree = ET.parse(database_path)
@@ -254,7 +251,6 @@ class VirtualDJSongsDatabase():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    @classmethod
     def _parse_song(self, song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
             song_el_tag = song_el.tag
             song_el_attrib = song_el.attrib
@@ -355,7 +351,6 @@ class VirtualDJSongsDatabase():
        
             return song
     #------------------------------------------------------------------------------------
-    @classmethod
     def read_local_sqlite_database(self, database_path: Union[str,Path], database_name: str, table_name: str) -> list[dict]:
 
         if database_name == self.SQLITE_CACHE_DB:
