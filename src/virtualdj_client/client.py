@@ -222,7 +222,7 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
-    async def _is_virtualdj_connected(self) -> bool:
+    async def is_connected_async(self) -> bool:
         """ Check if VirtualDJ software is running and Network Control Plugin is responding """
         is_vdj_running = self.is_app_running()
         if is_vdj_running == False:
@@ -237,11 +237,7 @@ class VirtualDJClient:
             self.vdj_utils.SaveClientLog(f"HTTP error {status_code}: {result_final}")
             return False
         else:
-            return True
-    #------------------------------------------------------------------------------------
-    async def is_connected_async(self) -> bool:
-        return await self._is_virtualdj_connected()
-    #------------------------------------------------------------------------------------
+            return True #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
         return asyncio.run(self.is_connected_async()) 
     
