@@ -4,10 +4,23 @@
 __version__ = '1.0.4'
 
 from pathlib import Path
+from dataclasses import dataclass
+from typing import Optional
 
 from .client_utils import VirtualDJUtils
 from .client_config import VDJ_FOLDER_HISTORY, VDJ_TRACKLIST_FILENAME
 
+
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjHistoryTracklistSong:
+    histo_time:  Optional[str] = None
+    song_name: Optional[str] = None
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjHistoryTracklist:
+    histo_date: Optional[str] = None
+    songs: Optional[list[VdjHistoryTracklistSong]] = None
 #------------------------------------------------------------------------------------
 class VirtualDJHistoryFiles():
     def __init__(self):
@@ -24,10 +37,18 @@ class VirtualDJHistoryFiles():
                     self._read_tracklist_file(history_folder)
     #------------------------------------------------------------------------------------
     def _read_tracklist_file(self, history_folder:Path):
+        tracklist = []
+
         history_path = history_folder / self.TRACKLIST_FILENAME
         if history_path.exists():
             with open(history_path,"r", encoding="utf-8") as file:
                 for line in file:
                     print(line)
+                    if line.find("VirtualDJ History") != -1 :
+                        item = VdjHistoryTracklist()
+                        item.histo_date = line[18:28]
+                        tracklist.append(item)
+        
+        return tracklist
          
 

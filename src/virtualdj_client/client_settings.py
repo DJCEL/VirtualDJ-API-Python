@@ -1,23 +1,33 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ settings
 #------------------------------------------------------------------------------------
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Optional
+from datetime import datetime
 
 from .client_utils import VirtualDJUtils
 from .client_config import VDJ_PROCESS_SETTINGS
 
 #------------------------------------------------------------------------------------
 @dataclass
+class VdjSettingsAudioConfigSetupAudio:
+    soundcard: Optional[str] = None
+    leftChannel: Optional[str] = None
+    rightChannel: Optional[str] = None
+    source: Optional[str] = None
+#------------------------------------------------------------------------------------
+@dataclass
 class VdjSettingsAudioConfigSetup:
-    audio: Optional[list[str]] = None
+    name: Optional[str] = None
+    audio: Optional[list[VdjSettingsAudioConfigSetupAudio]] = None
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSettingsAudioConfig:
+    current: Optional[str] = None
     setup: Optional[list[VdjSettingsAudioConfigSetup]] = None
 #------------------------------------------------------------------------------------
 @dataclass
@@ -782,7 +792,7 @@ class VirtualDJSettings():
             self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {settings_path} => Invalid XML file")
             return None
         except OSError as exc:
-            print(f"VirtualDJ settings reading {database_path} => Cannot read the file")
+            print(f"VirtualDJ settings reading {settings_path} => Cannot read the file")
             self.vdj_utils.SaveClientLog(f"VirtualDJ settings reading {settings_path} => Cannot read the file")
             return None
 
@@ -796,6 +806,26 @@ class VirtualDJSettings():
 
 
         settings = VdjSettings()
+        settings.audioConfig = VdjSettingsAudioConfig()
+        settings.audioConfig.setup = [VdjSettingsAudioConfigSetup()]
+        settings.automation = VdjSettingsAutomation()
+        settings.controls = VdjSettingsControls()
+        settings.skins = VdjSettingsSkins()
+        settings.audio = VdjSettingsAudio()
+        settings.video = VdjSettingsVideo()
+        settings.karaoke = VdjSettingsKaraoke()
+        settings.controllers = VdjSettingsControllers()
+        settings.timecode = VdjSettingsTimecode()
+        settings.sampler = VdjSettingsSampler()
+        settings.browser = VdjSettingsBrowser()
+        settings.tags = VdjSettingsTags()
+        settings.automix = VdjSettingsAutomix()
+        settings.internet = VdjSettingsInternet()
+        settings.record = VdjSettingsRecord()
+        settings.broadcast = VdjSettingsBroadcast()
+        settings.options = VdjSettingsOptions()
+        settings.performance = VdjSettingsPerformance()
+        settings.skin = VdjSettingsSkin()
 
         for child in root:
             child_tag = child.tag
@@ -806,74 +836,58 @@ class VirtualDJSettings():
         return settings
     #------------------------------------------------------------------------------------
     def _parse_settings(self, settings, child: ET.Element, child_tag: str, child_attrib: str) -> VdjSettings:
+
         for subchild in child:
                 subchild_tag = subchild.tag
                 subchild_attrib = subchild.attrib
                 subchild_text = subchild.text
 
                 if child_tag == "audioConfig":
-                    audioconfig = VdjSettingsAudioConfig()
-                    settings.audioconfig =  audioconfig
+                    a = 0
                 elif child_tag == "automation":
-                    automation = VdjSettingsAutomation()
-                    settings.automation = automation
+                    a = 0
                 elif child_tag == "controls":
-                    controls = VdjSettingsControls()
-                    settings.controls = controls
+                    a = 0
                 elif child_tag == "skins":
-                    skins = VdjSettingsSkins()
-                    settings.skins = skins
+                    a = 0
                 elif child_tag == "audio":
-                    audio = VdjSettingsAudio()
-                    settings.audio = audio
+                    a = 0
                 elif child_tag == "video":
-                    video = VdjSettingsVideo()
-                    settings.video = video
+                    a = 0
                 elif child_tag == "karaoke":
-                    karaoke = VdjSettingsKaraoke()
-                    settings.karaoke = karaoke
+                    a = 0
                 elif child_tag == "controllers":
-                    controllers = VdjSettingsControllers()
-                    settings.controllers = controllers
+                    a = 0
                 elif child_tag == "timecode":
-                    timecode = VdjSettingsTimecode()
-                    settings.timecode = timecode
+                    a = 0
                 elif child_tag == "sampler":
-                    sampler = VdjSettingsSampler()
-                    settings.sampler = sampler
+                    a = 0
                 elif child_tag == "browser":
-                    browser = VdjSettingsBrowser()
-                    settings.browser = browser
+                    a = 0
                 elif child_tag == "tags":
-                    tags = VdjSettingsTags()
-                    settings.tags = tags
+                    a = 0
                 elif child_tag == "automix":
-                    automix = VdjSettingsAutomix()
-                    settings.automix = automix
+                    a = 0
                 elif child_tag == "internet":
-                    internet = VdjSettingsInternet()
                     if subchild_tag == "checkUpdates":
-                        internet.checkUpdates = subchild_text
-                    settings.internet = internet
+                        settings.internet.checkUpdates = subchild_text
                 elif child_tag == "record":
-                    record = VdjSettingsRecord()
-                    settings.record = record
+                    a = 0
                 elif child_tag == "broadcast":
-                    broadcast = VdjSettingsBroadcast()
-                    settings.broadcast = broadcast
+                    a = 0
                 elif child_tag == "options":
-                    options = VdjSettingsOptions()
                     if subchild_tag == "loadSecurity":
-                        options.loadSecurity = subchild_text
-                    settings.options = options 
+                        settings.options.loadSecurity = subchild_text
+                    elif subchild_tag == "autoUpdateFailedCount":
+                        settings.options.autoUpdateFailedCount = self._to_int(subchild_text)
+                    elif subchild_tag == "autoUpdateFailedSvn":
+                        settings.options.autoUpdateFailedSvn = subchild_text
                 elif child_tag == "performance":
-                    performance = VdjSettingsPerformance()
-                    settings.performance = performance 
+                    if subchild_tag == "stemsRealtimeSeparation":
+                        settings.performance.stemsRealtimeSeparation = subchild_text
                 elif child_tag == "skin":
-                    skin = VdjSettingsSkin()
                     if subchild_tag == "skinStarterTip":
-                        skin.skinStarterTip = self._to_int(subchild_text)
-                    settings.skin = skin
+                        settings.skin.skinStarterTip = self._to_int(subchild_text)
                 else:
                     print(f"child_tag < {child_tag} > not defined")
                     self.vdj_utils.SaveClientLog(f"child_tag < {child_tag} > not defined")

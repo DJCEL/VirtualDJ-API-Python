@@ -259,7 +259,7 @@ def read_VirtualDJ_database():
 #------------------------------------------------------------------------------------------------------------------------------------
 def read_VirtualDJ_history_files():
     print("#############################")
-    print("#  Read VirtualDJ history   #")
+    print("#  Read VirtualDJ History   #")
     print("#############################")
 
 
