@@ -876,8 +876,24 @@ class VirtualDJSettings():
                 elif child_tag == "broadcast":
                     a = 0
                 elif child_tag == "options":
-                    if subchild_tag == "loadSecurity":
+                    if subchild_tag == "language":
+                        settings.options.language = subchild_text
+                    elif subchild_tag == "loadSecurity":
                         settings.options.loadSecurity = subchild_text
+                    elif subchild_tag == "endOfSongWarning":
+                        settings.options.endOfSongWarning = self._to_int(subchild_text)
+                    elif subchild_tag == "autoDiscMarker":
+                        settings.options.autoDiscMarker = subchild_text
+                    elif subchild_tag == "sandboxSplitHeadphones":
+                        settings.options.sandboxSplitHeadphones = subchild_text
+                    elif subchild_tag == "sandboxPreviewOnly":
+                        settings.options.sandboxPreviewOnly = subchild_text
+                    elif subchild_tag == "VDJScriptGlobalVariables":
+                        settings.options.VDJScriptGlobalVariables = subchild_text
+                    elif subchild_tag == "crashGuard":
+                        settings.options.crashGuard = subchild_text
+                    elif subchild_tag == "crashReportLevel":
+                        settings.options.crashReportLevel = self._to_int(subchild_text)
                     elif subchild_tag == "autoUpdateFailedCount":
                         settings.options.autoUpdateFailedCount = self._to_int(subchild_text)
                     elif subchild_tag == "autoUpdateFailedSvn":

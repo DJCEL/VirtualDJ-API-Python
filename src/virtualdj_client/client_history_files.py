@@ -51,4 +51,3 @@ class VirtualDJHistoryFiles():
         
         return tracklist
          
-
