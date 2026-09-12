@@ -5,7 +5,7 @@ from src.virtualdj_client import VirtualDJClient
 
 console = Console()
 
-def test_clientExt():
+def test_client():
      # Initialize VirtualDJ client
     client = VirtualDJClient()
 
@@ -33,33 +33,11 @@ def test_clientExt():
     result1h = client.get("get_vdj_folder")
     result1i = client.get("get_browsed_folder_tab")
     result1j = client.get("get_browsed_folder")
-
-
-    # test 1k
-    vdjscript = "get_browsed_folder_path"
-    result1k = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1k}")
-
-    # test 1l
-    vdjscript = "get_browsed_folder_scrollsize"
-    result1l = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1l}")
-
-    # test 1m
-    vdjscript = "get_browsed_folder_scrollpos"
-    result1m = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1m}")
-    
-    # test 1n
-    vdjscript = "get_browsed_scrollsize"
-    result1n = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1n}")
-
-    # test 1o
-    vdjscript = "get_browsed_scrollpos"
-    result1o = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1o}")
-
+    result1k = client.get("get_browsed_folder_path")
+    result1l = client.get("get_browsed_folder_scrollsize") 
+    result1m = client.get("get_browsed_folder_scrollpos")
+    result1n = client.get("get_browsed_scrollsize")
+    result1o = client.get("get_browsed_scrollpos")
     # test 1p
     vdjscript = "file_count"
     result1p = client.get(vdjscript)
