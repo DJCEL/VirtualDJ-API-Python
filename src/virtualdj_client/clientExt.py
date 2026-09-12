@@ -19,7 +19,6 @@ class VDJDeck:
 class VdjDeckData:
     Filepath: Optional[str] = None
     Filesize: Optional[int] = None
-    Filename: Optional[str] = None
     Artist: Optional[str] = None
     Title: Optional[str] = None
     Remix: Optional[str] = None
@@ -28,13 +27,19 @@ class VdjDeckData:
     Year: Optional[str] = None
     Comment: Optional[str] = None
     Bpm: Optional[float] = None
+    BpmCurrent: Optional[float] = None
     Key: Optional[str] = None
-    Harmonic: Optional[str] = None
+    KeyHarmonic: Optional[str] = None
+    KeyCurrent: Optional[str] = None
+    KeyCurrentHarmonic: Optional[str] = None
     Duration: Optional[float] = None
     Position: Optional[float] = None
+    Time: Optional[float] = None
     Beat: Optional[float] = None 
     Volume: Optional[float] = None
+    Level: Optional[float] = None
     LoopSize: Optional[int] = None
+    Pitch: Optional[float] = None 
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientExt():
@@ -89,7 +94,6 @@ class VirtualDJClientExt():
         deckdata = VdjDeckData()
         deckdata.Filepath = await self._get_result(deck, "get_filepath")
         deckdata.Filesize = self._to_int(await self._get_result(deck, "get_filesize"))
-        deckdata.Filename = await self._get_result(deck, "get_filename")
         deckdata.Artist = await self._get_result(deck, "get_artist")
         deckdata.Title = await self._get_result(deck, "get_title")
         deckdata.Remix = await self._get_result(deck, "get_remix")
@@ -97,14 +101,18 @@ class VirtualDJClientExt():
         deckdata.Album = await self._get_result(deck, "get_album")
         deckdata.Year = await self._get_result(deck, "get_year")
         deckdata.Comment = await self._get_result(deck, "get_comment")
-        deckdata.Bpm = self._to_float(await self._get_result(deck, "get_bpm"))
-        deckdata.Key = await self._get_result(deck, "get_key")
-        deckdata.Harmonic = await self._get_result(deck, "get_harmonic")
+        deckdata.Bpm = self._to_float(await self._get_result(deck, "get_bpm absolute"))
+        deckdata.BpmCurrent = self._to_float(await self._get_result(deck, "get_bpm"))
+        deckdata.KeyCurrent = await self._get_result(deck, "get_key 'musical'")
+        deckdata.KeyCurrentHarmonic = await self._get_result(deck, "get_harmonic")
         deckdata.Duration = self._to_float(await self._get_result(deck, "get_songlength"))
         deckdata.Position = self._to_float(await self._get_result(deck, "get_position"))
+        deckdata.Time = self._to_float(await self._get_result(deck, "get_time"))
         deckdata.Beat = self._to_float(await self._get_result(deck, "get_beat"))
         deckdata.Volume = self._to_float(await self._get_result(deck, "get_volume"))
+        deckdata.Level = self._to_float(await self._get_result(deck, "get_level"))
         deckdata.LoopSize = self._to_int(await self._get_result(deck, "get_loop"))
+        deckdata.Pitch = self._to_int(await self._get_result(deck, "get_pitch"))
         return deckdata
     #------------------------------------------------------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
