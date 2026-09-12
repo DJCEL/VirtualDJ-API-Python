@@ -240,10 +240,11 @@ def run_VirtualDJ_clientExt():
 
 
     leftdeckdata: VdjDeckData = None
-    leftdeckdata = client.get_DeckData("left")
-    console.print(f"LefDeck = {leftdeckdata}")
-
     rightdeckdata: VdjDeckData = None
+
+    leftdeckdata = client.get_DeckData("left")
+    console.print(f"LeftDeck = {leftdeckdata}")
+
     rightdeckdata = client.get_DeckData("right")
     console.print(f"RightDeck = {rightdeckdata}")
 

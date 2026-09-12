@@ -51,7 +51,9 @@ class VdjDeckData:
     IsBeatlock: Optional[bool] = None
     IsMasterTempo: Optional[bool] = None
     IsKeylock: Optional[bool] = None
-
+    HasStems: Optional[bool] = None
+    HasLyrics: Optional[bool] = None
+    IsVideo: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientExt():
     def __init__(self):
@@ -142,6 +144,9 @@ class VirtualDJClientExt():
         deckdata.IsBeatlock = self._to_bool(await self._get_result(deck, "beatlock"))
         deckdata.IsMasterTempo = self._to_bool(await self._get_result(deck, "master_tempo"))
         deckdata.IsKeylock = self._to_bool(await self._get_result(deck, "key_lock"))
+        deckdata.HasStems = self._to_bool(await self._get_result(deck, "has_stems"))
+        deckdata.HasLyrics = self._to_bool(await self._get_result(deck, "has_lyrics"))
+        deckdata.IsVideo = self._to_bool(await self._get_result(deck, "is_video"))
         return deckdata
     #------------------------------------------------------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
