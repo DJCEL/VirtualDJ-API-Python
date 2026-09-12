@@ -8,6 +8,7 @@ from typing import Optional, Literal
 from dataclasses import dataclass
 
 from .client import VirtualDJClient
+from .client_utils import VirtualDJUtils
 
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
@@ -17,13 +18,14 @@ class VDJDeck:
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
+    Id:Optional[int] = None
     Filepath: Optional[str] = None
     Filesize: Optional[int] = None
     Artist: Optional[str] = None
     Title: Optional[str] = None
     Remix: Optional[str] = None
-    Genre: Optional[str] = None
     Album: Optional[str] = None
+    Genre: Optional[str] = None
     Year: Optional[str] = None
     Rating: Optional[int] = None
     Comment: Optional[str] = None
@@ -53,41 +55,146 @@ class VdjDeckData:
     IsKeylock: Optional[bool] = None
     HasStems: Optional[bool] = None
     HasLyrics: Optional[bool] = None
+    HasError: Optional[str] = None
     IsVideo: Optional[bool] = None
+    IsPfl: Optional[bool] = None
+    HasLinkedTracks: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientExt():
     def __init__(self):
-        self.client = VirtualDJClient()
+        self.vdj_client = VirtualDJClient()
+        self.vdj_utils = VirtualDJUtils()
+    #------------------------------------------------------------------------------------
+    #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
     def is_app_running(self) -> bool:
-        return self.client.is_app_running()
+        """ Check if VirtualDJ software is running """
+        return self.vdj_utils.is_virtualdj_running()
     #------------------------------------------------------------------------------------
     def open_app(self) -> bool:
-        return self.client.open_app()
+        """ Open VirtuaDJ """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == True:
+            return True
+
+        bRes = self.vdj_utils.launch_virtualdj_software()
+        return bRes 
     #------------------------------------------------------------------------------------
-    def close_app(self) -> bool:
-        return self.client.close_app()
+    async def get_loadSecurity_async(self) -> bool:
+        vdj_script = 'setting "loadSecurity"'
+        result = await self.get_async(vdj_script)
+        if result in ['on','silent']:
+           print("VirtualDJ => loadSecurity option is activated")
+           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
+           return True
+        else:
+           print("VirtualDJ => loadSecurity option is disable")
+           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
+           return False
+    #------------------------------------------------------------------------------------
+    def get_loadSecurity(self) -> bool:
+        return asyncio.run(self.get_loadSecurity_async())
+    #------------------------------------------------------------------------------------
+    async def disable_loadSecurity_async(self):
+        vdj_script = 'setting "loadSecurity" off'
+        result = await self.send_async(vdj_script)
+        if result == True:
+            print("VirtualDJ => loadSecurity option is now disable")
+            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
+    #------------------------------------------------------------------------------------
+    def disable_loadSecurity(self):
+        return asyncio.run(self.disable_loadSecurity_async())
+    #------------------------------------------------------------------------------------
+    def close_app(self, force_close: bool = False) -> bool:
+        """ Close VirtuaDJ """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == False:
+            return True
+
+        is_vdj_connected = self.is_connected()
+        if is_vdj_connected == True:
+            is_vdj_security = self.get_loadSecurity()
+            if is_vdj_security and force_close:
+                self.disable_loadSecurity()
+
+            # Close VirtualDJ
+            vdj_script = "close"
+            result = self.send(vdj_script)
+            if result == True:
+                return True
+
+        # TODO: Force kill app if (force_close == True)
+        return False
+    #------------------------------------------------------------------------------------
+    #  Check if VirtualDJ is connected
+    #------------------------------------------------------------------------------------
+    async def is_connected_async(self) -> bool:
+        """ Check if VirtualDJ software is running and Network Control Plugin is responding """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == False:
+            return False
+
+        vdj_script = "get_version"
+        vdj_response = await self.vdj_client.query(vdj_script)
+        bRes = (vdj_response.status == "ok")
+        if bRes == False:
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
+            return False
+        else:
+            return True
     #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
-        return self.client.is_connected()
+        return asyncio.run(self.is_connected_async()) 
+    #------------------------------------------------------------------------------------
+    #  VirtualDJ Get/Send
+    #------------------------------------------------------------------------------------
+    async def get_async(self, vdjscript: str) -> str:
+        """ Query VirtualDJ with a vdjscript """
+        vdj_response = await self.vdj_client.query(vdjscript)
+        bRes = (vdj_response.status == "ok")
+        if bRes:
+            result_final = vdj_response.result 
+            return result_final
+        else:
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
+            return f"Failed to query < {vdjscript} >: {result_final}"            
+    #------------------------------------------------------------------------------------
+    async def send_async(self, vdjscript: str) -> bool:
+        """ Execute a vdjscript and return status """
+        vdj_response = await self.vdj_client.execute(vdjscript)
+        bRes = (vdj_response.status == "ok")
+        if bRes:
+            bRes2 = (vdj_response.result.lower() == "true")
+            return bRes2
+        else:
+            status_code = vdj_response.status_code
+            result_final = vdj_response.result
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
+            return False
+    #------------------------------------------------------------------------------------
+    def send(self, vdj_script: str) -> bool:
+        return asyncio.run(self.send_async(vdj_script))
+    #------------------------------------------------------------------------------------
+    def get(self, vdj_script: str) -> str:
+        return asyncio.run(self.get_async(vdj_script))
+    #------------------------------------------------------------------------------------
+    #  Vdjscript Helper
     #------------------------------------------------------------------------------------
     @staticmethod
-    def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
-        vdj_script_full = vdj_script1 + ' & ' + vdj_script2
-        return vdj_script_full
+    def vdjscript_and(vdjscript1:str, vdjscript2:str) -> str:
+        vdjscript_full = vdjscript1 + ' & ' + vdjscript2
+        return vdjscript_full
     #------------------------------------------------------------------------------------
     @staticmethod
-    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
-        vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
-        return vdj_script_full
+    def vdjscript_if_then_else(vdjscript_condition:str, vdjscript_if_true:str, vdjscript_if_false:str) -> str:
+        vdjscript_full = vdjscript_condition + ' ? ' + vdjscript_if_true + " : " + vdjscript_if_false
+        return vdjscript_full
     #------------------------------------------------------------------------------------
-    async def _get_result(self, deck: str, verb: str) -> str:
-        vdj_script = f"deck {deck} {verb}"
-        result = await self.client.get_async(vdj_script)
-        result_check = result[0:15]
-        if result_check == 'Failed to query':
-            return None
-        return result
+    #  Format conversion
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_float(value: Optional[str]) -> Optional[float]:
@@ -115,9 +222,20 @@ class VirtualDJClientExt():
             return value.lower() in ('yes','true','on','1')
         except ValueError:
             return None
-    #------------------------------------------------------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #  get_DeckData()
+    #------------------------------------------------------------------------------------  
+    async def _get_result(self, deck: str, verb: str) -> str:
+        vdjscript = f"deck {deck} {verb}"
+        result = await self.get_async(vdjscript)
+        result_check = result[0:15]
+        if result_check == 'Failed to query':
+            return None
+        return result
+    #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
         deckdata = VdjDeckData()
+        deckdata.Id = self._to_int(await self._get_result(deck, "get_deck"))
         deckdata.Filepath = await self._get_result(deck, "get_filepath")
         deckdata.Filesize = self._to_int(await self._get_result(deck, "get_filesize"))
         deckdata.Artist = await self._get_result(deck, "get_artist")
@@ -152,10 +270,13 @@ class VirtualDJClientExt():
         deckdata.IsKeylock = self._to_bool(await self._get_result(deck, "key_lock"))
         deckdata.HasStems = self._to_bool(await self._get_result(deck, "has_stems"))
         deckdata.HasLyrics = self._to_bool(await self._get_result(deck, "has_lyrics"))
+        deckdata.HasError = await self._get_result(deck, "deck_has_error")
         deckdata.IsVideo = self._to_bool(await self._get_result(deck, "is_video"))
+        deckdata.IsPfl = self._to_bool(await self._get_result(deck, "pfl"))
+        deckdata.HasLinkedTracks = self._to_bool(await self._get_result(deck, "has_linked_tracks"))
+
         return deckdata
     #------------------------------------------------------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
         return asyncio.run(self.get_DeckData_async(deck))
-
-
+   

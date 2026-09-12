@@ -178,11 +178,11 @@ class VirtualDJSongsDatabase():
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
             print(f"VirtualDJ database reading {database_path} => Invalid XML file")
-            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Invalid XML file")
+            self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Invalid XML file")
             return []
         except OSError as exc:
             print(f"VirtualDJ database reading {database_path} => Cannot read database")
-            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Cannot read database")
+            self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Cannot read database")
             return []
 
         root = tree.getroot()
@@ -190,17 +190,17 @@ class VirtualDJSongsDatabase():
         root_attrib = root.attrib
         if root_tag != "VirtualDJ_Database":
             print(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
-            self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
+            self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
             return []
 
         songs_list = root.findall(".//Song")        
         songs_list_count = len(songs_list)
 
         print(f"VirtualDJ database reading => {root_attrib}")
-        self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => {root_attrib}")
+        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => {root_attrib}")
 
         print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
-        self.vdj_utils.SaveClientLog(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
+        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
 
 
         VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
@@ -345,7 +345,7 @@ class VirtualDJSongsDatabase():
                     song.Comment = child_attrib.get("Comment")
                 else:
                     print(f"child_tag < {child_tag} > not defined")
-                    self.vdj_utils.SaveClientLog(f"child_tag < {child_tag} > not defined")
+                    self.vdj_utils.save_client_log(f"child_tag < {child_tag} > not defined")
             
             # We add Poi list outside of the loop
             song.Poi = poi_list or None
@@ -396,8 +396,9 @@ class VirtualDJSongsDatabase():
                         value = dict(row)
                         result.append(value)
         except Exception as e:
-            print(f"Failed to query the sqlite database: ", str(e))
-            self.vdj_utils.SaveClientLog(f"Failed to query the sqlite database: ", str(e))
+            msg = str(e)
+            print(f"Failed to query the sqlite database: {msg}")
+            self.vdj_utils.save_client_log(f"Failed to query the sqlite database: {msg}")
             result = []
 
         return result

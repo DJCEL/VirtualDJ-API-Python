@@ -14,13 +14,12 @@ import logging
 
 from .client_config import VDJ_CLIENT_DEBUG, VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC, VDJ_PROCESS_SETTINGS
 
-logger = logging.getLogger(__name__)
-
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJUtils:
     def __init__(self):
         self.LOG_FOLDER = './log'
         self.LOG_FILENAME = 'client.log'
+        self.logger = logging.getLogger(__name__)
 
         self._create_client_log()
     #------------------------------------------------------------------------------------
@@ -41,9 +40,9 @@ class VirtualDJUtils:
 
             logging.basicConfig(filename=filepath, level=logging.INFO)
     #------------------------------------------------------------------------------------
-    def SaveClientLog(self, msg):
+    def save_client_log(self, msg):
         if VDJ_CLIENT_DEBUG:
-            logger.info(msg)
+            self.logger.info(msg)
     #------------------------------------------------------------------------------------
     @staticmethod
     def close_client_log():
@@ -141,12 +140,12 @@ class VirtualDJUtils:
             subprocess.Popen([app_path], **popen_kwargs)
         except FileNotFoundError:
             print(f"VirtualDJ not found: {app_path}")
-            self.SaveClientLog(f"VirtualDJ not found: {app_path}")
+            self.save_client_log(f"VirtualDJ not found: {app_path}")
             return False
         except Exception as e:
             msg =  app_path + "\n" + str(e)
             print(msg)
-            self.SaveClientLog(msg)
+            self.save_client_log(msg)
             return False
 
         return True
