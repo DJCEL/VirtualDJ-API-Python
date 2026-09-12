@@ -326,7 +326,7 @@ def client_main_params():
     parser.add_argument("-db", "--database", action="store_true", help="Read the VirtualDJ database")
     parser.add_argument("-ht", "--history", action="store_true", help="Read the VirtualDJ History files")
     parser.add_argument("-st", "--settings", action="store_true", help="Read the VirtualDJ Settings")
-    parser.add_argument("-to", "--tools", action="store_true", help="Use the VirtualDJ Tools")
+    parser.add_argument("-ext", "--extended", action="store_true", help="Use the VirtualDJ clientExt version")
 
     args = parser.parse_args()
 
@@ -344,7 +344,7 @@ def client_main():
     if args.settings:
         read_VirtualDJ_settings()
 
-    if args.tools:
+    if args.extended:
         run_VirtualDJ_clientExt()
 
     if not args.disable:
@@ -355,7 +355,7 @@ def main():
     #sys.argv = ["main.py", "--disable", "--database"]
     #sys.argv = ["main.py", "--disable", "--history"]
     #sys.argv = ["main.py", "--disable", "--settings"]
-    sys.argv = ["main.py", "--disable", "--tools"]
+    sys.argv = ["main.py", "--disable", "--extended"]
     client_main()
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
