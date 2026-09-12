@@ -31,7 +31,7 @@
     <InterpreterReference Include="Global|PythonCore|3.14" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\virtualdj_client\clientExt.py" />
+    <Compile Include="src\virtualdj_client\client.py" />
     <Compile Include="src\virtualdj_client\client_settings.py" />
     <Compile Include="src\virtualdj_client\client_utils.py" />
     <Compile Include="src\virtualdj_client\client_history_files.py" />
@@ -39,8 +39,8 @@
     <Compile Include="src\virtualdj_client\__init__.py" />
     <Compile Include="src\main.py" />
     <Compile Include="src\virtualdj_client\client_config.py" />
-    <Compile Include="src\virtualdj_client\client.py" />
-    <Compile Include="tests\test_clientExt.py" />
+    <Compile Include="src\virtualdj_client\client_http.py" />
+    <Compile Include="tests\test_client.py" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />

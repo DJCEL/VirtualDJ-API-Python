@@ -18,7 +18,6 @@ class VDJDeck:
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
-    Id:Optional[int] = None
     Filepath: Optional[str] = None
     Filesize: Optional[int] = None
     Artist: Optional[str] = None
@@ -65,67 +64,6 @@ class VirtualDJClient():
         self.vdj_client = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
     #------------------------------------------------------------------------------------
-    #  Launch / Quit VirtualDJ
-    #------------------------------------------------------------------------------------
-    def is_app_running(self) -> bool:
-        """ Check if VirtualDJ software is running """
-        return self.vdj_utils.is_virtualdj_running()
-    #------------------------------------------------------------------------------------
-    def open_app(self) -> bool:
-        """ Open VirtuaDJ """
-        is_vdj_running = self.is_app_running()
-        if is_vdj_running == True:
-            return True
-
-        bRes = self.vdj_utils.launch_virtualdj_software()
-        return bRes 
-    #------------------------------------------------------------------------------------
-    async def get_loadSecurity_async(self) -> bool:
-        vdj_script = 'setting "loadSecurity"'
-        result = await self.get_async(vdj_script)
-        if result in ['on','silent']:
-           print("VirtualDJ => loadSecurity option is activated")
-           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
-           return True
-        else:
-           print("VirtualDJ => loadSecurity option is disable")
-           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
-           return False
-    #------------------------------------------------------------------------------------
-    def get_loadSecurity(self) -> bool:
-        return asyncio.run(self.get_loadSecurity_async())
-    #------------------------------------------------------------------------------------
-    async def disable_loadSecurity_async(self):
-        vdj_script = 'setting "loadSecurity" off'
-        result = await self.send_async(vdj_script)
-        if result == True:
-            print("VirtualDJ => loadSecurity option is now disable")
-            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
-    #------------------------------------------------------------------------------------
-    def disable_loadSecurity(self):
-        return asyncio.run(self.disable_loadSecurity_async())
-    #------------------------------------------------------------------------------------
-    def close_app(self, force_close: bool = False) -> bool:
-        """ Close VirtuaDJ """
-        is_vdj_running = self.is_app_running()
-        if is_vdj_running == False:
-            return True
-
-        is_vdj_connected = self.is_connected()
-        if is_vdj_connected == True:
-            is_vdj_security = self.get_loadSecurity()
-            if is_vdj_security and force_close:
-                self.disable_loadSecurity()
-
-            # Close VirtualDJ
-            vdj_script = "close"
-            result = self.send(vdj_script)
-            if result == True:
-                return True
-
-        # TODO: Force kill app if (force_close == True)
-        return False
-    #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
     async def is_connected_async(self) -> bool:
@@ -145,8 +83,60 @@ class VirtualDJClient():
         else:
             return True
     #------------------------------------------------------------------------------------
-    def is_connected(self) -> bool:
-        return asyncio.run(self.is_connected_async()) 
+    #  Launch / Quit VirtualDJ
+    #------------------------------------------------------------------------------------
+    def is_app_running(self) -> bool:
+        """ Check if VirtualDJ software is running """
+        return self.vdj_utils.is_virtualdj_running()
+    #------------------------------------------------------------------------------------
+    def open_app(self) -> bool:
+        """ Open VirtuaDJ if not open """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == True:
+            return True
+
+        bRes = self.vdj_utils.launch_virtualdj_software()
+        return bRes 
+    #------------------------------------------------------------------------------------
+    async def get_loadSecurity_async(self) -> bool:
+        vdj_script = 'setting "loadSecurity"'
+        result = await self.get_async(vdj_script)
+        if result in ['on','silent']:
+           print("VirtualDJ => loadSecurity option is activated")
+           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
+           return True
+        else:
+           print("VirtualDJ => loadSecurity option is disable")
+           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
+           return False    
+    #------------------------------------------------------------------------------------
+    async def disable_loadSecurity_async(self):
+        vdj_script = 'setting "loadSecurity" off'
+        result = await self.send_async(vdj_script)
+        if result == True:
+            print("VirtualDJ => loadSecurity option is now disable")
+            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
+    #------------------------------------------------------------------------------------
+    async def close_app_async(self, force_close: bool = False) -> bool:
+        """ Close VirtuaDJ """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == False:
+            return True
+
+        is_vdj_connected = await self.is_connected_async()
+        if is_vdj_connected == True:
+            is_vdj_security = await self.get_loadSecurity_async()
+            if is_vdj_security and force_close:
+                await self.disable_loadSecurity_async()
+
+            # Close VirtualDJ
+            vdj_script = "close"
+            result = await self.send_async(vdj_script)
+            if result == True:
+                return True
+
+        # TODO: Force kill app if (force_close == True)
+        return False
     #------------------------------------------------------------------------------------
     #  VirtualDJ Get/Send
     #------------------------------------------------------------------------------------
@@ -161,7 +151,7 @@ class VirtualDJClient():
             status_code = vdj_response.status_code
             result_final = vdj_response.result
             self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
-            return f"Failed to query < {vdjscript} >: {result_final}"            
+            return result_final            
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
         """ Execute a vdjscript and return status """
@@ -175,12 +165,6 @@ class VirtualDJClient():
             result_final = vdj_response.result
             self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
             return False
-    #------------------------------------------------------------------------------------
-    def send(self, vdj_script: str) -> bool:
-        return asyncio.run(self.send_async(vdj_script))
-    #------------------------------------------------------------------------------------
-    def get(self, vdj_script: str) -> str:
-        return asyncio.run(self.get_async(vdj_script))
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper
     #------------------------------------------------------------------------------------
@@ -197,7 +181,7 @@ class VirtualDJClient():
     #  Format conversion
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _to_float(value: Optional[str]) -> Optional[float]:
+    def to_float(value: Optional[str]) -> Optional[float]:
         if value is None:
             return None
         try:
@@ -206,7 +190,7 @@ class VirtualDJClient():
             return None
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _to_int(value: Optional[str]) -> Optional[int]:
+    def to_int(value: Optional[str]) -> Optional[int]:
         if value is None:
             return None
         try:
@@ -215,7 +199,7 @@ class VirtualDJClient():
             return None
     #------------------------------------------------------------------------------------
     @staticmethod
-    def _to_bool(value: Optional[str]) -> Optional[bool]:
+    def to_bool(value: Optional[str]) -> Optional[bool]:
         if value is None:
             return None
         try:
@@ -228,55 +212,73 @@ class VirtualDJClient():
     async def _get_result(self, deck: str, verb: str) -> str:
         vdjscript = f"deck {deck} {verb}"
         result = await self.get_async(vdjscript)
-        result_check = result[0:15]
-        if result_check == 'Failed to query':
+        result_check = result[0:5]
+        if result_check == 'error':
             return None
         return result
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
         deckdata = VdjDeckData()
-        deckdata.Id = self._to_int(await self._get_result(deck, "get_deck"))
         deckdata.Filepath = await self._get_result(deck, "get_filepath")
-        deckdata.Filesize = self._to_int(await self._get_result(deck, "get_filesize"))
+        deckdata.Filesize = self.to_int(await self._get_result(deck, "get_filesize"))
         deckdata.Artist = await self._get_result(deck, "get_artist")
         deckdata.Title = await self._get_result(deck, "get_title")
         deckdata.Remix = await self._get_result(deck, "get_remix")
         deckdata.Genre = await self._get_result(deck, "get_genre")
         deckdata.Album = await self._get_result(deck, "get_album")
         deckdata.Year = await self._get_result(deck, "get_year")
-        deckdata.Rating = self._to_int(await self._get_result(deck, "rating"))
+        deckdata.Rating = self.to_int(await self._get_result(deck, "rating"))
         deckdata.Comment = await self._get_result(deck, "get_comment")
-        deckdata.Bpm = self._to_float(await self._get_result(deck, "get_bpm absolute"))
-        deckdata.BpmCurrent = self._to_float(await self._get_result(deck, "get_bpm"))
+        deckdata.Bpm = self.to_float(await self._get_result(deck, "get_bpm absolute"))
+        deckdata.BpmCurrent = self.to_float(await self._get_result(deck, "get_bpm"))
         deckdata.KeyCurrent = await self._get_result(deck, "get_key 'musical'")
         deckdata.KeyCurrentHarmonic = await self._get_result(deck, "get_harmonic")
-        deckdata.Duration = self._to_float(await self._get_result(deck, "get_songlength"))
-        deckdata.Position = self._to_float(await self._get_result(deck, "get_position"))
-        deckdata.Time = self._to_float(await self._get_result(deck, "get_time"))
-        deckdata.Beat = self._to_float(await self._get_result(deck, "get_beat"))
-        deckdata.Beatgrid = self._to_float(await self._get_result(deck, "get_beatgrid"))
-        deckdata.Beatpos = self._to_float(await self._get_result(deck, "get_beatpos"))
-        deckdata.Firstbeat = self._to_float(await self._get_result(deck, "get_firstbeat"))
-        deckdata.Volume = self._to_float(await self._get_result(deck, "get_volume"))
-        deckdata.Level = self._to_float(await self._get_result(deck, "get_level"))
-        deckdata.LoopSize = self._to_int(await self._get_result(deck, "get_loop"))
-        deckdata.Pitch = self._to_float(await self._get_result(deck, "get_pitch"))
-        deckdata.IsPlaying = self._to_bool(await self._get_result(deck, "play"))
-        deckdata.IsLooping = self._to_bool(await self._get_result(deck, "loop"))
-        deckdata.IsReverse = self._to_bool(await self._get_result(deck, "reverse"))
-        deckdata.IsSync = self._to_bool(await self._get_result(deck, "sync"))
-        deckdata.IsBeatlock = self._to_bool(await self._get_result(deck, "beatlock"))
-        deckdata.IsMasterTempo = self._to_bool(await self._get_result(deck, "master_tempo"))
-        deckdata.IsKeylock = self._to_bool(await self._get_result(deck, "key_lock"))
-        deckdata.HasStems = self._to_bool(await self._get_result(deck, "has_stems"))
-        deckdata.HasLyrics = self._to_bool(await self._get_result(deck, "has_lyrics"))
+        deckdata.Duration = self.to_float(await self._get_result(deck, "get_songlength"))
+        deckdata.Position = self.to_float(await self._get_result(deck, "get_position"))
+        deckdata.Time = self.to_float(await self._get_result(deck, "get_time"))
+        deckdata.Beat = self.to_float(await self._get_result(deck, "get_beat"))
+        deckdata.Beatgrid = self.to_float(await self._get_result(deck, "get_beatgrid"))
+        deckdata.Beatpos = self.to_float(await self._get_result(deck, "get_beatpos"))
+        deckdata.Firstbeat = self.to_float(await self._get_result(deck, "get_firstbeat"))
+        deckdata.Volume = self.to_float(await self._get_result(deck, "get_volume"))
+        deckdata.Level = self.to_float(await self._get_result(deck, "get_level"))
+        deckdata.LoopSize = self.to_int(await self._get_result(deck, "get_loop"))
+        deckdata.Pitch = self.to_float(await self._get_result(deck, "get_pitch"))
+        deckdata.IsPlaying = self.to_bool(await self._get_result(deck, "play"))
+        deckdata.IsLooping = self.to_bool(await self._get_result(deck, "loop"))
+        deckdata.IsReverse = self.to_bool(await self._get_result(deck, "reverse"))
+        deckdata.IsSync = self.to_bool(await self._get_result(deck, "sync"))
+        deckdata.IsBeatlock = self.to_bool(await self._get_result(deck, "beatlock"))
+        deckdata.IsMasterTempo = self.to_bool(await self._get_result(deck, "master_tempo"))
+        deckdata.IsKeylock = self.to_bool(await self._get_result(deck, "key_lock"))
+        deckdata.HasStems = self.to_bool(await self._get_result(deck, "has_stems"))
+        deckdata.HasLyrics = self.to_bool(await self._get_result(deck, "has_lyrics"))
         deckdata.HasError = await self._get_result(deck, "deck_has_error")
-        deckdata.IsVideo = self._to_bool(await self._get_result(deck, "is_video"))
-        deckdata.IsPfl = self._to_bool(await self._get_result(deck, "pfl"))
-        deckdata.HasLinkedTracks = self._to_bool(await self._get_result(deck, "has_linked_tracks"))
-
+        deckdata.IsVideo = self.to_bool(await self._get_result(deck, "is_video"))
+        deckdata.IsPfl = self.to_bool(await self._get_result(deck, "pfl"))
+        deckdata.HasLinkedTracks = self.to_bool(await self._get_result(deck, "has_linked_tracks"))
         return deckdata
-    #------------------------------------------------------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    #  asyncio.run()
+    #------------------------------------------------------------------------------------
+    def is_connected(self) -> bool:
+        return asyncio.run(self.is_connected_async()) 
+    #------------------------------------------------------------------------------------
+    def close_app(self, force_close: bool = False) -> bool:
+        return asyncio.run(self.close_app_async()) 
+    #------------------------------------------------------------------------------------
+    def send(self, vdj_script: str) -> bool:
+        return asyncio.run(self.send_async(vdj_script))
+    #------------------------------------------------------------------------------------
+    def get(self, vdj_script: str) -> str:
+        return asyncio.run(self.get_async(vdj_script))
+    #------------------------------------------------------------------------------------
+    def get_loadSecurity(self) -> bool:
+        return asyncio.run(self.get_loadSecurity_async())
+    #------------------------------------------------------------------------------------
+    def disable_loadSecurity(self):
+        return asyncio.run(self.disable_loadSecurity_async())
+    #------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
         return asyncio.run(self.get_DeckData_async(deck))
    

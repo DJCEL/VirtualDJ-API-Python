@@ -29,26 +29,11 @@ def test_clientExt():
     result1d = client.get("get_none")
     result1e = client.get("deck left get_filepath")
     result1f = client.get("get_browsed_filepath")
+    result1g = client.get("get_status")
+    result1h = client.get("get_vdj_folder")
+    result1i = client.get("get_browsed_folder_tab")
+    result1j = client.get("get_browsed_folder")
 
-    # test 1g
-    vdjscript = "get_status"
-    result1g = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1g}")
-
-    # test 1h
-    vdjscript = "get_vdj_folder"
-    result1h = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1h}")
-
-    # test 1i
-    vdjscript = "get_browsed_folder_tab"
-    result1i = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1i}")
-
-    # test 1j
-    vdjscript = "get_browsed_folder"
-    result1j = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1j}")
 
     # test 1k
     vdjscript = "get_browsed_folder_path"
