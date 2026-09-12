@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClient, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
+from virtualdj_client import VirtualDJClient, VirtualDJClientExt, VdjDeckData, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 
@@ -209,6 +209,43 @@ def control_VirtualDJ():
     #client.close_app()
 
 #------------------------------------------------------------------------------------------------------------------------------------
+def run_VirtualDJ_clientExt():
+    print("################################################################")
+    print("# Control VirtualDJ with the Network Control plugin (Extended) #")
+    print("################################################################")
+
+    # Initialize VirtualDJ clientExt
+    client = VirtualDJClientExt()
+
+    # Check if VirtualDJ is running
+    client_running = client.is_app_running()
+    console.print(f"VirtualDJ running => {client_running}")
+
+    # Launch VirtualDJ if not running
+    if client_running == False:
+        console.print("Launching VirtualDJ...")
+        client_launching = client.open_app()
+        console.print(f"VirtualDJ launching => {client_launching}")
+        client_running = client.is_app_running()
+        console.print(f"VirtualDJ running => {client_running}")
+        if (client_running == False):
+            sys.exit()
+
+    # Check the NetWork Control plugin
+    client_connected = client.is_connected()
+    console.print(f"VirtualDJ NetWork Control plugin connected => {client_connected}")
+    if (client_connected == False):
+        console.print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
+        sys.exit()
+
+
+    deckdata: VdjDeckData = None
+    deckdata = client.get_DeckData("left")
+
+    console.print("Left deck:")
+    console.print(deckdata)
+
+#------------------------------------------------------------------------------------------------------------------------------------
 def read_VirtualDJ_database():
     print("##############################")
     print("#  Read VirtualDJ database   #")
@@ -289,6 +326,7 @@ def client_main_params():
     parser.add_argument("-db", "--database", action="store_true", help="Read the VirtualDJ database")
     parser.add_argument("-ht", "--history", action="store_true", help="Read the VirtualDJ History files")
     parser.add_argument("-st", "--settings", action="store_true", help="Read the VirtualDJ Settings")
+    parser.add_argument("-to", "--tools", action="store_true", help="Use the VirtualDJ Tools")
 
     args = parser.parse_args()
 
@@ -306,6 +344,9 @@ def client_main():
     if args.settings:
         read_VirtualDJ_settings()
 
+    if args.tools:
+        run_VirtualDJ_clientExt()
+
     if not args.disable:
         control_VirtualDJ()
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -314,6 +355,7 @@ def main():
     #sys.argv = ["main.py", "--disable", "--database"]
     #sys.argv = ["main.py", "--disable", "--history"]
     #sys.argv = ["main.py", "--disable", "--settings"]
+    sys.argv = ["main.py", "--disable", "--tools"]
     client_main()
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":

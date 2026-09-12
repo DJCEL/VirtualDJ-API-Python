@@ -1,22 +1,18 @@
 """ 
 VirtualDJ HTTP API client using the Network Control plugin 
 """
-__version__ = '1.0.20'
+__version__ = '1.0.21'
 
 import httpx
 import asyncio
-from typing import Optional,Literal
+from typing import Literal
 from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
 
 from .client_utils import VirtualDJUtils
 from .client_config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
 
-#------------------------------------------------------------------------------------------------------------------------------------
-@dataclass
-class VDJDeck:
-    name: Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master'] = None
-    id: int = None
+
 #------------------------------------------------------------------------------------
 @dataclass
 class VDJResponse:
@@ -152,18 +148,6 @@ class VirtualDJClient:
     #------------------------------------------------------------------------------------
     def get(self, vdj_script: str) -> str:
         return asyncio.run(self.get_async(vdj_script))
-    #------------------------------------------------------------------------------------
-    # VirtualDJ script tools
-    #------------------------------------------------------------------------------------
-    @staticmethod
-    def vdjscript_and(vdj_script1:str, vdj_script2:str) -> str:
-        vdj_script_full = vdj_script1 + ' & ' + vdj_script2
-        return vdj_script_full
-    #------------------------------------------------------------------------------------
-    @staticmethod
-    def vdjscript_if_then_else(vdj_script_condition:str, vdj_script_if_true:str, vdj_script_if_false:str) -> str:
-        vdj_script_full = vdj_script_condition + ' ? ' + vdj_script_if_true + " : " + vdj_script_if_false
-        return vdj_script_full
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
