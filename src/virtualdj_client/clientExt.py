@@ -12,8 +12,8 @@ from .client import VirtualDJClient
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VDJDeck:
-    name: Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master'] = None
-    id: int = None
+    name: Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master'] | None = None
+    id: int | None = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
@@ -91,22 +91,28 @@ class VirtualDJClientExt():
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_float(value: Optional[str]) -> Optional[float]:
+        if value is None:
+            return None
         try:
-            return float(value) if value is not None else None
+            return float(value)
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_int(value: Optional[str]) -> Optional[int]:
+        if value is None:
+            return None
         try:
-            return int(value) if value is not None else None
+            return int(value)
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_bool(value: Optional[str]) -> Optional[bool]:
+        if value is None:
+            return None
         try:
-            return (value == 'yes' or value != 'no') if value is not None else None
+            return value.lower() in ('yes','true','on','1')
         except ValueError:
             return None
     #------------------------------------------------------------------------------------------------------------------------------------
@@ -136,7 +142,7 @@ class VirtualDJClientExt():
         deckdata.Volume = self._to_float(await self._get_result(deck, "get_volume"))
         deckdata.Level = self._to_float(await self._get_result(deck, "get_level"))
         deckdata.LoopSize = self._to_int(await self._get_result(deck, "get_loop"))
-        deckdata.Pitch = self._to_int(await self._get_result(deck, "get_pitch"))
+        deckdata.Pitch = self._to_float(await self._get_result(deck, "get_pitch"))
         deckdata.IsPlaying = self._to_bool(await self._get_result(deck, "play"))
         deckdata.IsLooping = self._to_bool(await self._get_result(deck, "loop"))
         deckdata.IsReverse = self._to_bool(await self._get_result(deck, "reverse"))

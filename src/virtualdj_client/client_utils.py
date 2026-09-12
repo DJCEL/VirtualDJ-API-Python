@@ -22,9 +22,9 @@ class VirtualDJUtils:
         self.LOG_FOLDER = './log'
         self.LOG_FILENAME = 'client.log'
 
-        self._CreateClientLog()
+        self._create_client_log()
     #------------------------------------------------------------------------------------
-    def _CreateClientLog(self):
+    def _create_client_log(self):
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
@@ -45,7 +45,8 @@ class VirtualDJUtils:
         if VDJ_CLIENT_DEBUG:
             logger.info(msg)
     #------------------------------------------------------------------------------------
-    def CloseClientLog():
+    @staticmethod
+    def close_client_log():
         logging.shutdown()
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_list(self) -> list[Path]:
