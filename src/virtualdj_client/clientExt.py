@@ -25,6 +25,7 @@ class VdjDeckData:
     Genre: Optional[str] = None
     Album: Optional[str] = None
     Year: Optional[str] = None
+    Rating: Optional[int] = None
     Comment: Optional[str] = None
     Bpm: Optional[float] = None
     BpmCurrent: Optional[float] = None
@@ -35,11 +36,21 @@ class VdjDeckData:
     Duration: Optional[float] = None
     Position: Optional[float] = None
     Time: Optional[float] = None
-    Beat: Optional[float] = None 
+    Beat: Optional[float] = None
+    Beatgrid: Optional[float] = None 
+    Beatpos: Optional[float] = None
+    Firstbeat: Optional[float] = None
     Volume: Optional[float] = None
     Level: Optional[float] = None
     LoopSize: Optional[int] = None
-    Pitch: Optional[float] = None 
+    Pitch: Optional[float] = None
+    IsPlaying: Optional[bool] = None
+    IsLooping: Optional[bool] = None
+    IsReverse: Optional[bool] = None
+    IsSync: Optional[bool] = None
+    IsBeatlock: Optional[bool] = None
+    IsMasterTempo: Optional[bool] = None
+    IsKeylock: Optional[bool] = None
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientExt():
@@ -89,6 +100,13 @@ class VirtualDJClientExt():
             return int(value) if value is not None else None
         except ValueError:
             return None
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _to_bool(value: Optional[str]) -> Optional[bool]:
+        try:
+            return (value == 'yes' or value != 'no') if value is not None else None
+        except ValueError:
+            return None
     #------------------------------------------------------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
         deckdata = VdjDeckData()
@@ -100,6 +118,7 @@ class VirtualDJClientExt():
         deckdata.Genre = await self._get_result(deck, "get_genre")
         deckdata.Album = await self._get_result(deck, "get_album")
         deckdata.Year = await self._get_result(deck, "get_year")
+        deckdata.Rating = self._to_int(await self._get_result(deck, "rating"))
         deckdata.Comment = await self._get_result(deck, "get_comment")
         deckdata.Bpm = self._to_float(await self._get_result(deck, "get_bpm absolute"))
         deckdata.BpmCurrent = self._to_float(await self._get_result(deck, "get_bpm"))
@@ -109,10 +128,20 @@ class VirtualDJClientExt():
         deckdata.Position = self._to_float(await self._get_result(deck, "get_position"))
         deckdata.Time = self._to_float(await self._get_result(deck, "get_time"))
         deckdata.Beat = self._to_float(await self._get_result(deck, "get_beat"))
+        deckdata.Beatgrid = self._to_float(await self._get_result(deck, "get_beatgrid"))
+        deckdata.Beatpos = self._to_float(await self._get_result(deck, "get_beatpos"))
+        deckdata.Firstbeat = self._to_float(await self._get_result(deck, "get_firstbeat"))
         deckdata.Volume = self._to_float(await self._get_result(deck, "get_volume"))
         deckdata.Level = self._to_float(await self._get_result(deck, "get_level"))
         deckdata.LoopSize = self._to_int(await self._get_result(deck, "get_loop"))
         deckdata.Pitch = self._to_int(await self._get_result(deck, "get_pitch"))
+        deckdata.IsPlaying = self._to_bool(await self._get_result(deck, "play"))
+        deckdata.IsLooping = self._to_bool(await self._get_result(deck, "loop"))
+        deckdata.IsReverse = self._to_bool(await self._get_result(deck, "reverse"))
+        deckdata.IsSync = self._to_bool(await self._get_result(deck, "sync"))
+        deckdata.IsBeatlock = self._to_bool(await self._get_result(deck, "beatlock"))
+        deckdata.IsMasterTempo = self._to_bool(await self._get_result(deck, "master_tempo"))
+        deckdata.IsKeylock = self._to_bool(await self._get_result(deck, "key_lock"))
         return deckdata
     #------------------------------------------------------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
