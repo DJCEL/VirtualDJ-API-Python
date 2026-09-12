@@ -1,13 +1,13 @@
 import pytest
 from rich.console import Console
 
-from src.virtualdj_client import VirtualDJClientExt
+from src.virtualdj_client import VirtualDJClient
 
 console = Console()
 
 def test_clientExt():
      # Initialize VirtualDJ client
-    client = VirtualDJClientExt()
+    client = VirtualDJClient()
 
 
     vdj_build = client.get("get_build")
@@ -23,37 +23,12 @@ def test_clientExt():
     result2j = client.send("browser_scroll +1")
     result2k = client.send("save_config")
     result2l = client.send("saveregistryconfig")
-
-    
-    # test 1a
-    vdjscript = "get_browsed_title_artist"
-    result1a = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1a}")
-
-    # test 1b
-    vdjscript = "deck left get_bpm"
-    result1b = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1b}")
-
-    # test 1c
-    vdjscript = "deck left get_key"
-    result1c = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1c}")
-
-    # test 1d
-    vdjscript = "get_none"
-    result1d = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1d}")
-
-    # test 1e
-    vdjscript = "deck left get_filepath"
-    result1e = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1e}")
-
-    # test 1f
-    vdjscript = "get_browsed_filepath"
-    result1f = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1f}")
+    result1a = client.get("get_browsed_title_artist")
+    result1b = client.get("deck left get_bpm") 
+    result1c = client.get("deck left get_key")
+    result1d = client.get("get_none")
+    result1e = client.get("deck left get_filepath")
+    result1f = client.get("get_browsed_filepath")
 
     # test 1g
     vdjscript = "get_status"

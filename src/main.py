@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClientExt, VdjDeckData, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
+from virtualdj_client import VirtualDJClient, VdjDeckData, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 
@@ -13,8 +13,8 @@ def run_VirtualDJ_clientExt():
     print("# Control VirtualDJ with the Network Control plugin  #")
     print("######################################################")
 
-    # Initialize VirtualDJ clientExt
-    client = VirtualDJClientExt()
+    # Initialize VirtualDJ client
+    client = VirtualDJClient()
 
     # Check if VirtualDJ is running
     client_running = client.is_app_running()
