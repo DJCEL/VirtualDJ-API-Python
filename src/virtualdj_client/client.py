@@ -25,7 +25,7 @@ class VdjDeckData:
     Remix: Optional[str] = None
     Album: Optional[str] = None
     Genre: Optional[str] = None
-    Year: Optional[str] = None
+    Year: Optional[int] = None
     Rating: Optional[int] = None
     Comment: Optional[str] = None
     Bpm: Optional[float] = None
@@ -181,6 +181,15 @@ class VirtualDJClient():
     #  Format conversion
     #------------------------------------------------------------------------------------
     @staticmethod
+    def to_str(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        elif value == '':
+            return None
+        else:
+            return value
+    #------------------------------------------------------------------------------------
+    @staticmethod
     def to_float(value: Optional[str]) -> Optional[float]:
         if value is None:
             return None
@@ -219,20 +228,21 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
         deckdata = VdjDeckData()
-        deckdata.Filepath = await self._get_result(deck, "get_filepath")
+        deckdata.Filepath = self.to_str(await self._get_result(deck, "get_filepath"))
         deckdata.Filesize = self.to_int(await self._get_result(deck, "get_filesize"))
-        deckdata.Artist = await self._get_result(deck, "get_artist")
-        deckdata.Title = await self._get_result(deck, "get_title")
-        deckdata.Remix = await self._get_result(deck, "get_remix")
-        deckdata.Genre = await self._get_result(deck, "get_genre")
-        deckdata.Album = await self._get_result(deck, "get_album")
-        deckdata.Year = await self._get_result(deck, "get_year")
+        deckdata.Artist = self.to_str(await self._get_result(deck, "get_artist"))
+        deckdata.Title = self.to_str(await self._get_result(deck, "get_title"))
+        deckdata.Remix = self.to_str(await self._get_result(deck, "get_remix"))
+        deckdata.Genre = self.to_str(await self._get_result(deck, "get_genre"))
+        deckdata.Album = self.to_str(await self._get_result(deck, "get_album"))
+        year_tmp = self.to_int(await self._get_result(deck, "get_year"))
+        deckdata.Year = None if year_tmp == 0 else year_tmp
         deckdata.Rating = self.to_int(await self._get_result(deck, "rating"))
-        deckdata.Comment = await self._get_result(deck, "get_comment")
+        deckdata.Comment = self.to_str(await self._get_result(deck, "get_comment"))
         deckdata.Bpm = self.to_float(await self._get_result(deck, "get_bpm absolute"))
         deckdata.BpmCurrent = self.to_float(await self._get_result(deck, "get_bpm"))
-        deckdata.KeyCurrent = await self._get_result(deck, "get_key 'musical'")
-        deckdata.KeyCurrentHarmonic = await self._get_result(deck, "get_harmonic")
+        deckdata.KeyCurrent = self.to_str(await self._get_result(deck, "get_key 'musical'"))
+        deckdata.KeyCurrentHarmonic = self.to_str(await self._get_result(deck, "get_harmonic"))
         deckdata.Duration = self.to_float(await self._get_result(deck, "get_songlength"))
         deckdata.Position = self.to_float(await self._get_result(deck, "get_position"))
         deckdata.Time = self.to_float(await self._get_result(deck, "get_time"))
@@ -253,7 +263,7 @@ class VirtualDJClient():
         deckdata.IsKeylock = self.to_bool(await self._get_result(deck, "key_lock"))
         deckdata.HasStems = self.to_bool(await self._get_result(deck, "has_stems"))
         deckdata.HasLyrics = self.to_bool(await self._get_result(deck, "has_lyrics"))
-        deckdata.HasError = await self._get_result(deck, "deck_has_error")
+        deckdata.HasError = self.to_str(await self._get_result(deck, "deck_has_error"))
         deckdata.IsVideo = self.to_bool(await self._get_result(deck, "is_video"))
         deckdata.IsPfl = self.to_bool(await self._get_result(deck, "pfl"))
         deckdata.HasLinkedTracks = self.to_bool(await self._get_result(deck, "has_linked_tracks"))
