@@ -14,7 +14,7 @@ VDJ_PROCESS_PATH_WINDOWS = r"C:\Program Files\VirtualDJ\virtualdj.exe"
 VDJ_PROCESS_PATH_MAC = "/Applications/VirtualDJ.app"
 
 # VirtualDJ - Settings
-VDJ_PROCESS_SETTINGS = "settings.xml"
+VDJ_XML_SETTINGS = "settings.xml"
 
 # VirtualDJ - Songs database
 VDJ_XML_DATABASE_NAME = "database.xml"
