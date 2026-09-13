@@ -10,7 +10,7 @@ from typing import Optional
 from datetime import datetime
 
 from .client_utils import VirtualDJUtils
-from .client_config import VDJ_PROCESS_SETTINGS
+from .client_config import VDJ_XML_SETTINGS
 
 #------------------------------------------------------------------------------------
 @dataclass
@@ -745,7 +745,7 @@ class VdjSettings:
 class VirtualDJSettings():
     def __init__(self):
         self.vdj_utils = VirtualDJUtils()
-        self.SETTINGS_FILENAME = VDJ_PROCESS_SETTINGS
+        self.SETTINGS_FILENAME = VDJ_XML_SETTINGS
     #------------------------------------------------------------------------------------
     def get_local_settings_path_list(self) -> list[Path]:
         settings_path_list : list[Path]= []
