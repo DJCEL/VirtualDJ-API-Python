@@ -9,6 +9,7 @@ from dataclasses import dataclass
 
 from .client_http import VirtualDJClientHttp, VdjResponse
 from .client_utils import VirtualDJUtils
+from .client_settings import VirtualDJSettings
 
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
@@ -63,6 +64,7 @@ class VirtualDJClient():
     def __init__(self):
         self.vdj_client = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
+        self.vdj_settings = VirtualDJSettings()
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
@@ -90,7 +92,7 @@ class VirtualDJClient():
         if is_vdj_running == True:
             return True
 
-        # TODO: check if updates are activated in VirtualDJ via settings.xml
+        # TODO: check if updates are activated in VirtualDJ via self.vdj_settings
 
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
