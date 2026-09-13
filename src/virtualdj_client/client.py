@@ -93,11 +93,8 @@ class VirtualDJClient():
             return True
 
         # TODO: check if updates are activated in VirtualDJ via self.vdj_settings
-
         settings_path_list = self.vdj_settings.get_local_settings_path_list()
-        console.print(f"VirtualDJ settings path list => {settings_path_list}")
         for settings_path in settings_path_list:
-            console.print(f"VirtualDJ settings path reading => {settings_path}")
             result = self.vdj_settings.read_local_xml_settings(settings_path)
 
         bRes = self.vdj_utils.launch_virtualdj_software()
