@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------
-# VirtualDJ ClientExt
+# VirtualDJ Client
 #------------------------------------------------------------------------------------
 __version__ = "1.0.0"
 
@@ -7,7 +7,7 @@ import asyncio
 from typing import Optional, Literal
 from dataclasses import dataclass
 
-from .client_http import VirtualDJClientHttp
+from .client_http import VirtualDJClientHttp, VdjResponse
 from .client_utils import VirtualDJUtils
 
 #------------------------------------------------------------------------------------------------------------------------------------
