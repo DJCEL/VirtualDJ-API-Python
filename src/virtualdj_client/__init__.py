@@ -1,6 +1,6 @@
 __version__ = "1.1.4"
 
-from .client import VirtualDJClient, VDJDeck, VdjDeckData
+from .client import VirtualDJClient, VdjDeck, VdjDeckData
 from .client_utils import VirtualDJUtils
 from .client_settings import VirtualDJSettings
 from .client_songs_database import VirtualDJSongsDatabase
