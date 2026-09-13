@@ -1,9 +1,7 @@
 import pytest
-from rich.console import Console
 
 from src.virtualdj_client import VirtualDJClient
 
-console = Console()
 
 def test_client():
      # Initialize VirtualDJ client
@@ -38,27 +36,8 @@ def test_client():
     result1m = client.get("get_browsed_folder_scrollpos")
     result1n = client.get("get_browsed_scrollsize")
     result1o = client.get("get_browsed_scrollpos")
-    # test 1p
-    vdjscript = "file_count"
-    result1p = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1p}")
-
-    # test 1q
-    vdjscript = "deck left has_stems"
-    result1q = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1q}")
-
-    # test 1r
-    vdjscript = 'setting "loadSecurity"'
-    result1r = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1r}")
-
-    # test 1s
-    vdjscript = 'setting "checkUpdates"'
-    result1s = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1s}")
-
-    # test 1t
-    vdjscript = "get_decks"
-    result1t = client.get(vdjscript)
-    console.print(f"VirtualDJ script get < {vdjscript} > => {result1t}")
+    result1p = client.get("file_count")
+    result1q = client.get("deck left has_stems")
+    result1r = client.get('setting "loadSecurity"')
+    result1s = client.get('setting "checkUpdates"')
+    result1t = client.get("get_decks")
