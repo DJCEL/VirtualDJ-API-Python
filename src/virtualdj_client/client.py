@@ -149,8 +149,7 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
-        bRes = (status == "ok")
-        if bRes: 
+        if status == "ok": 
             return result
         else:
             self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
@@ -162,10 +161,9 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
-        bRes = (status == "ok")
-        if bRes:
-            bRes2 = (result.lower() == "true")
-            return bRes2
+        if status == "ok":
+            bRes = (result.lower() == "true")
+            return bRes
         else:
             self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
             return False
