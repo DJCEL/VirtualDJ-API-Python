@@ -93,9 +93,11 @@ class VirtualDJClient():
             return True
 
         # TODO: check if updates are activated in VirtualDJ
+        settings: VdjSettings = None
         settings_path_list = self.vdj_settings.get_local_settings_path_list()
         for settings_path in settings_path_list:
             settings = self.vdj_settings.read_local_xml_settings(settings_path)
+            checkUpdates = settings.internet.checkUpdates
 
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
