@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 from .client_http import VirtualDJClientHttp, VdjResponse
 from .client_utils import VirtualDJUtils
-from .client_settings import VirtualDJSettings
+from .client_settings import VirtualDJSettings, VdjSettings
 
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
@@ -95,7 +95,7 @@ class VirtualDJClient():
         # TODO: check if updates are activated in VirtualDJ
         settings_path_list = self.vdj_settings.get_local_settings_path_list()
         for settings_path in settings_path_list:
-            result = self.vdj_settings.read_local_xml_settings(settings_path)
+            settings = self.vdj_settings.read_local_xml_settings(settings_path)
 
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
