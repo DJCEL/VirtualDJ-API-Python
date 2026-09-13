@@ -8,7 +8,7 @@ from virtualdj_client import VirtualDJClient, VdjDeckData, VirtualDJSongsDatabas
 console = Console()
 
 #------------------------------------------------------------------------------------------------------------------------------------
-def run_VirtualDJ_clientExt():
+def run_VirtualDJ_client():
     print("######################################################")
     print("# Control VirtualDJ with the Network Control plugin  #")
     print("######################################################")
@@ -164,7 +164,7 @@ def client_main():
         read_VirtualDJ_settings()
 
     if not args.disable:
-        run_VirtualDJ_clientExt()
+        run_VirtualDJ_client()
 #------------------------------------------------------------------------------------------------------------------------------------
 def main():
     #sys.argv = ["main.py", "--help"]
