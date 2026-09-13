@@ -7,7 +7,6 @@ def test_client():
      # Initialize VirtualDJ client
     client = VirtualDJClient()
 
-
     vdj_build = client.get("get_build")
     result2a = client.send("deck 1 play_pause & loop 4 & crossfader -5%") 
     result2b = client.send("sync")
