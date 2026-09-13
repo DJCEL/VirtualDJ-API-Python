@@ -95,6 +95,9 @@ class VirtualDJClient():
         if is_vdj_running == True:
             return True
 
+
+        # TODO: check if updates are activated in VirtualDJ via settings.xml
+
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
     #------------------------------------------------------------------------------------
