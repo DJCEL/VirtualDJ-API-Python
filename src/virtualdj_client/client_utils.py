@@ -123,8 +123,6 @@ class VirtualDJUtils:
         else:
             return False
 
-        # TODO: check if updates are activated in VirtualDJ via settings.xml
-
         try:
             # Open the application in background:
             popen_kwargs = {
