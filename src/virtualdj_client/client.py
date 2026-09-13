@@ -67,11 +67,7 @@ class VirtualDJClient():
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
     async def is_connected_async(self) -> bool:
-        """ Check if VirtualDJ software is running and Network Control Plugin is responding """
-        is_vdj_running = self.is_app_running()
-        if is_vdj_running == False:
-            return False
-
+        """ Check if Network Control Plugin is responding """
         vdj_response = await self.vdj_client.query("get_version")
         status = vdj_response.status
         status_code = vdj_response.status_code
@@ -100,8 +96,8 @@ class VirtualDJClient():
         return bRes 
     #------------------------------------------------------------------------------------
     async def get_loadSecurity_async(self) -> bool:
-        vdj_script = 'setting "loadSecurity"'
-        result = await self.get_async(vdj_script)
+        vdjscript = 'setting "loadSecurity"'
+        result = await self.get_async(vdjscript)
         if result in ['on','silent']:
            print("VirtualDJ => loadSecurity option is activated")
            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
@@ -112,8 +108,8 @@ class VirtualDJClient():
            return False    
     #------------------------------------------------------------------------------------
     async def disable_loadSecurity_async(self):
-        vdj_script = 'setting "loadSecurity" off'
-        result = await self.send_async(vdj_script)
+        vdjscript = 'setting "loadSecurity" off'
+        result = await self.send_async(vdjscript)
         if result == True:
             print("VirtualDJ => loadSecurity option is now disable")
             self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
@@ -131,8 +127,7 @@ class VirtualDJClient():
                 await self.disable_loadSecurity_async()
 
             # Close VirtualDJ
-            vdj_script = "close"
-            result = await self.send_async(vdj_script)
+            result = await self.send_async("close")
             if result == True:
                 return True
 
