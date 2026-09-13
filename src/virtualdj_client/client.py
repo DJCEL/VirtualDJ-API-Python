@@ -156,8 +156,7 @@ class VirtualDJClient():
         result = vdj_response.result
         self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
         if status == "ok":
-            bRes = (result.lower() == "true")
-            return bRes
+            return (result.lower() == "true")
         else:
             return False
     #------------------------------------------------------------------------------------
