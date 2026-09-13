@@ -22,7 +22,6 @@ def run_VirtualDJ_client():
 
     # Launch VirtualDJ if not running
     if client_running == False:
-        console.print("Launching VirtualDJ...")
         client_launching = client.open_app()
         console.print(f"VirtualDJ launching => {client_launching}")
         client_running = client.is_app_running()

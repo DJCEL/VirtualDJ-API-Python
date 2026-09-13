@@ -69,7 +69,9 @@ class VirtualDJClient():
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
     async def is_connected_async(self) -> bool:
-        """ Check if Network Control Plugin is responding """
+        """ 
+        Check if Network Control Plugin is responding 
+        """
         vdj_response = await self.vdj_client.query("get_version")
         status = vdj_response.status
         status_code = vdj_response.status_code
@@ -83,60 +85,93 @@ class VirtualDJClient():
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
     def is_app_running(self) -> bool:
-        """ Check if VirtualDJ software is running """
+        """ 
+        Check if VirtualDJ software is running 
+        """
         return self.vdj_utils.is_virtualdj_running()
     #------------------------------------------------------------------------------------
-    def open_app(self) -> bool:
-        """ Open VirtuaDJ if not open """
-        is_vdj_running = self.is_app_running()
-        if is_vdj_running == True:
-            return True
-
-        # TODO: check if updates are activated in VirtualDJ
+    def get_checkUpdates(self) -> bool:
+        """ 
+        Check if checkUpdates is activated in VirtualDJ settings
+        """
+        bRes = False
         settings: VdjSettings = None
         settings_path_list = self.vdj_settings.get_local_settings_path_list()
         for settings_path in settings_path_list:
             settings = self.vdj_settings.read_local_xml_settings(settings_path)
             checkUpdates = settings.internet.checkUpdates
+            if checkUpdates.lower() in ['yes','yes (silent)']:
+                bRes = True
+        return bRes
+    #------------------------------------------------------------------------------------
+    def set_checkUpdates(self, value:str) -> bool:
+        """ 
+        set checkUpdates in VirtualDJ settings
+        """
+        #TODO: write the new value in VirtualDJ settings
+        return False
+    #------------------------------------------------------------------------------------
+    def open_app(self) -> bool:
+        """ 
+        Open VirtuaDJ if not open 
+        """
+        is_vdj_running = self.is_app_running()
+        if is_vdj_running == True:
+            return True
+
+        checkUpdates = self.get_checkUpdates()
+        if checkUpdates:
+            print(f"VirtualDJ checkUpdates option => {checkUpdates}")
+            self.set_checkUpdates('off')
 
         bRes = self.vdj_utils.launch_virtualdj_software()
         return bRes 
     #------------------------------------------------------------------------------------
     async def get_loadSecurity_async(self) -> bool:
+        """ 
+        Get the loadSecurity option
+        """
         vdjscript = 'setting "loadSecurity"'
         result = await self.get_async(vdjscript)
         if result in ['on','silent']:
-           print("VirtualDJ => loadSecurity option is activated")
-           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
            return True
         else:
-           print("VirtualDJ => loadSecurity option is disable")
-           self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
            return False    
     #------------------------------------------------------------------------------------
-    async def disable_loadSecurity_async(self):
-        vdjscript = 'setting "loadSecurity" off'
+    async def set_loadSecurity_async(self, value: str) -> bool:
+        """ 
+        Set the loadSecurity option
+        """
+        vdjscript = f'setting "loadSecurity" {value}'
         result = await self.send_async(vdjscript)
-        if result == True:
-            print("VirtualDJ => loadSecurity option is now disable")
-            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
+        return result
     #------------------------------------------------------------------------------------
     async def close_app_async(self, force_close: bool = False) -> bool:
-        """ Close VirtuaDJ """
+        """ 
+        Close VirtuaDJ 
+        """
         is_vdj_running = self.is_app_running()
         if is_vdj_running == False:
             return True
 
-        is_vdj_connected = await self.is_connected_async()
-        if is_vdj_connected == True:
-            is_vdj_security = await self.get_loadSecurity_async()
-            if is_vdj_security and force_close:
-                await self.disable_loadSecurity_async()
+        is_vdj_security = await self.get_loadSecurity_async()
+        if is_vdj_security:
+            print("VirtualDJ => loadSecurity option is activated")
+            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
+        else:
+            print("VirtualDJ => loadSecurity option is disable")
+            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
 
-            # Close VirtualDJ
-            result = await self.send_async("close")
+        if is_vdj_security and force_close:
+            result = await self.set_loadSecurity_async("off")
             if result == True:
-                return True
+                print("VirtualDJ => loadSecurity option is now disable")
+                self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
+
+
+        close = await self.send_async("close")
+        if close == True:
+            return True
 
         # TODO: Force kill app if (force_close == True)
         return False
@@ -144,7 +179,9 @@ class VirtualDJClient():
     #  VirtualDJ Get/Send
     #------------------------------------------------------------------------------------
     async def get_async(self, vdjscript: str) -> str:
-        """ Query VirtualDJ with a vdjscript """
+        """ 
+        Query VirtualDJ with a vdjscript 
+        """
         vdj_response = await self.vdj_client.query(vdjscript)
         status = vdj_response.status
         status_code = vdj_response.status_code

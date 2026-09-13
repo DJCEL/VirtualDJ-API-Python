@@ -12,7 +12,7 @@ import psutil
 import subprocess
 import logging
 
-from .client_config import VDJ_CLIENT_DEBUG, VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC, VDJ_PROCESS_SETTINGS
+from .client_config import VDJ_CLIENT_DEBUG, VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJUtils:
