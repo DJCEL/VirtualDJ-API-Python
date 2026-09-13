@@ -72,17 +72,14 @@ class VirtualDJClient():
         if is_vdj_running == False:
             return False
 
-        vdj_script = "get_version"
-        vdj_response = await self.vdj_client.query(vdj_script)
-        bRes = (vdj_response.status == "ok")
-        if bRes == False:
-            status_code = vdj_response.status_code
-            result_final = vdj_response.result
-            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
-            return False
-        else:
-            return True
-    #------------------------------------------------------------------------------------
+        vdj_response = await self.vdj_client.query("get_version")
+        status = vdj_response.status
+        status_code = vdj_response.status_code
+        result = vdj_response.result
+        if status == "ok":
+           return True
+        else: self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
+            return False #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
     def is_app_running(self) -> bool:
