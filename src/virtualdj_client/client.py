@@ -78,8 +78,10 @@ class VirtualDJClient():
         result = vdj_response.result
         if status == "ok":
            return True
-        else: self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
-            return False #------------------------------------------------------------------------------------
+        else:
+ self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
+            return False
+ #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
     #------------------------------------------------------------------------------------
     def is_app_running(self) -> bool:
@@ -91,7 +93,6 @@ class VirtualDJClient():
         is_vdj_running = self.is_app_running()
         if is_vdj_running == True:
             return True
-
 
         # TODO: check if updates are activated in VirtualDJ via settings.xml
 
