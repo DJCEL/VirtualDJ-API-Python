@@ -1,6 +1,6 @@
 __version__ = "1.1.4"
 
-from .client import VirtualDJClient, VdjDeck, VdjDeckData
+from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckData
 from .client_utils import VirtualDJUtils
 from .client_settings import VirtualDJSettings
 from .client_songs_database import VirtualDJSongsDatabase
@@ -15,7 +15,8 @@ from .client_history_files import __version__ as __client_history_files_version_
 __all__ = [
     "__version__",  
     "VirtualDJClient",
-    "VDJDeck", 
+    "VdjResponse",
+    "VdjDeck", 
     "VdjDeckData",
     "VirtualDJUtils", 
     "VirtualDJSettings",
