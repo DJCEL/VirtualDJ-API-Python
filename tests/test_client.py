@@ -7,7 +7,7 @@ def test_client():
      # Initialize VirtualDJ client
     client = VirtualDJClient()
 
-    vdj_build = client.get("get_build")
+    # Send tests
     result2a = client.send("deck 1 play_pause & loop 4 & crossfader -5%") 
     result2b = client.send("sync")
     result2c = client.send("deck right play_button")
@@ -20,6 +20,9 @@ def test_client():
     result2j = client.send("browser_scroll +1")
     result2k = client.send("save_config")
     result2l = client.send("saveregistryconfig")
+
+    # Get tests
+    vdj_build = client.get("get_build")
     result1a = client.get("get_browsed_title_artist")
     result1b = client.get("deck left get_bpm") 
     result1c = client.get("deck left get_key")
