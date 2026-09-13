@@ -12,7 +12,7 @@ from .client_utils import VirtualDJUtils
 
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
-class VDJDeck:
+class VdjDeck:
     name: Literal['left', 'right', 'leftvideo', 'rightvideo', 'all', 'default', 'active', 'master'] | None = None
     id: int | None = None
 #------------------------------------------------------------------------------------------------------------------------------------
