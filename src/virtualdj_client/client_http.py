@@ -12,7 +12,7 @@ from .client_config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, V
 
 #------------------------------------------------------------------------------------
 @dataclass
-class VDJResponse:
+class VdjResponse:
     status: Literal["ok","error"]
     status_code: int
     result: str
@@ -31,7 +31,7 @@ class VirtualDJClientHttp:
             await self._client.aclose()
             self._client = None
     #------------------------------------------------------------------------------------
-    async def _send_vdj_request(self, vdjscript: str, is_query: bool = False) -> VDJResponse:
+    async def _send_vdj_request(self, vdjscript: str, is_query: bool = False) -> VdjResponse:
         """ Send command via HTTP Network Control plugin """
 
         headers = {"Content-Type": "text/plain"}
@@ -60,47 +60,47 @@ class VirtualDJClientHttp:
                         ext_result = result[0:6]
                         bErr = (ext_result.lower() == "error:")
                     status = "error" if bErr else "ok"
-                    return VDJResponse(status=status, status_code=status_code, result=result)
+                    return VdjResponse(status=status, status_code=status_code, result=result)
                 else:
                     bErr = (result.lower() != "true")
                     status = "error" if bErr else "ok"
-                    return VDJResponse(status=status, status_code=status_code, result=result)
+                    return VdjResponse(status=status, status_code=status_code, result=result)
             elif status_code == 401:
                 status = "error"
                 result = "Authentication failed - check password"
-                return VDJResponse(status=status, status_code=status_code, result=result)
+                return VdjResponse(status=status, status_code=status_code, result=result)
             else:
                 status = "error"
                 result = f"{response.text}"
-                return VDJResponse(status=status, status_code=status_code, result=result)
+                return VdjResponse(status=status, status_code=status_code, result=result)
 
         except httpx.ConnectError:
             status = "error"
             status_code = -1
             result = "HTTP Connection error"
-            return VDJResponse(status=status, status_code=status_code, result=result)
+            return VdjResponse(status=status, status_code=status_code, result=result)
         except httpx.TimeoutException:
             status = "error"
             status_code = -2
             result = "HTTP timeout"
-            return VDJResponse(status=status, status_code=status_code, result=result)
+            return VdjResponse(status=status, status_code=status_code, result=result)
         except httpx.HTTPError as e:
             status = "error"
             status_code = -3
             result = f"{e} It could be a problem of password too."
-            return VDJResponse(status=status, status_code=status_code, result=result)
+            return VdjResponse(status=status, status_code=status_code, result=result)
         except Exception as e:
             status = "error"
             status_code = -4
             result = str(e)
-            return VDJResponse(status=status, status_code=status_code, result=result)
+            return VdjResponse(status=status, status_code=status_code, result=result)
     #------------------------------------------------------------------------------------
-    async def query(self, vdjscript: str) -> VDJResponse:
+    async def query(self, vdjscript: str) -> VdjResponse:
         """ Query VirtualDJ with a vdjscript """
         vdj_response = await self._send_vdj_request(vdjscript, is_query=True)
         return vdj_response
     #------------------------------------------------------------------------------------    
-    async def execute(self, vdjscript: str) -> VDJResponse:
+    async def execute(self, vdjscript: str) -> VdjResponse:
         """ Send command to VirtualDJ with a vdjscript """
         vdj_response = await self._send_vdj_request(vdjscript)
         return vdj_response
