@@ -79,7 +79,7 @@ class VirtualDJClient():
         if status == "ok":
            return True
         else:
- self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
             return False
  #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
