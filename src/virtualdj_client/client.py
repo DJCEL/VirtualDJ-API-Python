@@ -92,7 +92,7 @@ class VirtualDJClient():
         if is_vdj_running == True:
             return True
 
-        # TODO: check if updates are activated in VirtualDJ via self.vdj_settings
+        # TODO: check if updates are activated in VirtualDJ
         settings_path_list = self.vdj_settings.get_local_settings_path_list()
         for settings_path in settings_path_list:
             result = self.vdj_settings.read_local_xml_settings(settings_path)
