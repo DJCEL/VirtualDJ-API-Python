@@ -148,13 +148,13 @@ class VirtualDJClient():
         vdj_response = await self.vdj_client.query(vdjscript)
         bRes = (vdj_response.status == "ok")
         if bRes:
-            result_final = vdj_response.result 
-            return result_final
+            result = vdj_response.result 
+            return result
         else:
             status_code = vdj_response.status_code
-            result_final = vdj_response.result
+            result = vdj_response.result
             self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
-            return result_final            
+            return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
         """ Execute a vdjscript and return status """
@@ -165,8 +165,8 @@ class VirtualDJClient():
             return bRes2
         else:
             status_code = vdj_response.status_code
-            result_final = vdj_response.result
-            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
+            result = vdj_response.result
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result}")
             return False
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper
