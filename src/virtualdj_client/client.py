@@ -153,7 +153,7 @@ class VirtualDJClient():
         if bRes: 
             return result
         else:
-              self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
+            self.vdj_utils.save_client_log(f"HTTP error {status_code}: {result_final}")
             return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
