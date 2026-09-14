@@ -265,6 +265,8 @@ class VirtualDJClient():
         return result
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+
         deckdata = VdjDeckData()
         deckdata.Filepath = self.to_str(await self._get_result(deck, "get_filepath"))
         deckdata.Filesize = self.to_int(await self._get_result(deck, "get_filesize"))
