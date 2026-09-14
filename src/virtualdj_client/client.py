@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.23"
+__version__ = "1.0.24"
 
 import asyncio
 from typing import Optional, Literal
@@ -18,7 +18,7 @@ class VdjDeck:
     id: int | None = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
-class VdjDeckData:
+class VdjDeckSong:
     Filepath: Optional[str] = None
     Filesize: Optional[int] = None
     Artist: Optional[str] = None
@@ -29,13 +29,22 @@ class VdjDeckData:
     Year: Optional[int] = None
     Rating: Optional[int] = None
     Comment: Optional[str] = None
-    Bpm: Optional[float] = None
-    BpmCurrent: Optional[float] = None
+    Bpm: Optional[float] = None    
     Key: Optional[str] = None
     KeyHarmonic: Optional[str] = None
+    Duration: Optional[float] = None   
+    HasStems: Optional[bool] = None
+    HasLyrics: Optional[bool] = None
+    HasError: Optional[str] = None
+    IsVideo: Optional[bool] = None
+    HasLinkedTracks: Optional[bool] = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjDeckEngine:
+    IsPfl: Optional[bool] = None
+    BpmCurrent: Optional[float] = None
     KeyCurrent: Optional[str] = None
     KeyCurrentHarmonic: Optional[str] = None
-    Duration: Optional[float] = None
     Position: Optional[float] = None
     Time: Optional[float] = None
     Beat: Optional[float] = None
@@ -53,12 +62,6 @@ class VdjDeckData:
     IsBeatlock: Optional[bool] = None
     IsMasterTempo: Optional[bool] = None
     IsKeylock: Optional[bool] = None
-    HasStems: Optional[bool] = None
-    HasLyrics: Optional[bool] = None
-    HasError: Optional[str] = None
-    IsVideo: Optional[bool] = None
-    IsPfl: Optional[bool] = None
-    HasLinkedTracks: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
@@ -264,10 +267,9 @@ class VirtualDJClient():
             return None
         return result
     #------------------------------------------------------------------------------------
-    async def get_DeckData_async(self, deck: str) -> VdjDeckData:
+    async def get_DeckSong_async(self, deck: str) -> VdjDeckSong:
         # TODO: check if we can use asyncio.gather() to decrease the latency
-
-        deckdata = VdjDeckData()
+        deckdata = VdjDeckSong()
         deckdata.Filepath = self.to_str(await self._get_result(deck, "get_filepath"))
         deckdata.Filesize = self.to_int(await self._get_result(deck, "get_filesize"))
         deckdata.Artist = self.to_str(await self._get_result(deck, "get_artist"))
@@ -280,10 +282,20 @@ class VirtualDJClient():
         deckdata.Rating = self.to_int(await self._get_result(deck, "rating"))
         deckdata.Comment = self.to_str(await self._get_result(deck, "get_comment"))
         deckdata.Bpm = self.to_float(await self._get_result(deck, "get_bpm absolute"))
+        deckdata.Duration = self.to_float(await self._get_result(deck, "get_songlength"))     
+        deckdata.HasStems = self.to_bool(await self._get_result(deck, "has_stems"))
+        deckdata.HasLyrics = self.to_bool(await self._get_result(deck, "has_lyrics"))
+        deckdata.HasError = self.to_str(await self._get_result(deck, "deck_has_error"))
+        deckdata.IsVideo = self.to_bool(await self._get_result(deck, "is_video"))
+        deckdata.HasLinkedTracks = self.to_bool(await self._get_result(deck, "has_linked_tracks"))
+        return deckdata
+    #------------------------------------------------------------------------------------
+    async def get_DeckEngine_async(self, deck: str) -> VdjDeckEngine:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+        deckdata = VdjDeckEngine()
         deckdata.BpmCurrent = self.to_float(await self._get_result(deck, "get_bpm"))
         deckdata.KeyCurrent = self.to_str(await self._get_result(deck, "get_key 'musical'"))
         deckdata.KeyCurrentHarmonic = self.to_str(await self._get_result(deck, "get_harmonic"))
-        deckdata.Duration = self.to_float(await self._get_result(deck, "get_songlength"))
         deckdata.Position = self.to_float(await self._get_result(deck, "get_position"))
         deckdata.Time = self.to_float(await self._get_result(deck, "get_time"))
         deckdata.Beat = self.to_float(await self._get_result(deck, "get_beat"))
@@ -301,12 +313,7 @@ class VirtualDJClient():
         deckdata.IsBeatlock = self.to_bool(await self._get_result(deck, "beatlock"))
         deckdata.IsMasterTempo = self.to_bool(await self._get_result(deck, "master_tempo"))
         deckdata.IsKeylock = self.to_bool(await self._get_result(deck, "key_lock"))
-        deckdata.HasStems = self.to_bool(await self._get_result(deck, "has_stems"))
-        deckdata.HasLyrics = self.to_bool(await self._get_result(deck, "has_lyrics"))
-        deckdata.HasError = self.to_str(await self._get_result(deck, "deck_has_error"))
-        deckdata.IsVideo = self.to_bool(await self._get_result(deck, "is_video"))
         deckdata.IsPfl = self.to_bool(await self._get_result(deck, "pfl"))
-        deckdata.HasLinkedTracks = self.to_bool(await self._get_result(deck, "has_linked_tracks"))
         return deckdata
     #------------------------------------------------------------------------------------
     #  asyncio.run()
@@ -329,6 +336,9 @@ class VirtualDJClient():
     def set_loadSecurity(self, value: str):
         return asyncio.run(self.set_loadSecurity_async(value))
     #------------------------------------------------------------------------------------
-    def get_DeckData(self, deck: str) -> VdjDeckData:
-        return asyncio.run(self.get_DeckData_async(deck))
+    def get_DeckSong(self, deck: str) -> VdjDeckSong:
+        return asyncio.run(self.get_DeckSong_async(deck))
+    #------------------------------------------------------------------------------------
+    def get_DeckEngine(self, deck: str) -> VdjDeckEngine:
+        return asyncio.run(self.get_DeckEngine_async(deck))
    
