@@ -475,18 +475,18 @@ class VirtualDJClient():
     async def _refresh_loop_async(self):
         try:
             while True:
-            time_start = time.monotonic()
-            try:
-               await self._refresh_cache_async()
-            except asyncio.CancelledError:
-                raise
-            except Exception as e:
-                self.vdj_utils.save_client_log(f"Refresh loop error: {type(e).__name__}: {e}")
+                time_start = time.monotonic()
+                try:
+                   await self._refresh_cache_async()
+                except asyncio.CancelledError:
+                   raise
+                except Exception as e:
+                    self.vdj_utils.save_client_log(f"Refresh loop error: {type(e).__name__}: {e}")
 
-            now = time.monotonic()
-            time_elapsed = now - time_start
-            delay = max(0.0, self._refresh_interval - time_elapsed)
-            await asyncio.sleep(delay)
+                now = time.monotonic()
+                time_elapsed = now - time_start
+                delay = max(0.0, self._refresh_interval - time_elapsed)
+                await asyncio.sleep(delay)
         finally:
             current_task = asyncio.current_task()
             if self._refresh_task is current_task:
