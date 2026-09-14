@@ -10,7 +10,7 @@ console = Console()
 #------------------------------------------------------------------------------------------------------------------------------------
 async def _test_cache_client_async():
     async with VirtualDJClient() as client:
-            await client2.start_refresh_async()
+            await client.start_refresh_async()
 
             console.print("\n")
             leftdeckdata: VdjDeckData = None
@@ -22,7 +22,7 @@ async def _test_cache_client_async():
             rightdeckdata = client.get_DeckData_cached("right")
             console.print(f"RightDeck = {rightdeckdata}")
 
-            await client2.stop_refresh_async()
+            await client.stop_refresh_async()
 #------------------------------------------------------------------------------------------------------------------------------------
 async def _test_cache_client():
     return asyncio.run(self._test_cache_client_async())
