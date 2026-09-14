@@ -4,6 +4,7 @@
 __version__ = "1.0.24"
 
 import asyncio
+import time
 from typing import Optional, Literal
 from dataclasses import dataclass
 
@@ -74,11 +75,6 @@ class VdjDeckEngine:
     EqKillLow: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
-class VdjDeckData:
-    Song: VdjDeckSong = None
-    Engine: VdjDeckEngine = None
-#------------------------------------------------------------------------------------------------------------------------------------
-@dataclass
 class VdjMixer:
     IsLimiterRunning: Optional[bool] = None
     IsMic: Optional[bool] = None
@@ -100,11 +96,24 @@ class VdjMixer:
     MixFx: Optional[str] = None
     ZeroDB: Optional[str] = None
 #------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjDeckData:
+    Song: VdjDeckSong = None
+    Engine: VdjDeckEngine = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjDeckCache:
+    data: VdjDeckData | None = None
+    updated_at: float = 0.0
+#------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
         self.vdj_client = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
         self.vdj_settings = VirtualDJSettings()
+        self._deck_cache: dict[str,VdjDeckData] = {}
+        self._refresh_task: asyncio.Task | None = None
+        self._refresh_interval = 1.0
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
@@ -337,6 +346,45 @@ class VirtualDJClient():
                 return value
         except ValueError:
             return None
+    #------------------------------------------------------------------------------------
+    #  Refresh loop task
+    #------------------------------------------------------------------------------------ 
+    async def start_refresh_async(self):
+        if self._refresh_task is None or self._refresh_task.done():
+            self._refresh_task = asyncio.create_task(self._refresh_loop_async())
+    #------------------------------------------------------------------------------------
+    async def stop_refresh_async(self):
+         if self._refresh_task is not None:
+             self._refresh_task.cancel()
+
+             try:
+                 await self._refresh_task
+             except asyncio.CancelledError:
+                 pass
+
+             self._refresh_task = None
+    #------------------------------------------------------------------------------------
+    async def _refresh_loop_async(self):
+        while True:
+            try:
+               await self._refresh_cache_async()
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                self.vdj_utils.save_clint_log(f"Cache refresh error: {type(e).__name__}: {e]}")
+
+            await asyncio.sleep(self._refresh_interval)
+    #------------------------------------------------------------------------------------
+    async def _refresh_cache_async(self):
+        left, right = await asyncio.gather(
+            self.get_DeckData_async("left"),
+            self.get_DeckData_async("right")
+        )
+
+        now = time.monotonic()
+
+        self._deck_cache["left"] = VdjDeckCache(data=left,updated_at=now)
+        self._deck_cache["right"] = VdjDeckCache(data=right,updated_at=now)
     #------------------------------------------------------------------------------------
     #  Deck
     #------------------------------------------------------------------------------------  
