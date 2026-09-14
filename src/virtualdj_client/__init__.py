@@ -1,6 +1,6 @@
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
-from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckData
+from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckSong, VdjDeckEngine, VdjDeckData, VdjMixer
 from .client_utils import VirtualDJUtils
 from .client_settings import VirtualDJSettings
 from .client_songs_database import VirtualDJSongsDatabase
@@ -17,7 +17,10 @@ __all__ = [
     "VirtualDJClient",
     "VdjResponse",
     "VdjDeck", 
+    "VdjDeckSong",
+    "VdjDeckEngine",
     "VdjDeckData",
+    "VdjMixer",
     "VirtualDJUtils", 
     "VirtualDJSettings",
     "VirtualDJSongsDatabase",

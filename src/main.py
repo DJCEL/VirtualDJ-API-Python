@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClient, VdjDeckData, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
+from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VdjDeckEngine, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 
@@ -35,6 +35,11 @@ def run_VirtualDJ_client():
     if (client_connected == False):
         console.print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
         sys.exit()
+
+    console.print("\n")
+    mixer: VdjMixer = None
+    mixer = client.get_Mixer()
+    console.print(f"Mixer = {mixer}")
 
     console.print("\n")
     decks_count = client.to_int(client.get("get_decks"))
