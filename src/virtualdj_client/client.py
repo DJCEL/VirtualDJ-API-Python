@@ -313,7 +313,7 @@ class VirtualDJClient():
         return asyncio.run(self.is_connected_async()) 
     #------------------------------------------------------------------------------------
     def close_app(self, force_close: bool = False) -> bool:
-        return asyncio.run(self.close_app_async()) 
+        return asyncio.run(self.close_app_async(force_close)) 
     #------------------------------------------------------------------------------------
     def send(self, vdj_script: str) -> bool:
         return asyncio.run(self.send_async(vdj_script))
