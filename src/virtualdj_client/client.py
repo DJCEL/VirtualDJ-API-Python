@@ -347,45 +347,6 @@ class VirtualDJClient():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    #  Refresh loop task
-    #------------------------------------------------------------------------------------ 
-    async def start_refresh_async(self):
-        if self._refresh_task is None or self._refresh_task.done():
-            self._refresh_task = asyncio.create_task(self._refresh_loop_async())
-    #------------------------------------------------------------------------------------
-    async def stop_refresh_async(self):
-         if self._refresh_task is not None:
-             self._refresh_task.cancel()
-
-             try:
-                 await self._refresh_task
-             except asyncio.CancelledError:
-                 pass
-
-             self._refresh_task = None
-    #------------------------------------------------------------------------------------
-    async def _refresh_loop_async(self):
-        while True:
-            try:
-               await self._refresh_cache_async()
-            except asyncio.CancelledError:
-                raise
-            except Exception as e:
-                self.vdj_utils.save_clint_log(f"Cache refresh error: {type(e).__name__}: {e]}")
-
-            await asyncio.sleep(self._refresh_interval)
-    #------------------------------------------------------------------------------------
-    async def _refresh_cache_async(self):
-        left, right = await asyncio.gather(
-            self.get_DeckData_async("left"),
-            self.get_DeckData_async("right")
-        )
-
-        now = time.monotonic()
-
-        self._deck_cache["left"] = VdjDeckCache(data=left,updated_at=now)
-        self._deck_cache["right"] = VdjDeckCache(data=right,updated_at=now)
-    #------------------------------------------------------------------------------------
     #  Deck
     #------------------------------------------------------------------------------------  
     async def _get_result_deck(self, deck: str, verb: str) -> str:
@@ -492,7 +453,49 @@ class VirtualDJClient():
         mixer.BoothVolume = self.to_float(await self._get_result_mixer("booth_volume"))
         mixer.MixFx = self.to_str(await self._get_result_mixer("setting 'mixfx'"))
         mixer.ZeroDB = self.to_zeroDB(await self._get_result_mixer("setting 'zeroDB'"))
-        return mixer
+        return mixer    
+    #------------------------------------------------------------------------------------
+    #  Refresh loop task
+    #------------------------------------------------------------------------------------ 
+    async def start_refresh_async(self):
+        if self._refresh_task is None or self._refresh_task.done():
+            self._refresh_task = asyncio.create_task(self._refresh_loop_async())
+    #------------------------------------------------------------------------------------
+    async def stop_refresh_async(self):
+         if self._refresh_task is not None:
+             self._refresh_task.cancel()
+
+             try:
+                 await self._refresh_task
+             except asyncio.CancelledError:
+                 pass
+
+             self._refresh_task = None
+    #------------------------------------------------------------------------------------
+    async def _refresh_loop_async(self):
+        while True:
+            try:
+               await self._refresh_cache_async()
+            except asyncio.CancelledError:
+                raise
+            except Exception as e:
+                self.vdj_utils.save_clint_log(f"Cache refresh error: {type(e).__name__}: {e}")
+
+            await asyncio.sleep(self._refresh_interval)
+    #------------------------------------------------------------------------------------
+    async def _refresh_cache_async(self):
+        left, right = await asyncio.gather(
+            self.get_DeckData_async("left"),
+            self.get_DeckData_async("right")
+        )
+
+        now = time.monotonic()
+
+        self._deck_cache["left"] = VdjDeckCache(data=left,updated_at=now)
+        self._deck_cache["right"] = VdjDeckCache(data=right,updated_at=now)
+    #------------------------------------------------------------------------------------
+    async def get_DeckData_cached_async(self, deck: str) -> VdjDeckData | None:
+        return self._deck_cache.get(deck)
     #------------------------------------------------------------------------------------
     #  asyncio.run()
     #------------------------------------------------------------------------------------
@@ -522,7 +525,9 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
         return asyncio.run(self.get_DeckData_async(deck))
-        #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
     def get_Mixer(self) -> VdjMixer:
         return asyncio.run(self.get_Mixer_async())
-   
+    #------------------------------------------------------------------------------------
+    def get_DeckData_cached(self, deck: str) -> VdjMixer:
+        return asyncio.run(self.get_DeckData_cached_async(deck))

@@ -45,14 +45,18 @@ def run_VirtualDJ_client():
     decks_count = client.to_int(client.get("get_decks"))
     console.print(f"Total number of decks = {decks_count}")
 
+
+    client.start_refresh_async()
+
+
     console.print("\n")
     leftdeckdata: VdjDeckData = None
-    leftdeckdata = client.get_DeckData("left")
+    leftdeckdata = client.get_DeckData_cached("left")
     console.print(f"LeftDeck = {leftdeckdata}")
 
     console.print("\n")
     rightdeckdata: VdjDeckData = None
-    rightdeckdata = client.get_DeckData("right")
+    rightdeckdata = client.get_DeckData_cached("right")
     console.print(f"RightDeck = {rightdeckdata}")
 
     if decks_count >= 3:
@@ -68,6 +72,8 @@ def run_VirtualDJ_client():
         console.print(f"Deck 4 = {deck4data}")
 
     console.print("\n")
+
+    client.stop_refresh_async()
 
 #------------------------------------------------------------------------------------------------------------------------------------
 def read_VirtualDJ_database():
