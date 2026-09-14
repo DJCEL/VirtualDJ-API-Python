@@ -324,8 +324,8 @@ class VirtualDJClient():
     def get_loadSecurity(self) -> bool:
         return asyncio.run(self.get_loadSecurity_async())
     #------------------------------------------------------------------------------------
-    def disable_loadSecurity(self):
-        return asyncio.run(self.disable_loadSecurity_async())
+    def set_loadSecurity(self, value: str):
+        return asyncio.run(self.set_loadSecurity_async(value))
     #------------------------------------------------------------------------------------
     def get_DeckData(self, deck: str) -> VdjDeckData:
         return asyncio.run(self.get_DeckData_async(deck))
