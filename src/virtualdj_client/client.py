@@ -459,7 +459,7 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------ 
     async def start_refresh_async(self):
         if self._refresh_task is None or self._refresh_task.done():
-            self._refresh_task = asyncio.create_task(self._refresh_loop_async())
+            self._refresh_task = asyncio.create_task(self._refresh_loop_async(), name="virtualdj-refresh-loop")
     #------------------------------------------------------------------------------------
     async def stop_refresh_async(self):
          if self._refresh_task is not None:
@@ -474,14 +474,27 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     async def _refresh_loop_async(self):
         while True:
+            time_start = time.monotonic()
             try:
                await self._refresh_cache_async()
             except asyncio.CancelledError:
                 raise
             except Exception as e:
-                self.vdj_utils.save_clint_log(f"Cache refresh error: {type(e).__name__}: {e}")
+                self.vdj_utils.save_client_log(f"Refresh loop error: {type(e).__name__}: {e}")
 
-            await asyncio.sleep(self._refresh_interval)
+            now = time.monotonic()
+            time_elapsed = now - time_start
+
+            delay = max(0.0, self._refresh_interval - time_elapsed)
+
+            try:
+                await asyncio.sleep(delay)
+            except asyncio.CancelledError:
+                raise
+            finally:
+                current_task = asyncio.current_task()
+                if self._refresh_task is current_task:
+                    self._refresh_task = None
     #------------------------------------------------------------------------------------
     async def _refresh_cache_async(self):
         left, right = await asyncio.gather(
@@ -528,6 +541,3 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     def get_Mixer(self) -> VdjMixer:
         return asyncio.run(self.get_Mixer_async())
-    #------------------------------------------------------------------------------------
-    def get_DeckData_cached(self, deck: str) -> VdjMixer:
-        return asyncio.run(self.get_DeckData_cached_async(deck))

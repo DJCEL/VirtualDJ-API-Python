@@ -8,6 +8,25 @@ from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VdjDeckEngi
 console = Console()
 
 #------------------------------------------------------------------------------------------------------------------------------------
+async def _test_cache_client_async():
+    async with VirtualDJClient() as client:
+            await client2.start_refresh_async()
+
+            console.print("\n")
+            leftdeckdata: VdjDeckData = None
+            leftdeckdata = client.get_DeckData_cached("left")
+            console.print(f"LeftDeck = {leftdeckdata}")
+
+            console.print("\n")
+            rightdeckdata: VdjDeckData = None
+            rightdeckdata = client.get_DeckData_cached("right")
+            console.print(f"RightDeck = {rightdeckdata}")
+
+            await client2.stop_refresh_async()
+#------------------------------------------------------------------------------------------------------------------------------------
+async def _test_cache_client():
+    return asyncio.run(self._test_cache_client_async())
+#------------------------------------------------------------------------------------------------------------------------------------
 def run_VirtualDJ_client():
     print("######################################################")
     print("# Control VirtualDJ with the Network Control plugin  #")
@@ -45,18 +64,14 @@ def run_VirtualDJ_client():
     decks_count = client.to_int(client.get("get_decks"))
     console.print(f"Total number of decks = {decks_count}")
 
-
-    client.start_refresh_async()
-
-
     console.print("\n")
     leftdeckdata: VdjDeckData = None
-    leftdeckdata = client.get_DeckData_cached("left")
+    leftdeckdata = client.get_DeckData("left")
     console.print(f"LeftDeck = {leftdeckdata}")
 
     console.print("\n")
     rightdeckdata: VdjDeckData = None
-    rightdeckdata = client.get_DeckData_cached("right")
+    rightdeckdata = client.get_DeckData("right")
     console.print(f"RightDeck = {rightdeckdata}")
 
     if decks_count >= 3:
@@ -73,8 +88,10 @@ def run_VirtualDJ_client():
 
     console.print("\n")
 
-    client.stop_refresh_async()
-
+    console.print("\n")
+    # TODEBUG: we want to use the refresh loop of 1 second in the client and call the cached data instead
+    _test_cache_client()
+  
 #------------------------------------------------------------------------------------------------------------------------------------
 def read_VirtualDJ_database():
     print("##############################")
