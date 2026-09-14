@@ -473,7 +473,8 @@ class VirtualDJClient():
              self._refresh_task = None
     #------------------------------------------------------------------------------------
     async def _refresh_loop_async(self):
-        while True:
+        try:
+            while True:
             time_start = time.monotonic()
             try:
                await self._refresh_cache_async()
@@ -484,17 +485,12 @@ class VirtualDJClient():
 
             now = time.monotonic()
             time_elapsed = now - time_start
-
             delay = max(0.0, self._refresh_interval - time_elapsed)
-
-            try:
-                await asyncio.sleep(delay)
-            except asyncio.CancelledError:
-                raise
-            finally:
-                current_task = asyncio.current_task()
-                if self._refresh_task is current_task:
-                    self._refresh_task = None
+            await asyncio.sleep(delay)
+        finally:
+            current_task = asyncio.current_task()
+            if self._refresh_task is current_task:
+                self._refresh_task = None
     #------------------------------------------------------------------------------------
     async def _refresh_cache_async(self):
         left, right = await asyncio.gather(
