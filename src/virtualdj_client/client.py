@@ -315,11 +315,11 @@ class VirtualDJClient():
     def close_app(self, force_close: bool = False) -> bool:
         return asyncio.run(self.close_app_async(force_close)) 
     #------------------------------------------------------------------------------------
-    def send(self, vdj_script: str) -> bool:
-        return asyncio.run(self.send_async(vdj_script))
+    def send(self, vdjscript: str) -> bool:
+        return asyncio.run(self.send_async(vdjscript))
     #------------------------------------------------------------------------------------
-    def get(self, vdj_script: str) -> str:
-        return asyncio.run(self.get_async(vdj_script))
+    def get(self, vdjscript: str) -> str:
+        return asyncio.run(self.get_async(vdjscript))
     #------------------------------------------------------------------------------------
     def get_loadSecurity(self) -> bool:
         return asyncio.run(self.get_loadSecurity_async())
