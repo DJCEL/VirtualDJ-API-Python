@@ -51,6 +51,7 @@ class VdjDeckEngine:
     IsMasterTempo: Optional[bool] = None
     IsKeylock: Optional[bool] = None
     IsTimecode: Optional[bool] = None
+    IsMute: Optional[bool] = None
     BpmCurrent: Optional[float] = None
     KeyCurrent: Optional[str] = None
     KeyCurrentHarmonic: Optional[str] = None
@@ -76,9 +77,11 @@ class VdjDeckEngine:
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjMixer:
+    IsInternalMixer: Optional[bool] = None
     IsLimiterRunning: Optional[bool] = None
     IsMic: Optional[bool] = None
     IsMixFx: Optional[bool] = None
+    HasSystemVolume: Optional[bool] = None
     Crossfader: Optional[float] = None
     CrossfaderDisable: Optional[bool] = None
     CrossfaderHamster: Optional[bool] = None
@@ -86,6 +89,7 @@ class VdjMixer:
     CrossfaderCustom: Optional[str] = None
     MasterVolume: Optional[float] = None
     MicVolume:  Optional[float] = None
+    Mic2Volume:  Optional[float] = None
     HeadphoneVolume: Optional[float] = None
     HeadphoneMix: Optional[float] = None
     HeadphoneGain: Optional[float] = None
@@ -95,6 +99,9 @@ class VdjMixer:
     BoothVolume: Optional[float] = None
     MixFx: Optional[str] = None
     ZeroDB: Optional[str] = None
+    SystemVolume: Optional[float] = None
+    VuMeterLeft: Optional[float] = None
+    VuMeterRight: Optional[float] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
@@ -111,9 +118,6 @@ class VirtualDJClient():
         self.vdj_client = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
         self.vdj_settings = VirtualDJSettings()
-        self._deck_cache: dict[str,VdjDeckData] = {}
-        self._refresh_task: asyncio.Task | None = None
-        self._refresh_interval = 1.0
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
@@ -406,6 +410,7 @@ class VirtualDJClient():
         deckengine.IsMasterTempo = self.to_bool(await self._get_result_deck(deck, "master_tempo"))
         deckengine.IsKeylock = self.to_bool(await self._get_result_deck(deck, "key_lock"))
         deckengine.IsTimecode = self.to_bool(await self._get_result_deck(deck, "timecode_active"))
+        deckengine.IsMute = self.to_bool(await self._get_result_deck(deck, "mute"))
         deckengine.Gain = self.to_float(await self._get_result_deck(deck, "gain"))
         deckengine.EqHigh = self.to_float(await self._get_result_deck(deck, "eq_low"))
         deckengine.EqMid = self.to_float(await self._get_result_deck(deck, "eq_low"))
@@ -437,6 +442,8 @@ class VirtualDJClient():
         mixer.IsLimiterRunning = self.to_bool(await self._get_result_mixer("get_limiter"))
         mixer.IsMic = self.to_bool(await self._get_result_mixer("mic"))
         mixer.IsMixFx = self.to_bool(await self._get_result_mixer("effect_mixfx_activate"))
+        mixer.IsInternalMixer = self.to_bool(await self._get_result_mixer("mixermode"))
+        mixer.HasSystemVolume = self.to_bool(await self._get_result_mixer("has_system_volume"))
         mixer.Crossfader = self.to_float(await self._get_result_mixer("crossfader"))
         mixer.CrossfaderDisable = self.to_bool(await self._get_result_mixer("crossfader_disable"))
         mixer.CrossfaderHamster = self.to_bool(await self._get_result_mixer("crossfader_hamster"))
@@ -444,6 +451,7 @@ class VirtualDJClient():
         mixer.CrossfaderCustom = self.to_str(await self._get_result_mixer("setting 'crossfaderCustom'"))
         mixer.MasterVolume = self.to_float(await self._get_result_mixer("master_volume"))
         mixer.MicVolume = self.to_float(await self._get_result_mixer("mic_volume"))
+        mixer.Mic2Volume = self.to_float(await self._get_result_mixer("mic2_volume"))
         mixer.HeadphoneVolume = self.to_float(await self._get_result_mixer("headphone_volume"))
         mixer.HeadphoneMix = self.to_float(await self._get_result_mixer("headphone_mix"))
         mixer.HeadphoneGain = self.to_float(await self._get_result_mixer("headphone_gain"))
@@ -453,58 +461,10 @@ class VirtualDJClient():
         mixer.BoothVolume = self.to_float(await self._get_result_mixer("booth_volume"))
         mixer.MixFx = self.to_str(await self._get_result_mixer("setting 'mixfx'"))
         mixer.ZeroDB = self.to_zeroDB(await self._get_result_mixer("setting 'zeroDB'"))
-        return mixer    
-    #------------------------------------------------------------------------------------
-    #  Refresh loop task
-    #------------------------------------------------------------------------------------ 
-    async def start_refresh_async(self):
-        if self._refresh_task is None or self._refresh_task.done():
-            self._refresh_task = asyncio.create_task(self._refresh_loop_async(), name="virtualdj-refresh-loop")
-    #------------------------------------------------------------------------------------
-    async def stop_refresh_async(self):
-         if self._refresh_task is not None:
-             self._refresh_task.cancel()
-
-             try:
-                 await self._refresh_task
-             except asyncio.CancelledError:
-                 pass
-
-             self._refresh_task = None
-    #------------------------------------------------------------------------------------
-    async def _refresh_loop_async(self):
-        try:
-            while True:
-                time_start = time.monotonic()
-                try:
-                   await self._refresh_cache_async()
-                except asyncio.CancelledError:
-                   raise
-                except Exception as e:
-                    self.vdj_utils.save_client_log(f"Refresh loop error: {type(e).__name__}: {e}")
-
-                now = time.monotonic()
-                time_elapsed = now - time_start
-                delay = max(0.0, self._refresh_interval - time_elapsed)
-                await asyncio.sleep(delay)
-        finally:
-            current_task = asyncio.current_task()
-            if self._refresh_task is current_task:
-                self._refresh_task = None
-    #------------------------------------------------------------------------------------
-    async def _refresh_cache_async(self):
-        left, right = await asyncio.gather(
-            self.get_DeckData_async("left"),
-            self.get_DeckData_async("right")
-        )
-
-        now = time.monotonic()
-
-        self._deck_cache["left"] = VdjDeckCache(data=left,updated_at=now)
-        self._deck_cache["right"] = VdjDeckCache(data=right,updated_at=now)
-    #------------------------------------------------------------------------------------
-    async def get_DeckData_cached_async(self, deck: str) -> VdjDeckData | None:
-        return self._deck_cache.get(deck)
+        mixer.SystemVolume = self.to_float(await self._get_result_mixer("system_volume"))
+        mixer.VuMeterLeft = self.to_float(await self._get_result_mixer("get_vu_meter_left 'master'"))
+        mixer.VuMeterRight = self.to_float(await self._get_result_mixer("get_vu_meter_right 'master'"))
+        return mixer
     #------------------------------------------------------------------------------------
     #  asyncio.run()
     #------------------------------------------------------------------------------------
