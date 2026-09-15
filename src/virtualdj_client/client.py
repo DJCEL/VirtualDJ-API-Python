@@ -464,8 +464,8 @@ class VirtualDJClient():
         mixer.MasterBalance = self.to_float(await self._get_result_mixer("master_balance"))
         mixer.BoothVolume = self.to_float(await self._get_result_mixer("booth_volume"))
         mixer.MixFxName = self.to_str(await self._get_result_mixer("setting 'mixfx'"))
+        #TOFIX: following line works on skin but returns yes with Network plugin:
         #mixer.MixFxName = self.to_str(await self._get_result_mixer("effect_mixfx"))
-        #mixer.MixFxName = self.to_str(await self._get_result_mixer("effect_mixfx_select"))
         mixer.ZeroDB = self.to_zeroDB(await self._get_result_mixer("setting 'zeroDB'"))
         mixer.SystemVolume = self.to_float(await self._get_result_mixer("system_volume"))
         mixer.MasterVuMeterLeft = self.to_float(await self._get_result_mixer("get_vu_meter_left 'master'"))
