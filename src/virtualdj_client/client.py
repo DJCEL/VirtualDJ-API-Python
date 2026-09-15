@@ -36,6 +36,8 @@ class VdjDeckSong:
     KeyHarmonic: Optional[str] = None
     Duration: Optional[float] = None   
     HasStems: Optional[bool] = None
+    HasStemsV1: Optional[bool] = None
+    HasStemsV2: Optional[bool] = None
     HasLyrics: Optional[bool] = None
     HasLinkedTracks: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
@@ -53,6 +55,7 @@ class VdjDeckEngine:
     IsTimecode: Optional[bool] = None
     IsLineIn: Optional[bool] = None
     IsMute: Optional[bool] = None
+    IsStemsReady: Optional[bool] = None
     BpmCurrent: Optional[float] = None
     KeyCurrent: Optional[str] = None
     KeyCurrentHarmonic: Optional[str] = None
@@ -82,6 +85,7 @@ class VdjMixer:
     IsInternalMixer: Optional[bool] = None
     IsLimiterRunning: Optional[bool] = None
     IsMic: Optional[bool] = None
+    IsMicFx: Optional[bool] = None
     IsMixFx: Optional[bool] = None
     HasSystemVolume: Optional[bool] = None
     Crossfader: Optional[float] = None
@@ -107,6 +111,7 @@ class VdjMixer:
     EqCrossfaderHigh: Optional[float] = None
     EqCrossfaderMid: Optional[float] = None
     EqCrossfaderLow: Optional[float] = None
+    MicFxName: Optional[str] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
@@ -383,6 +388,8 @@ class VirtualDJClient():
         song.HasLyrics = self.to_bool(await self._get_result_deck(deck, "has_lyrics"))
         song.HasLinkedTracks = self.to_bool(await self._get_result_deck(deck, "has_linked_tracks"))
         song.IsVideo = self.to_bool(await self._get_result_deck(deck, "is_video"))
+        song.HasStemsV1 = self.to_bool(await self._get_result_deck(deck, "has_stems '1.0'"))
+        song.HasStemsV2 = self.to_bool(await self._get_result_deck(deck, "has_stems '2.0'"))
         return song
     #------------------------------------------------------------------------------------
     async def get_DeckEngine_async(self, deck: str) -> VdjDeckEngine:
@@ -423,6 +430,7 @@ class VirtualDJClient():
         deckengine.EqKillLow = self.to_bool(await self._get_result_deck(deck, "eq_kill_low"))
         deckengine.FilterName = self.to_str(await self._get_result_deck(deck, "filter_selectcolorfx"))
         deckengine.Filter = self.to_float(await self._get_result_deck(deck, "filter"))
+        deckengine.IsStemsReady = self.to_bool(await self._get_result_deck(deck, "has_stems 'ready'"))
         return deckengine
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
@@ -445,6 +453,7 @@ class VirtualDJClient():
         mixer = VdjMixer()
         mixer.IsLimiterRunning = self.to_bool(await self._get_result_mixer("get_limiter"))
         mixer.IsMic = self.to_bool(await self._get_result_mixer("mic"))
+        mixer.IsMicFx = self.to_bool(await self._get_result_mixer("effect_active 'mic'"))
         mixer.IsMixFx = self.to_bool(await self._get_result_mixer("effect_mixfx_activate"))
         mixer.IsInternalMixer = self.to_bool(await self._get_result_mixer("mixermode"))
         mixer.HasSystemVolume = self.to_bool(await self._get_result_mixer("has_system_volume"))
@@ -471,6 +480,7 @@ class VirtualDJClient():
         mixer.EqCrossfaderHigh = self.to_float(await self._get_result_mixer("eq_crossfader_high"))
         mixer.EqCrossfaderMid = self.to_float(await self._get_result_mixer("eq_crossfader_mid"))
         mixer.EqCrossfaderLow = self.to_float(await self._get_result_mixer("eq_crossfader_low"))
+        mixer.MicFxName = self.to_str(await self._get_result_mixer("get_effect_name 'mic'"))
         return mixer
     #------------------------------------------------------------------------------------
     #  asyncio.run()
