@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VdjDeckEngine, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
+from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 

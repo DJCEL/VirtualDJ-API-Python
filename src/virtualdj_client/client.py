@@ -51,6 +51,7 @@ class VdjDeckEngine:
     IsMasterTempo: Optional[bool] = None
     IsKeylock: Optional[bool] = None
     IsTimecode: Optional[bool] = None
+    IsLineIn: Optional[bool] = None
     IsMute: Optional[bool] = None
     BpmCurrent: Optional[float] = None
     KeyCurrent: Optional[str] = None
@@ -67,6 +68,7 @@ class VdjDeckEngine:
     VolumeTotal: Optional[float] = None
     Pitch: Optional[float] = None
     Gain: Optional[float] = None
+    FilterName: Optional[str] = None
     Filter: Optional[float] = None
     EqHigh: Optional[float] = None
     EqMid: Optional[float] = None
@@ -97,11 +99,14 @@ class VdjMixer:
     SamplerVolumeMaster: Optional[float] = None
     MasterBalance: Optional[float] = None
     BoothVolume: Optional[float] = None
-    MixFx: Optional[str] = None
+    MixFxName: Optional[str] = None
     ZeroDB: Optional[str] = None
     SystemVolume: Optional[float] = None
-    VuMeterLeft: Optional[float] = None
-    VuMeterRight: Optional[float] = None
+    MasterVuMeterLeft: Optional[float] = None
+    MasterVuMeterRight: Optional[float] = None
+    EqCrossfaderHigh: Optional[float] = None
+    EqCrossfaderMid: Optional[float] = None
+    EqCrossfaderLow: Optional[float] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
@@ -174,7 +179,7 @@ class VirtualDJClient():
 
         checkUpdates = self.get_checkUpdates()
         if checkUpdates:
-            print(f"VirtualDJ checkUpdates option => {checkUpdates}")
+            self.vdj_utils.save_client_log(f"VirtualDJ checkUpdates option => {checkUpdates}")
             self.set_checkUpdates('off')
 
         bRes = self.vdj_utils.launch_virtualdj_software()
@@ -209,16 +214,13 @@ class VirtualDJClient():
 
         is_vdj_security = await self.get_loadSecurity_async()
         if is_vdj_security:
-            print("VirtualDJ => loadSecurity option is activated")
             self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
         else:
-            print("VirtualDJ => loadSecurity option is disable")
             self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
 
         if is_vdj_security and force_close:
             result = await self.set_loadSecurity_async("off")
             if result == True:
-                print("VirtualDJ => loadSecurity option is now disable")
                 self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
 
 
@@ -410,6 +412,7 @@ class VirtualDJClient():
         deckengine.IsMasterTempo = self.to_bool(await self._get_result_deck(deck, "master_tempo"))
         deckengine.IsKeylock = self.to_bool(await self._get_result_deck(deck, "key_lock"))
         deckengine.IsTimecode = self.to_bool(await self._get_result_deck(deck, "timecode_active"))
+        deckengine.IsLineIn = self.to_bool(await self._get_result_deck(deck, "linein"))
         deckengine.IsMute = self.to_bool(await self._get_result_deck(deck, "mute"))
         deckengine.Gain = self.to_float(await self._get_result_deck(deck, "gain"))
         deckengine.EqHigh = self.to_float(await self._get_result_deck(deck, "eq_low"))
@@ -418,6 +421,7 @@ class VirtualDJClient():
         deckengine.EqKillHigh = self.to_bool(await self._get_result_deck(deck, "eq_kill_high"))
         deckengine.EqKillMid = self.to_bool(await self._get_result_deck(deck, "eq_kill_mid")) 
         deckengine.EqKillLow = self.to_bool(await self._get_result_deck(deck, "eq_kill_low"))
+        deckengine.FilterName = self.to_str(await self._get_result_deck(deck, "filter_selectcolorfx"))
         deckengine.Filter = self.to_float(await self._get_result_deck(deck, "filter"))
         return deckengine
     #------------------------------------------------------------------------------------
@@ -459,11 +463,14 @@ class VirtualDJClient():
         mixer.SamplerVolumeMaster = self.to_float(await self._get_result_mixer("sampler_volume_master"))
         mixer.MasterBalance = self.to_float(await self._get_result_mixer("master_balance"))
         mixer.BoothVolume = self.to_float(await self._get_result_mixer("booth_volume"))
-        mixer.MixFx = self.to_str(await self._get_result_mixer("setting 'mixfx'"))
+        mixer.MixFxName = self.to_str(await self._get_result_mixer("setting 'mixfx'"))
         mixer.ZeroDB = self.to_zeroDB(await self._get_result_mixer("setting 'zeroDB'"))
         mixer.SystemVolume = self.to_float(await self._get_result_mixer("system_volume"))
-        mixer.VuMeterLeft = self.to_float(await self._get_result_mixer("get_vu_meter_left 'master'"))
-        mixer.VuMeterRight = self.to_float(await self._get_result_mixer("get_vu_meter_right 'master'"))
+        mixer.MasterVuMeterLeft = self.to_float(await self._get_result_mixer("get_vu_meter_left 'master'"))
+        mixer.MasterVuMeterRight = self.to_float(await self._get_result_mixer("get_vu_meter_right 'master'"))
+        mixer.EqCrossfaderHigh = self.to_float(await self._get_result_mixer("eq_crossfader_high"))
+        mixer.EqCrossfaderMid = self.to_float(await self._get_result_mixer("eq_crossfader_mid"))
+        mixer.EqCrossfaderLow = self.to_float(await self._get_result_mixer("eq_crossfader_low"))
         return mixer
     #------------------------------------------------------------------------------------
     #  asyncio.run()
