@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.25"
+__version__ = "1.0.26"
 
 import asyncio
 import time
@@ -119,9 +119,38 @@ class VdjDeckData:
     Engine: VdjDeckEngine = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
-class VdjDeckCache:
-    data: VdjDeckData | None = None
-    updated_at: float = 0.0
+class VdjBrowserFolder:
+    browsed_folder_tab: Optional[int] = None
+    browsed_folder: Optional[str] = None
+    browsed_header: Optional[str] = None
+    browsed_folder_icon: Optional[int] = None
+    browsed_folder_path: Optional[str] = None
+    browsed_folder_scrollpos: Optional[int] = None
+    browsed_folder_scrollsize: Optional[int] = None
+    browsed_folder_selection_index: Optional[int] = None
+    file_count: Optional[int] = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjBrowserFile:
+    browsed_title_artist: Optional[str] = None
+    browsed_artist: Optional[str] = None
+    browsed_title: Optional[str] = None
+    browsed_filepath: Optional[str] = None
+    browsed_bpm: Optional[float] = None
+    browsed_key: Optional[str] = None
+    browsed_genre: Optional[str] = None
+    browsed_comment: Optional[str] = None
+    browsed_composer: Optional[str] = None
+    browsed_color: Optional[str] = None
+    browsed_album: Optional[str] = None
+    browsed_scrollpos: Optional[int] = None
+    browsed_scrollsize: Optional[int] = None
+    browsed_selection_index: Optional[int] = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjBrowser:
+    Folder: Optional[VdjBrowserFolder] = None
+    File: Optional[VdjBrowserFile] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
@@ -483,6 +512,54 @@ class VirtualDJClient():
         mixer.MicFxName = self.to_str(await self._get_result_mixer("get_effect_name 'mic'"))
         return mixer
     #------------------------------------------------------------------------------------
+    #  Browser
+    #------------------------------------------------------------------------------------  
+    async def _get_result_browser(self, vdjscript: str) -> str:
+        result = await self.get_async(vdjscript)
+        result_check = result[0:5]
+        if result_check == 'error':
+            return None
+        return result
+    #------------------------------------------------------------------------------------
+    async def get_BrowserFolder_async(self) -> VdjBrowserFolder:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+        browserfolder = VdjBrowserFolder()
+        browserfolder.browsed_folder = self.to_str(await self._get_result_browser("get_browsed_folder"))
+        browserfolder.browsed_folder_icon = self.to_int(await self._get_result_browser("get_browsed_folder_icon"))
+        browserfolder.browsed_folder_path = self.to_str(await self._get_result_browser("get_browsed_folder_path"))
+        browserfolder.browsed_folder_scrollpos = self.to_int(await self._get_result_browser("get_browsed_folder_scrollpos"))
+        browserfolder.browsed_folder_scrollsize = self.to_int(await self._get_result_browser("get_browsed_folder_scrollsize"))
+        browserfolder.browsed_folder_selection_index = self.to_int(await self._get_result_browser("get_browsed_folder_selection_index"))
+        browserfolder.browsed_folder_tab = self.to_int(await self._get_result_browser("get_browsed_folder_tab"))
+        browserfolder.browsed_header = self.to_str(await self._get_result_browser("get_browsed_header"))
+        browserfolder.file_count = self.to_int(await self._get_result_browser("file_count"))
+        return browserfolder
+    #------------------------------------------------------------------------------------
+    async def get_BrowserFile_async(self) -> VdjBrowserFile:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+        browserfile = VdjBrowserFile()
+        browserfile.browsed_scrollpos = self.to_int(await self._get_result_browser("get_browsed_scrollpos"))
+        browserfile.browsed_scrollsize = self.to_int(await self._get_result_browser("get_browsed_scrollsize"))
+        browserfile.browsed_selection_index = self.to_int(await self._get_result_browser("get_browsed_selection_index"))
+        browserfile.browsed_filepath = self.to_str(await self._get_result_browser("get_browsed_filepath"))
+        browserfile.browsed_artist = self.to_str(await self._get_result_browser("get_browsed_artist"))
+        browserfile.browsed_title = self.to_str(await self._get_result_browser("get_browsed_title"))
+        browserfile.browsed_title_artist = self.to_str(await self._get_result_browser("get_browsed_title_artist "))
+        browserfile.browsed_bpm = self.to_float(await self._get_result_browser("get_browsed_bpm"))
+        browserfile.browsed_key = self.to_str(await self._get_result_browser("get_browsed_key"))
+        browserfile.browsed_genre = self.to_str(await self._get_result_browser("get_browsed_genre"))
+        browserfile.browsed_comment = self.to_str(await self._get_result_browser("get_browsed_comment"))
+        browserfile.browsed_composer = self.to_str(await self._get_result_browser("get_browsed_composer"))
+        browserfile.browsed_color = self.to_str(await self._get_result_browser("get_browsed_color"))
+        browserfile.browsed_album = self.to_str(await self._get_result_browser("get_browsed_album"))
+        return browserfile
+    #------------------------------------------------------------------------------------
+    async def get_Browser_async(self) -> VdjBrowser:
+        browser = VdjBrowser()
+        browser.Folder = await self.get_BrowserFolder_async()
+        browser.File = await self.get_BrowserFile_async()
+        return browser
+    #------------------------------------------------------------------------------------
     #  asyncio.run()
     #------------------------------------------------------------------------------------
     def is_connected(self) -> bool:
@@ -514,3 +591,6 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     def get_Mixer(self) -> VdjMixer:
         return asyncio.run(self.get_Mixer_async())
+    #------------------------------------------------------------------------------------
+    def get_Browser(self) -> VdjBrowser:
+        return asyncio.run(self.get_Browser_async())

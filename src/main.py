@@ -3,7 +3,7 @@ import os
 from rich.console import Console
 import argparse
 
-from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
+from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VdjBrowser, VirtualDJSongsDatabase, VirtualDJHistoryFiles, VirtualDJSettings
 
 console = Console()
 
@@ -40,6 +40,11 @@ def run_VirtualDJ_client():
     mixer: VdjMixer = None
     mixer = client.get_Mixer()
     console.print(f"Mixer = {mixer}")
+
+    console.print("\n")
+    browser: VdjBrowser = None
+    browser = client.get_Browser()
+    console.print(f"Browser = {browser}")
 
     console.print("\n")
     decks_count = client.to_int(client.get("get_decks"))
