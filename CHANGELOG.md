@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.6 (2026-09-15)
+
+* Definition of VdjDeckSong, VdjDeckEngine, VdjMixer to query VirtualDJ
+
 ## 1.1.2 (2026-09-08)
 
 * Cleaning of code

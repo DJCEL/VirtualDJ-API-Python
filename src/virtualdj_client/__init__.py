@@ -1,4 +1,4 @@
-__version__ = "1.1.5"
+__version__ = "1.1.6"
 
 from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckSong, VdjDeckEngine, VdjDeckData, VdjMixer
 from .client_utils import VirtualDJUtils
