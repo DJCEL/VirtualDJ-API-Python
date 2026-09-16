@@ -7,7 +7,8 @@ import queue
 
 from virtualdj_client import (
     VirtualDJClient, 
-    VdjDeckData, 
+    VdjDeckSong,
+    VdjDeckEngine,
     VdjMixer, 
     VdjBrowserFolder, 
     VdjBrowserFile,
@@ -19,12 +20,13 @@ class VirtualDJMonitor(tk.Tk):
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
         self._define_menu()
+        self._define_frame()
+        self.interval_refresh = 100  # ms
+
         self.client: VirtualDJClient | None = None
         self.loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
-        self.interval_refresh = 100  # ms
-        self._define_frame()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self.async_thread.start()
