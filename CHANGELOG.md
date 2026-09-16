@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.8 (2026-09-16)
+
+* Add main_gui.py to launch a graphical user interface (tkinter)
+
 ## 1.1.6 (2026-09-15)
 
 * Definition of VdjDeckSong, VdjDeckEngine, VdjMixer to query VirtualDJ
