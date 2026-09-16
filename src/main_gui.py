@@ -36,25 +36,27 @@ class VirtualDJMonitor(tk.Tk):
         self.destroy()
     #------------------------------------------------------------------------------------
     def _define_frame(self):
-        self.leftdecksong_frame = self._make_frame("Left Deck - Song")
-        self.leftdeckengine_frame = self._make_frame("Left Deck - Engine")
-        self.rightdecksong_frame = self._make_frame("Right Deck - Song")
-        self.rightdeckengine_frame = self._make_frame("Right Deck - Engine")
-        self.mixer_frame = self._make_frame("Mixer")
-        self.browserfolder_frame = self._make_frame("Browser - Folder")
-        self.browserfile_frame = self._make_frame("Browser - File")
+        frames = [
+            ("leftdecksong_frame", "Left Deck - Song"),
+            ("leftdeckengine_frame", "Left Deck - Engine"),
+            ("rightdecksong_frame", "Right Deck - Song"),
+            ("rightdeckengine_frame", "Rigth Deck - Engine"),
+            ("mixer_frame", "Mixer"),
+            ("browserfolder_frame", "Browser - Folder"),
+            ("browserfile_frame", "Browser - File"),
+        ]
 
-        self.leftdecksong_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.leftdeckengine_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.rightdecksong_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.rightdeckengine_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.mixer_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=2)
-        self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        for row, (attribute,title) in enumerate(frames):
+            frame = self._make_frame(title)
+            setattr(self, attribute, frame)
+            self.grid_rowconfigure(row, weight=1,minsize=0)
+            frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=2)
+
+        self.grid_columnconfigure(0,weight=1)
     #------------------------------------------------------------------------------------
     def _make_frame(self, title: str):
         frame = ttk.LabelFrame(self,text=title)
-        text = tk.Text(frame, height=8, state='disabled', font=("Consolas",10))
+        text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)
         frame.text_widget = text
         return frame
