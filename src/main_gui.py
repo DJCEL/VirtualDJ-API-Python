@@ -35,6 +35,19 @@ class VirtualDJMonitor(tk.Tk):
         self._stopping = True
         self.destroy()
     #------------------------------------------------------------------------------------
+    def _define_frame(self):
+        self.leftdeck_frame = self._make_frame("Left Deck")
+        self.rightdeck_frame = self._make_frame("Right Deck")
+        self.mixer_frame = self._make_frame("Mixer")
+        self.browserfolder_frame = self._make_frame("Browser Folder")
+        self.browserfile_frame = self._make_frame("Browser File")
+
+        self.leftdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.rightdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.mixer_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=5)
+    #------------------------------------------------------------------------------------
     def _make_frame(self, title: str):
         frame = ttk.LabelFrame(self,text=title)
         text = tk.Text(frame, height=8, state='disabled', font=("Consolas",10))
@@ -71,75 +84,65 @@ class VirtualDJMonitor(tk.Tk):
     async def _client_main(self):
         async with VirtualDJClient() as client:
             self.client = client
-            while not self._stopping.is_set():
-                try:
-                    result = await self._refresh_data(client)
-                    try:
-                        self._result_queue.get_nowait()
-                    except queue.Empty:
-                        pass
-                    try:
-                        self._result_queue.put_nowait(result)
-                    except queue.Full:
-                        pass
-                except Exception as exc:
-                    try:
-                        self._result_queue.get_nowait()
-                    except queue.Empty:
-                        pass
-                    try:
-                        self._result_queue.put_nowait({"error": exc})
-                    except queue.Full:
-                        pass
-
-                await asyncio.sleep(self.interval_refresh / 1000)
+            tasks = [
+                asyncio.create_task(self._poll_data(client,"leftdeck" , lambda: client.get_DeckData_async("left") )),
+                asyncio.create_task(self._poll_data(client,"rightdeck", lambda: client.get_DeckData_async("right"))),
+                asyncio.create_task(self._poll_data(client,"mixer", lambda: client.get_Mixer_async())),
+                asyncio.create_task(self._poll_data(client,"browserfolder", lambda: client.get_BrowserFolder_async())),
+                asyncio.create_task(self._poll_data(client,"browserfile", lambda: client.get_BrowserFile_async())),
+                ]
+                   
+            try:
+                await asyncio.gather(*tasks)
+            finally:
+                for task in tasks:
+                    task.cancel()
+                await asyncio.gather(*tasks, return_exceptions=True)
+                   
             self.client = None
     #------------------------------------------------------------------------------------
-    def _define_frame(self):
-        self.leftdeck_frame = self._make_frame("Left Deck")
-        self.rightdeck_frame = self._make_frame("Right Deck")
-        self.mixer_frame = self._make_frame("Mixer")
-        self.browserfolder_frame = self._make_frame("Browser Folder")
-        self.browserfile_frame = self._make_frame("Browser File")
+    async def _poll_data(self, client, name, getter):
+        while not self._stopping.is_set():
+            start_time = asyncio.get_running_loop().time()
 
-        self.leftdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.rightdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.mixer_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=5)
-    #------------------------------------------------------------------------------------
-    async def _refresh_data(self, client: VirtualDJClient):
-        """ Async request """
-        (leftdeck, rightdeck, mixer, browserfolder, browserfile) = await asyncio.gather(
-            client.get_DeckData_async("left"),
-            client.get_DeckData_async("right"),
-            client.get_Mixer_async(),
-            client.get_BrowserFolder_async(),
-            client.get_BrowserFile_async(),
-        )
-        return {
-            "leftdeck" : leftdeck,
-            "rightdeck" : rightdeck,
-            "mixer": mixer,
-            "browserfolder": browserfolder,
-            "browserfile": browserfile,
-            }
+            try:
+                result = await getter()
+                result_dict = {"name": name, "value": result}
+            except Exception as e:
+                result_dict = {"name": name, "value": e}
+            
+            self._result_queue.put(result_dict)
+
+            elapsed = asyncio.get_running_loop().time() - start_time
+            delay = max(0.0, (self.interval_refresh / 1000) - elapsed)
+
+            if delay > 0:
+                try:
+                    await asyncio.wait_for(self._stopping.wait(), timeout=delay)
+                except asyncio.TimeoutError:
+                    pass
     #------------------------------------------------------------------------------------
     def refresh_ui(self):
         try:
             while True:
                 result = self._result_queue.get_nowait()
+                name = result["name"]
 
                 if "error" in result:
-                    self._update_frame_text(self.leftdeck_frame, f"Refresh error: {result["error"]}")
-                    continue
-
-                self._update_frame_text(self.leftdeck_frame, result["leftdeck"])
-                self._update_frame_text(self.rightdeck_frame, result["rightdeck"])
-                self._update_frame_text(self.mixer_frame, result["mixer"])
-                self._update_frame_text(self.browserfolder_frame, result["browserfolder"])
-                self._update_frame_text(self.browserfile_frame, result["browserfile"])
-
+                    value = f"Refresh error: {result['error']}"
+                else:
+                    value = result["value"]
+                 
+                if name == "leftdeck":
+                    self._update_frame_text(self.leftdeck_frame, value)
+                elif name == "rightdeck":
+                    self._update_frame_text(self.rightdeck_frame, value)
+                elif name == "mixer":
+                    self._update_frame_text(self.mixer_frame, value)
+                elif name == "browserfolder":
+                    self._update_frame_text(self.browserfolder_frame, value)
+                elif name == "browserfile":
+                    self._update_frame_text(self.browserfile_frame, value)
         except queue.Empty:
             pass
 
