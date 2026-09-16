@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.26"
+__version__ = "1.0.27"
 
 import asyncio
 import time
@@ -83,7 +83,7 @@ class VdjDeckEngine:
 @dataclass
 class VdjMixer:
     IsInternalMixer: Optional[bool] = None
-    IsLimiterRunning: Optional[bool] = None
+    Limiter: Optional[float] = None
     IsMic: Optional[bool] = None
     IsMicFx: Optional[bool] = None
     IsMixFx: Optional[bool] = None
@@ -157,6 +157,12 @@ class VirtualDJClient():
         self.vdj_client = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
         self.vdj_settings = VirtualDJSettings()
+    #------------------------------------------------------------------------------------
+    async def __aenter__(self):
+        return self
+    #------------------------------------------------------------------------------------
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        pass
     #------------------------------------------------------------------------------------
     #  Check if VirtualDJ is connected
     #------------------------------------------------------------------------------------
@@ -480,7 +486,8 @@ class VirtualDJClient():
     async def get_Mixer_async(self) -> VdjMixer:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         mixer = VdjMixer()
-        mixer.IsLimiterRunning = self.to_bool(await self._get_result_mixer("get_limiter"))
+        limiter = await self._get_result_mixer("get_limiter")
+        mixer.Limiter = self.to_float(await self._get_result_mixer("get_limiter"))
         mixer.IsMic = self.to_bool(await self._get_result_mixer("mic"))
         mixer.IsMicFx = self.to_bool(await self._get_result_mixer("effect_active 'mic'"))
         mixer.IsMixFx = self.to_bool(await self._get_result_mixer("effect_mixfx_activate"))
@@ -591,6 +598,12 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     def get_Mixer(self) -> VdjMixer:
         return asyncio.run(self.get_Mixer_async())
+    #------------------------------------------------------------------------------------
+    def get_BrowserFolder(self) -> VdjBrowserFolder:
+        return asyncio.run(self.get_BrowserFolder_async())
+    #------------------------------------------------------------------------------------
+    def get_BrowserFile(self) -> VdjBrowserFile:
+        return asyncio.run(self.get_BrowserFile_async())
     #------------------------------------------------------------------------------------
     def get_Browser(self) -> VdjBrowser:
         return asyncio.run(self.get_Browser_async())
