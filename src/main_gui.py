@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 import asyncio
 import threading
 import dataclasses
@@ -16,8 +16,9 @@ from virtualdj_client import (
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("VirtualDJ - Monitor")
+        self.title("VirtualDJ Monitor")
         self.geometry("1024x768")
+        self._define_menu()
         self.client: VirtualDJClient | None = None
         self.loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
@@ -32,8 +33,22 @@ class VirtualDJMonitor(tk.Tk):
     def on_close(self):
         if self._stopping.is_set():
             return
-        self._stopping = True
+        self._stopping.set()
         self.destroy()
+    #------------------------------------------------------------------------------------
+    def _define_menu(self):
+        menubar = tk.Menu(self)
+
+        help_menu = tk.Menu(menubar , tearoff=False)
+        help_menu.add_command(label="About", command=self._show_about)
+        
+        menubar.add_cascade(label="Help", menu=help_menu)
+        self.config(menu=menubar)
+     #------------------------------------------------------------------------------------
+    def _show_about(self):
+        messagebox.showinfo("About VirtualDJ Monitor",
+                            "version: 1.1.8\n\n"
+                            "developped by DJCEL")
     #------------------------------------------------------------------------------------
     def _define_frame(self):
         frames = [
