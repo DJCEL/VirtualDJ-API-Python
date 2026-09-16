@@ -16,7 +16,7 @@ from virtualdj_client import (
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("VirtualDJ Monitor")
+        self.title("VirtualDJ Client")
         self.geometry("1024x768")
         self._define_menu()
         self.client: VirtualDJClient | None = None
@@ -47,7 +47,7 @@ class VirtualDJMonitor(tk.Tk):
         self.config(menu=menubar)
      #------------------------------------------------------------------------------------
     def _show_about(self):
-        messagebox.showinfo("About VirtualDJ Monitor",
+        messagebox.showinfo("About VirtualDJ Client",
                             "version: 1.1.8\n\n"
                             "developped by DJCEL")
     #------------------------------------------------------------------------------------
