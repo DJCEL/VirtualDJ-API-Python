@@ -3,9 +3,16 @@ from tkinter import ttk
 import asyncio
 import threading
 import dataclasses
+import queue
 
-from virtualdj_client import VirtualDJClient, VdjDeckData, VdjMixer, VdjBrowserFolder, VdjBrowserFile
-
+from virtualdj_client import (
+    VirtualDJClient, 
+    VdjDeckData, 
+    VdjMixer, 
+    VdjBrowserFolder, 
+    VdjBrowserFile,
+)
+#---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -13,13 +20,14 @@ class VirtualDJMonitor(tk.Tk):
         self.geometry("1024x768")
         self.client: VirtualDJClient | None = None
         self.loop: asyncio.AbstractEventLoop | None = None
-        self._stopping = False
-        self.ui_refresh_interval_ms = 100  # refresh each 100ms
+        self._stopping = threading.Event()
+        self._result_queue = queue.Queue(maxsize=1)
+        self.interval_refresh = 100  # ms
         self._define_frame()
         self.protocol("WM_DELETE_WINDOW", self.on_close)
         self.async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self.async_thread.start()
-        self.after(self.ui_refresh_interval_ms, self.refresh_ui)
+        self.after(self.interval_refresh, self.refresh_ui)
     #------------------------------------------------------------------------------------
     def on_close(self):
         if self._stopping:
@@ -47,7 +55,7 @@ class VirtualDJMonitor(tk.Tk):
             else:
                 data = vars(vdjdata)
 
-            widget.insert("end", str(data))
+            widget.insert("end", data)
 
         widget.configure(state="disabled")
     #------------------------------------------------------------------------------------
@@ -63,8 +71,28 @@ class VirtualDJMonitor(tk.Tk):
     async def _client_main(self):
         async with VirtualDJClient() as client:
             self.client = client
-            while not self._stopping:
-                await asyncio.sleep(0.2)
+            while not self._stopping.is_set():
+                try:
+                    result = await self._refresh_data(client)
+                    try:
+                        self._result_queue.get_nowait()
+                    except queue.Empty:
+                        pass
+                    try:
+                        self._result_queue.put_nowait(result)
+                    except queue.Full:
+                        pass
+                except Exception as exc:
+                    try:
+                        self._result_queue.get_nowait()
+                    except queue.Empty:
+                        pass
+                    try:
+                        self._result_queue.put_nowait({"error": exc})
+                    except queue.Full:
+                        pass
+
+                await asyncio.sleep(self.interval_refresh / 1000)
             self.client = None
     #------------------------------------------------------------------------------------
     def _define_frame(self):
@@ -80,47 +108,43 @@ class VirtualDJMonitor(tk.Tk):
         self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=5)
         self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=5)
     #------------------------------------------------------------------------------------
-    async def _get_all_data(self):
+    async def _refresh_data(self, client: VirtualDJClient):
         """ Async request """
-        if self.client is None:
-             return None
-        leftdeck = await self.client.get_DeckData_async("left")
-        rightdeck = await self.client.get_DeckData_async("right")
-        mixer = await self.client.get_Mixer_async()
-        browserfolder = await self.client.get_BrowserFolder_async()
-        browserfile = await self.client.get_BrowserFile_async()
-        results =  (leftdeck, rightdeck, mixer, browserfolder, browserfile)
-        return results
-    #------------------------------------------------------------------------------------
-    def _on_result(future):
-        try:
-            results = future.result()
-            self.after(0, self._update_ui, results)
-        except Exception as e:
-            print(f"Request error: {e}")
+        (leftdeck, rightdeck, mixer, browserfolder, browserfile) = await asyncio.gather(
+            client.get_DeckData_async("left"),
+            client.get_DeckData_async("right"),
+            client.get_Mixer_async(),
+            client.get_BrowserFolder_async(),
+            client.get_BrowserFile_async(),
+        )
+        return {
+            "leftdeck" : leftdeck,
+            "rightdeck" : rightdeck,
+            "mixer": mixer,
+            "browserfolder": browserfolder,
+            "browserfile": browserfile,
+            }
     #------------------------------------------------------------------------------------
     def refresh_ui(self):
-        """ GUI refresh """
-        if (not self._stopping and self.loop is not None and self.client is not None):
-            future = asyncio.run_coroutine_threadsafe(self._get_all_data(), self.loop)
-            def on_result(future):
-                try:
-                    results = future.result()
-                    self.after(0, self._update_ui, results)
-                except Exception as e:
-                    print(f"Request error: {e}")
-            future.add_done_callback(on_result)
+        try:
+            while True:
+                result = self._result_queue.get_nowait()
 
-        if not self._stopping:
-            self.after(self.ui_refresh_interval_ms, self.refresh_ui)
-    #------------------------------------------------------------------------------------
-    def update_ui(self, results):
-        (leftdeck, rightdeck, mixer, browserfolder, browserfile) = results
-        self._update_frame_text(self.leftdeck_frame, leftdeck)
-        self._update_frame_text(self.rightdeck_frame, rightdeck)
-        self._update_frame_text(self.mixer_frame, mixer)
-        self._update_frame_text(self.browserfolder_frame, browserfolder)
-        self._update_frame_text(self.browserfile_frame, browserfile)
+                if "error" in result:
+                    self._update_frame_text(self.leftdeck_frame, f"Refresh error: {result["error"]}")
+                    continue
+
+                self._update_frame_text(self.leftdeck_frame, result["leftdeck"])
+                self._update_frame_text(self.rightdeck_frame, result["rightdeck"])
+                self._update_frame_text(self.mixer_frame, result["mixer"])
+                self._update_frame_text(self.browserfolder_frame, result["browserfolder"])
+                self._update_frame_text(self.browserfile_frame, result["browserfile"])
+
+        except queue.Empty:
+            pass
+
+        if not self._stopping.is_set():
+            self.after(self.interval_refresh, self.refresh_ui)
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     app = VirtualDJMonitor()
