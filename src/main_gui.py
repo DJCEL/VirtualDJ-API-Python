@@ -40,6 +40,7 @@ class VirtualDJMonitor(tk.Tk):
         menubar = tk.Menu(self)
 
         help_menu = tk.Menu(menubar , tearoff=False)
+        help_menu.add_command(label="Exit", command=self.on_close)
         help_menu.add_command(label="About", command=self._show_about)
         
         menubar.add_cascade(label="Help", menu=help_menu)
