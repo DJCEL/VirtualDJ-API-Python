@@ -90,7 +90,7 @@ class VirtualDJMonitor(tk.Tk):
                 asyncio.create_task(self._poll_data(client,"mixer", lambda: client.get_Mixer_async())),
                 asyncio.create_task(self._poll_data(client,"browserfolder", lambda: client.get_BrowserFolder_async())),
                 asyncio.create_task(self._poll_data(client,"browserfile", lambda: client.get_BrowserFile_async())),
-                ]
+            ]
                    
             try:
                 await asyncio.gather(*tasks)
