@@ -30,7 +30,7 @@ class VirtualDJMonitor(tk.Tk):
         self.after(self.interval_refresh, self.refresh_ui)
     #------------------------------------------------------------------------------------
     def on_close(self):
-        if self._stopping:
+        if self._stopping.is_set():
             return
         self._stopping = True
         self.destroy()
