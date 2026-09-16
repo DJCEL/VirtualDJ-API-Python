@@ -20,7 +20,7 @@ class VirtualDJMonitor(tk.Tk):
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
         self._define_menu()
-        self._define_frame()
+        self._define_tab()
         self.interval_refresh = 100  # ms
 
         self.client: VirtualDJClient | None = None
@@ -53,7 +53,23 @@ class VirtualDJMonitor(tk.Tk):
                             "version: 1.1.8\n\n"
                             "developped by DJCEL")
     #------------------------------------------------------------------------------------
-    def _define_frame(self):
+    def _define_tab(self):
+        """ we define 2 tabs """
+        self.notebook = ttk.Notebook(self)
+        self.notebook.pack(fill="both",expand=True)
+        self.get_tab = ttk.Frame(self.notebook)
+        self.send_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.get_tab,text="Get")
+        self.notebook.add(self.send_tab,text="Send")
+
+        """ GET tab """
+        self._define_frame_get(self.get_tab)
+
+        """ SEND tab """
+        self._define_frame_send(self.send_tab)
+        
+    #------------------------------------------------------------------------------------
+    def _define_frame_get(self, parent):
         frames = [
             ("leftdecksong_frame", "Left Deck - Song"),
             ("leftdeckengine_frame", "Left Deck - Engine"),
@@ -65,21 +81,28 @@ class VirtualDJMonitor(tk.Tk):
         ]
 
         for row, (attribute,title) in enumerate(frames):
-            frame = self._make_frame(title)
+            frame = self._make_frame(parent, title)
             setattr(self, attribute, frame)
-            self.grid_rowconfigure(row, weight=1,minsize=0)
+            parent.grid_rowconfigure(row, weight=1,minsize=0)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=2)
 
-        self.grid_columnconfigure(0,weight=1)
+        parent.grid_columnconfigure(0,weight=1)
+
     #------------------------------------------------------------------------------------
-    def _make_frame(self, title: str):
-        frame = ttk.LabelFrame(self,text=title)
+    def _define_frame_send(self, parent):
+        parent.grid_rowconfigure(0,weight=1)
+        parent.grid_columnconfigure(0,weight=1)
+        send_label = ttk.Label(parent,text="Send vdjscript to VirtualDJ")
+        send_label.grid(row=0,column=0)
+    #------------------------------------------------------------------------------------
+    def _make_frame(self, parent, title: str):
+        frame = ttk.LabelFrame(parent,text=title)
         text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)
         frame.text_widget = text
         return frame
     #------------------------------------------------------------------------------------
-    def _update_frame_text(self,frame, vdjdata):
+    def _update_frame_text(self, frame, vdjdata):
         widget = frame.text_widget
         widget.configure(state="normal")
         widget.delete("1.0", "end")
