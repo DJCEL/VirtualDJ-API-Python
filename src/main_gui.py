@@ -36,17 +36,21 @@ class VirtualDJMonitor(tk.Tk):
         self.destroy()
     #------------------------------------------------------------------------------------
     def _define_frame(self):
-        self.leftdeck_frame = self._make_frame("Left Deck")
-        self.rightdeck_frame = self._make_frame("Right Deck")
+        self.leftdecksong_frame = self._make_frame("Left Deck - Song")
+        self.leftdeckengine_frame = self._make_frame("Left Deck - Engine")
+        self.rightdecksong_frame = self._make_frame("Right Deck - Song")
+        self.rightdeckengine_frame = self._make_frame("Right Deck - Engine")
         self.mixer_frame = self._make_frame("Mixer")
-        self.browserfolder_frame = self._make_frame("Browser Folder")
-        self.browserfile_frame = self._make_frame("Browser File")
+        self.browserfolder_frame = self._make_frame("Browser - Folder")
+        self.browserfile_frame = self._make_frame("Browser - File")
 
-        self.leftdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.rightdeck_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.mixer_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=5)
-        self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=5)
+        self.leftdecksong_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.leftdeckengine_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.rightdecksong_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.rightdeckengine_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.mixer_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.browserfolder_frame.pack(fill="both", expand=True, padx=10, pady=2)
+        self.browserfile_frame.pack(fill="both", expand=True, padx=10, pady=2)
     #------------------------------------------------------------------------------------
     def _make_frame(self, title: str):
         frame = ttk.LabelFrame(self,text=title)
@@ -85,8 +89,10 @@ class VirtualDJMonitor(tk.Tk):
         async with VirtualDJClient() as client:
             self.client = client
             tasks = [
-                asyncio.create_task(self._poll_data(client,"leftdeck" , lambda: client.get_DeckData_async("left") )),
-                asyncio.create_task(self._poll_data(client,"rightdeck", lambda: client.get_DeckData_async("right"))),
+                asyncio.create_task(self._poll_data(client,"leftdecksong" , lambda: client.get_DeckSong_async("left") )),
+                asyncio.create_task(self._poll_data(client,"leftdeckengine" , lambda: client.get_DeckEngine_async("left") )),
+                asyncio.create_task(self._poll_data(client,"rightdecksong", lambda: client.get_DeckSong_async("right"))),
+                asyncio.create_task(self._poll_data(client,"rightdeckengine", lambda: client.get_DeckEngine_async("right"))),
                 asyncio.create_task(self._poll_data(client,"mixer", lambda: client.get_Mixer_async())),
                 asyncio.create_task(self._poll_data(client,"browserfolder", lambda: client.get_BrowserFolder_async())),
                 asyncio.create_task(self._poll_data(client,"browserfile", lambda: client.get_BrowserFile_async())),
@@ -133,10 +139,14 @@ class VirtualDJMonitor(tk.Tk):
                 else:
                     value = result["value"]
                  
-                if name == "leftdeck":
-                    self._update_frame_text(self.leftdeck_frame, value)
-                elif name == "rightdeck":
-                    self._update_frame_text(self.rightdeck_frame, value)
+                if name == "leftdecksong":
+                    self._update_frame_text(self.leftdecksong_frame, value)
+                elif name == "leftdeckengine":
+                    self._update_frame_text(self.leftdeckengine_frame, value)
+                elif name == "rightdecksong":
+                    self._update_frame_text(self.rightdecksong_frame, value)
+                elif name == "rightdeckengine":
+                    self._update_frame_text(self.rightdeckengine_frame, value)
                 elif name == "mixer":
                     self._update_frame_text(self.mixer_frame, value)
                 elif name == "browserfolder":
