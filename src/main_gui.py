@@ -84,16 +84,40 @@ class VirtualDJMonitor(tk.Tk):
             frame = self._make_frame(parent, title)
             setattr(self, attribute, frame)
             parent.grid_rowconfigure(row, weight=1,minsize=0)
-            frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=2)
+            frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
 
         parent.grid_columnconfigure(0,weight=1)
 
     #------------------------------------------------------------------------------------
     def _define_frame_send(self, parent):
-        parent.grid_rowconfigure(0,weight=1)
-        parent.grid_columnconfigure(0,weight=1)
-        send_label = ttk.Label(parent,text="Send vdjscript to VirtualDJ")
-        send_label.grid(row=0,column=0)
+      
+        self.vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
+        self.vdjscript_frame.pack(fill="x",padx=10,pady=5)
+        self.vdjscript_entry = ttk.Entry(self.vdjscript_frame)
+        self.vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
+        self.send_button = ttk.Button(self.vdjscript_frame, text="Send", command=self._send_vdjscript)
+        self.send_button.pack(side="right",padx=5,pady=5)
+        self.vdjscript_entry.bind("<Return>",lambda event:self._send_vdjscript())
+    #------------------------------------------------------------------------------------
+    def _send_vdjscript(self):
+        vdjscript = self.vdjscript_entry.get().strip()
+        if not vdjscript:
+            return
+        if self.client is None:
+            return
+        if self.loop is None:
+            return
+        try:
+            future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self.loop)
+            future.add_done_callback(self._vdjscript_done)
+        except Exception as e:
+            pass
+    #------------------------------------------------------------------------------------
+    def _vdjscript_done(self, future):
+        try:
+            result = future.result()
+        except Excepton as e:
+            pass
     #------------------------------------------------------------------------------------
     def _make_frame(self, parent, title: str):
         frame = ttk.LabelFrame(parent,text=title)
