@@ -200,11 +200,7 @@ class VirtualDJMonitor(tk.Tk):
             while True:
                 result = self._result_queue.get_nowait()
                 name = result["name"]
-
-                if "error" in result:
-                    value = f"Refresh error: {result['error']}"
-                else:
-                    value = result["value"]
+                value = result["value"]
                  
                 if name == "leftdecksong":
                     self._update_frame_text(self.leftdecksong_frame, value)
