@@ -102,20 +102,13 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     def _define_tab_get(self, parent):
         frames_get_definition = [
-            ("leftdecksong", "leftdecksong_frame", "Left Deck - Song",
-     lambda client: client.get_DeckSong_async("left")),
-            ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine",
-     lambda client: client.get_DeckEngine_async("left")),
-            ("rightdecksong", "rightdecksong_frame", "Right Deck - Song",
-     lambda client: client.get_DeckSong_async("right")),
-            ("rightdeckengine", "rightdeckengine_frame", "Rigth Deck - Engine",
-     lambda client: client.get_DeckEngine_async("right")),
-            ("mixer", "mixer_frame", "Mixer",
-     lambda client: client.get_Mixer_async()),
-            ("browserfolder", "browserfolder_frame", "Browser - Folder",
-     lambda client: client.get_BrowserFolder_async()),
-            ("browserfile", "browserfile_frame", "Browser - File",
-     lambda client: client.get_BrowserFile_async()),
+            ("leftdecksong", "leftdecksong_frame", "Left Deck - Song", lambda client: client.get_DeckSong_async("left")),
+            ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine", lambda client: client.get_DeckEngine_async("left")),
+            ("rightdecksong", "rightdecksong_frame", "Right Deck - Song", lambda client: client.get_DeckSong_async("right")),
+            ("rightdeckengine", "rightdeckengine_frame", "Rigth Deck - Engine", lambda client: client.get_DeckEngine_async("right")),
+            ("mixer", "mixer_frame", "Mixer", lambda client: client.get_Mixer_async()),
+            ("browserfolder", "browserfolder_frame", "Browser - Folder", lambda client: client.get_BrowserFolder_async()),
+            ("browserfile", "browserfile_frame", "Browser - File", lambda client: client.get_BrowserFile_async()),
         ]
 
         self.frames_get = {}
