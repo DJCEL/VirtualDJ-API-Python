@@ -81,9 +81,11 @@ class VirtualDJMonitor(tk.Tk):
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both",expand=True)
         self.get_tab = ttk.Frame(self.notebook)
-        self.send_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.get_tab,text="Get")
+        self.send_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.send_tab,text="Send")
+        self.songDB_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.songDB_tab,text="Songs database")
 
         """ GET tab """
         self._define_frame_get(self.get_tab)
