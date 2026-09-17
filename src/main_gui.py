@@ -165,7 +165,7 @@ class VirtualDJMonitor(tk.Tk):
     async def _client_main_get(self):
         async with VirtualDJClient() as client:
             self.client = client
-            tasks = [asyncio.create_task(self._poll_data(client, name, config["getter"])) for name, config in self.frames_get.items()]
+            tasks = [asyncio.create_task(self._poll_data(client, name, config)) for name, config in self.frames_get.items()]
                    
             try:
                 await asyncio.gather(*tasks)
@@ -176,7 +176,9 @@ class VirtualDJMonitor(tk.Tk):
                    
             self.client = None
     #------------------------------------------------------------------------------------
-    async def _poll_data(self, client, name, getter):
+    async def _poll_data(self, client, name, config):
+        getter = config["getter"]
+
         while not self._stopping.is_set():
             start_time = asyncio.get_running_loop().time()
 
