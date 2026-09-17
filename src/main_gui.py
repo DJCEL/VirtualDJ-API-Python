@@ -71,21 +71,28 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     def _define_frame_get(self, parent):
         frames_get_definition = [
-            ("leftdecksong", "leftdecksong_frame", "Left Deck - Song"),
-            ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine"),
-            ("rightdecksong", "rightdecksong_frame", "Right Deck - Song"),
-            ("rightdeckengine", "rightdeckengine_frame", "Rigth Deck - Engine"),
-            ("mixer", "mixer_frame", "Mixer"),
-            ("browserfolder", "browserfolder_frame", "Browser - Folder"),
-            ("browserfile", "browserfile_frame", "Browser - File"),
+            ("leftdecksong", "leftdecksong_frame", "Left Deck - Song",
+     lambda client: client.get_DeckSong_async("left")),
+            ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine",
+     lambda client: client.get_DeckEngine_async("left")),
+            ("rightdecksong", "rightdecksong_frame", "Right Deck - Song",
+     lambda client: client.get_DeckSong_async("right")),
+            ("rightdeckengine", "rightdeckengine_frame", "Rigth Deck - Engine",
+     lambda client: client.get_DeckEngine_async("right")),
+            ("mixer", "mixer_frame", "Mixer",
+     lambda client: client.get_Mixer_async()),
+            ("browserfolder", "browserfolder_frame", "Browser - Folder",
+     lambda client: client.get_BrowserFolder_async()),
+            ("browserfile", "browserfile_frame", "Browser - File",
+     lambda client: client.get_BrowserFile_async()),
         ]
 
         self.frames_get = {}
 
-        for row, (name,frame_id,frame_title) in enumerate(frames_get_definition):
+        for row, (name, frame_id, frame_title, getter) in enumerate(frames_get_definition):
             frame = self._make_frame(parent, frame_title)
             setattr(self, frame_id, frame)
-            self.frames_get[name] = frame
+            self.frames_get[name] = {"frame": frame, "getter": getter}
             parent.grid_rowconfigure(row, weight=1,minsize=0)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
 
@@ -204,9 +211,9 @@ class VirtualDJMonitor(tk.Tk):
                 result = self._result_queue.get_nowait()
                 name = result["name"]
                 value = result["value"]
-                frame = self.frames_get.get(name)
-                if frame is not None:
-                    self._update_frame_text(frame, value)
+                config = self.frames_get.get(name)
+                if config is not None:
+                    self._update_frame_text(config["frame"], value)
                  
         except queue.Empty:
             pass
