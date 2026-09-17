@@ -70,7 +70,7 @@ class VirtualDJMonitor(tk.Tk):
         
     #------------------------------------------------------------------------------------
     def _define_frame_get(self, parent):
-        frames_get = [
+        self.frames_get = [
             ("leftdecksong", "leftdecksong_frame", "Left Deck - Song"),
             ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine"),
             ("rightdecksong", "rightdecksong_frame", "Right Deck - Song"),
@@ -80,7 +80,7 @@ class VirtualDJMonitor(tk.Tk):
             ("browserfile", "browserfile_frame", "Browser - File"),
         ]
 
-        for row, (id,frame_id,frame_title) in enumerate(frames_get):
+        for row, (id,frame_id,frame_title) in enumerate(self.frames_get):
             frame = self._make_frame(parent, frame_title)
             setattr(self, frame_id, frame)
             parent.grid_rowconfigure(row, weight=1,minsize=0)
