@@ -13,12 +13,13 @@ from virtualdj_client import (
     VdjMixer, 
     VdjBrowserFolder, 
     VdjBrowserFile,
+    VirtualDJSongsDatabase,
 )
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
-        self.client = VirtualDJClient()
-        self._init_client(self.client)
+        self.client: VirtualDJClient | None = None
+        self._init_client()
         super().__init__()
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
@@ -39,7 +40,10 @@ class VirtualDJMonitor(tk.Tk):
         self._stopping.set()
         self.destroy()
     #------------------------------------------------------------------------------------
-    def _init_client(self, client):
+    def _init_client(self):
+        client = VirtualDJClient()
+        self.client = client
+
         # Check if VirtualDJ is running
         client_running = client.is_app_running()
         print(f"VirtualDJ running => {client_running}")
@@ -88,13 +92,15 @@ class VirtualDJMonitor(tk.Tk):
         self.notebook.add(self.songDB_tab,text="Songs database")
 
         """ GET tab """
-        self._define_frame_get(self.get_tab)
+        self._define_tab_get(self.get_tab)
 
         """ SEND tab """
-        self._define_frame_send(self.send_tab)
-        
+        self._define_tab_send(self.send_tab)
+
+        """ SONGSDB tab """
+        self._define_tab_songsdb(self.songDB_tab)
     #------------------------------------------------------------------------------------
-    def _define_frame_get(self, parent):
+    def _define_tab_get(self, parent):
         frames_get_definition = [
             ("leftdecksong", "leftdecksong_frame", "Left Deck - Song",
      lambda client: client.get_DeckSong_async("left")),
@@ -122,9 +128,8 @@ class VirtualDJMonitor(tk.Tk):
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
 
         parent.grid_columnconfigure(0,weight=1)
-
     #------------------------------------------------------------------------------------
-    def _define_frame_send(self, parent):
+    def _define_tab_send(self, parent):
         self.vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
         self.vdjscript_frame.pack(fill="x",padx=10,pady=5)
         self.vdjscript_entry = ttk.Entry(self.vdjscript_frame)
@@ -132,6 +137,11 @@ class VirtualDJMonitor(tk.Tk):
         self.send_button = ttk.Button(self.vdjscript_frame, text="Send", command=self._send_vdjscript)
         self.send_button.pack(side="right",padx=5,pady=5)
         self.vdjscript_entry.bind("<Return>",lambda event:self._send_vdjscript())
+    #------------------------------------------------------------------------------------
+    def _define_tab_songsdb(self, parent):
+        songsDB = VirtualDJSongsDatabase()
+        database_list = songsDB.get_local_database_list()
+
     #------------------------------------------------------------------------------------
     def _send_vdjscript(self):
         vdjscript = self.vdjscript_entry.get().strip()
