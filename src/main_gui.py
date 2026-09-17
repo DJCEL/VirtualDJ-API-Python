@@ -17,13 +17,14 @@ from virtualdj_client import (
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
+        self.client = VirtualDJClient()
+        self._init_client(self.client)
         super().__init__()
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
         self._define_menu()
         self._define_tab()
         self.interval_refresh = 100  # ms
-        self.client = VirtualDJClient()
         self.loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
@@ -31,7 +32,6 @@ class VirtualDJMonitor(tk.Tk):
         self.async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self.async_thread.start()
         self.after(self.interval_refresh, self.refresh_ui)
-        self._init_client(self.client)
     #------------------------------------------------------------------------------------
     def on_close(self):
         if self._stopping.is_set():
