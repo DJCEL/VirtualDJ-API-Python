@@ -165,15 +165,7 @@ class VirtualDJMonitor(tk.Tk):
     async def _client_main_get(self):
         async with VirtualDJClient() as client:
             self.client = client
-            tasks = [
-                asyncio.create_task(self._poll_data(client,"leftdecksong" , lambda: client.get_DeckSong_async("left") )),
-                asyncio.create_task(self._poll_data(client,"leftdeckengine" , lambda: client.get_DeckEngine_async("left") )),
-                asyncio.create_task(self._poll_data(client,"rightdecksong", lambda: client.get_DeckSong_async("right"))),
-                asyncio.create_task(self._poll_data(client,"rightdeckengine", lambda: client.get_DeckEngine_async("right"))),
-                asyncio.create_task(self._poll_data(client,"mixer", lambda: client.get_Mixer_async())),
-                asyncio.create_task(self._poll_data(client,"browserfolder", lambda: client.get_BrowserFolder_async())),
-                asyncio.create_task(self._poll_data(client,"browserfile", lambda: client.get_BrowserFile_async())),
-            ]
+            tasks = [asyncio.create_task(self._poll_data(client, name, config["getter"])) for name, config in self.frames_get.items()]
                    
             try:
                 await asyncio.gather(*tasks)
