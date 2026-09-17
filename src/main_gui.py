@@ -4,6 +4,7 @@ import asyncio
 import threading
 import dataclasses
 import queue
+import sys
 
 from virtualdj_client import (
     VirtualDJClient, 
@@ -22,8 +23,7 @@ class VirtualDJMonitor(tk.Tk):
         self._define_menu()
         self._define_tab()
         self.interval_refresh = 100  # ms
-
-        self.client: VirtualDJClient | None = None
+        self.client = VirtualDJClient()
         self.loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
@@ -31,12 +31,35 @@ class VirtualDJMonitor(tk.Tk):
         self.async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self.async_thread.start()
         self.after(self.interval_refresh, self.refresh_ui)
+        self._init_client(self.client)
     #------------------------------------------------------------------------------------
     def on_close(self):
         if self._stopping.is_set():
             return
         self._stopping.set()
         self.destroy()
+    #------------------------------------------------------------------------------------
+    def _init_client(self, client):
+        # Check if VirtualDJ is running
+        client_running = client.is_app_running()
+        print(f"VirtualDJ running => {client_running}")
+
+        # Launch VirtualDJ if not running
+        if client_running == False:
+            print("Launching VirtualDJ...")
+            client_launched = client.open_app()
+            print(f"VirtualDJ launched => {client_launched}")
+            client_running = client.is_app_running()
+            print(f"VirtualDJ running => {client_running}")
+            if (client_running == False):
+                sys.exit()
+
+        # Check the NetWork Control plugin
+        client_connected = client.is_connected()
+        print(f"VirtualDJ NetWork Control plugin connected => {client_connected}")
+        if (client_connected == False):
+            print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
+            sys.exit()
     #------------------------------------------------------------------------------------
     def _define_menu(self):
         menubar = tk.Menu(self)
@@ -100,7 +123,6 @@ class VirtualDJMonitor(tk.Tk):
 
     #------------------------------------------------------------------------------------
     def _define_frame_send(self, parent):
-      
         self.vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
         self.vdjscript_frame.pack(fill="x",padx=10,pady=5)
         self.vdjscript_entry = ttk.Entry(self.vdjscript_frame)
@@ -177,7 +199,6 @@ class VirtualDJMonitor(tk.Tk):
             self.client = None
     #------------------------------------------------------------------------------------
     async def _poll_data(self, client, name, getter):
-
         while not self._stopping.is_set():
             start_time = asyncio.get_running_loop().time()
 
