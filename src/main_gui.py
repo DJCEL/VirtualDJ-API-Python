@@ -204,21 +204,10 @@ class VirtualDJMonitor(tk.Tk):
                 result = self._result_queue.get_nowait()
                 name = result["name"]
                 value = result["value"]
+                frame = self.frames_get.get(name)
+                if frame is not None:
+                    self._update_frame_text(frame, value)
                  
-                if name == "leftdecksong":
-                    self._update_frame_text(self.leftdecksong_frame, value)
-                elif name == "leftdeckengine":
-                    self._update_frame_text(self.leftdeckengine_frame, value)
-                elif name == "rightdecksong":
-                    self._update_frame_text(self.rightdecksong_frame, value)
-                elif name == "rightdeckengine":
-                    self._update_frame_text(self.rightdeckengine_frame, value)
-                elif name == "mixer":
-                    self._update_frame_text(self.mixer_frame, value)
-                elif name == "browserfolder":
-                    self._update_frame_text(self.browserfolder_frame, value)
-                elif name == "browserfile":
-                    self._update_frame_text(self.browserfile_frame, value)
         except queue.Empty:
             pass
 
