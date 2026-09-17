@@ -80,9 +80,9 @@ class VirtualDJMonitor(tk.Tk):
             ("browserfile_frame", "Browser - File"),
         ]
 
-        for row, (attribute,title) in enumerate(frames_get):
-            frame = self._make_frame(parent, title)
-            setattr(self, attribute, frame)
+        for row, (frame_id,frame_title) in enumerate(frames_get):
+            frame = self._make_frame(parent, frame_title)
+            setattr(self, frame_id, frame)
             parent.grid_rowconfigure(row, weight=1,minsize=0)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
 
