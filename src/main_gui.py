@@ -181,7 +181,7 @@ class VirtualDJMonitor(tk.Tk):
             start_time = asyncio.get_running_loop().time()
 
             try:
-                value = await getter()
+                value = await getter(client)
             except Exception as e:
                 value = e
             
