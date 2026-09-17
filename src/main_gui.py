@@ -181,12 +181,11 @@ class VirtualDJMonitor(tk.Tk):
             start_time = asyncio.get_running_loop().time()
 
             try:
-                result = await getter()
-                result_dict = {"name": name, "value": result}
+                value = await getter()
             except Exception as e:
-                result_dict = {"name": name, "value": e}
+                value = e
             
-            self._result_queue.put(result_dict)
+           result_dict = {"name": name, "value": value} self._result_queue.put(result_dict)
 
             elapsed = asyncio.get_running_loop().time() - start_time
             delay = max(0.0, (self.interval_refresh / 1000) - elapsed)
