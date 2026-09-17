@@ -147,12 +147,12 @@ class VirtualDJMonitor(tk.Tk):
         self.loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self.loop)
         try:
-            self.loop.run_until_complete(self._client_main())
+            self.loop.run_until_complete(self._client_main_get())
         finally:
             self.loop.close()
             self.loop = None
     #------------------------------------------------------------------------------------
-    async def _client_main(self):
+    async def _client_main_get(self):
         async with VirtualDJClient() as client:
             self.client = client
             tasks = [
