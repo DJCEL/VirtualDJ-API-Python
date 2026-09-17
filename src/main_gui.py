@@ -119,7 +119,7 @@ class VirtualDJMonitor(tk.Tk):
     def _vdjscript_done(self, future):
         try:
             result = future.result()
-        except Excepton as e:
+        except Exception as e:
             pass
     #------------------------------------------------------------------------------------
     def _make_frame(self, parent, title: str):
