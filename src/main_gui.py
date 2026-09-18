@@ -6,6 +6,7 @@ import dataclasses
 import queue
 import sys
 import os
+from pathlib import Path
 
 __version__ = "1.0.8"
 
@@ -184,9 +185,25 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
         database_list = self.songsDB.get_local_database_list()
+        database_list_full = []
+        for db_path in database_list:
+            database_name = os.path.basename(db_path)
+            if (database_name == self.songsDB.XML_DATABASE_NAME):
+                db_path_ext = str(db_path)
+                database_list_full.append(db_path_ext)
+            elif (database_name == self.songsDB.SQLITE_CACHE_DB):
+                db_path_ext = str(db_path) + ' [' + self.songsDB.SQLITE_CACHE_DB_WAVEFORMS + ']'
+                database_list_full.append(db_path_ext)
+            elif (database_name == self.songsDB.SQLITE_EXTRA_DB):
+                db_path_ext1 = str(db_path) + ' [' + self.songsDB.SQLITE_EXTRA_DB_LYRICS + ']'
+                database_list_full.append(db_path_ext1)
+                db_path_ext2 = str(db_path) + ' [' + self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS + ']'
+                database_list_full.append(db_path_ext2)
+                db_path_ext3 = str(db_path) + ' [' + self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA + ']'
+                database_list_full.append(db_path_ext3)
 
-        database_list_comboDB = ["--- Select a database ---"]
-        database_list_comboDB.extend(database_list)
+        database_list_comboDB = ["--- Select a data source ---"]
+        database_list_comboDB.extend(database_list_full)
         
         self.choixDB = tk.StringVar()
         comboDB = ttk.Combobox(parent, textvariable=self.choixDB, values=database_list_comboDB, width=100)
@@ -207,7 +224,19 @@ class VirtualDJMonitor(tk.Tk):
         self.frameDB.text_widget = text
     #------------------------------------------------------------------------------------
     def on_selectDB(self, event):
-        db_path = self.choixDB.get()
+
+        self._update_frame_text(self.frameDBcount,"")
+        self._update_frame_text(self.frameDB,"")
+
+        db_path_ext = self.choixDB.get()
+        if db_path_ext.endswith("]"):
+            part1, part2 = db_path_ext.split(" [", 1)
+            db_path = Path(part1)
+            table_name = part2.rstrip("]")
+        else:
+            db_path = Path(db_path_ext)
+            table_name = ""
+
         database_name = os.path.basename(db_path)
 
         if (database_name == self.songsDB.XML_DATABASE_NAME):
@@ -218,8 +247,7 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = songs_database[0]
                 self._update_frame_text(self.frameDB,item_1)
-        elif (database_name == self.songsDB.SQLITE_CACHE_DB):
-            table_name = self.songsDB.SQLITE_CACHE_DB_WAVEFORMS
+        elif (database_name == self.songsDB.SQLITE_CACHE_DB and table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS):   
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
@@ -227,8 +255,7 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
-        elif (database_name == self.songsDB.SQLITE_EXTRA_DB):
-            table_name = self.songsDB.SQLITE_EXTRA_DB_LYRICS
+        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
@@ -236,7 +263,7 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
-            table_name = self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS
+        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
@@ -244,7 +271,7 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
-            table_name = self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA
+        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
@@ -365,6 +392,8 @@ class VirtualDJMonitor(tk.Tk):
             if dataclasses.is_dataclass(vdjdata):
                 data = dataclasses.asdict(vdjdata)
             elif isinstance(vdjdata, dict):
+                data = vdjdata
+            elif isinstance(vdjdata, str):
                 data = vdjdata
             else:
                 data = vars(vdjdata)
