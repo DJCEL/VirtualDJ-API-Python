@@ -18,20 +18,20 @@ from virtualdj_client import (
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
+        super().__init__()
         self.client: VirtualDJClient | None = None
         self._init_client()
-        super().__init__()
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
         self._define_menu()
         self._define_tab()
         self.interval_refresh = 100  # ms
-        self.loop: asyncio.AbstractEventLoop | None = None
+        self._loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
         self.protocol("WM_DELETE_WINDOW", self.on_close)
-        self.async_thread = threading.Thread(target=self._run_async_client, daemon=True)
-        self.async_thread.start()
+        self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
+        self._async_thread.start()
         self.after(self.interval_refresh, self.refresh_ui)
     #------------------------------------------------------------------------------------
     def on_close(self):
@@ -129,12 +129,17 @@ class VirtualDJMonitor(tk.Tk):
         self.vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
         self.send_button = ttk.Button(self.vdjscript_frame, text="Send", command=self._send_vdjscript)
         self.send_button.pack(side="right",padx=5,pady=5)
-        self.vdjscript_entry.bind("<Return>",lambda event:self._send_vdjscript())
+
+        self.examples_frame = ttk.LabelFrame(parent, text="Examples")
+        self.examples_frame.pack(fill="both",padx=10,pady=5)
+        self.browser_scroll_up_button = ttk.Button(self.examples_frame, text="browser_scroll -1", command=lambda: self._send_command("browser_scroll -1"))
+        self.browser_scroll_up_button.pack(side="left", fill="both", padx=5,pady=5)
+        self.browser_scroll_down_button = ttk.Button(self.examples_frame, text="browser_scroll +1", command=lambda: self._send_command("browser_scroll +1"))
+        self.browser_scroll_down_button.pack(side="left", fill="both", padx=5,pady=5)
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
         songsDB = VirtualDJSongsDatabase()
         database_list = songsDB.get_local_database_list()
-
     #------------------------------------------------------------------------------------
     def _send_vdjscript(self):
         vdjscript = self.vdjscript_entry.get().strip()
@@ -142,10 +147,24 @@ class VirtualDJMonitor(tk.Tk):
             return
         if self.client is None:
             return
-        if self.loop is None:
+        if self._loop is None:
             return
         try:
-            future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self.loop)
+            future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self._loop)
+            future.add_done_callback(self._vdjscript_done)
+        except Exception as e:
+            pass
+    #------------------------------------------------------------------------------------
+    def _send_command(self, vdjscript: str):
+        #vdjscript = "browser_scroll +1"
+        if not vdjscript:
+            return
+        if self.client is None:
+            return
+        if self._loop is None:
+            return
+        try:
+            future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self._loop)
             future.add_done_callback(self._vdjscript_done)
         except Exception as e:
             pass
@@ -181,13 +200,13 @@ class VirtualDJMonitor(tk.Tk):
         widget.configure(state="disabled")
     #------------------------------------------------------------------------------------
     def _run_async_client(self):
-        self.loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(self.loop)
+        self._loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(self._loop)
         try:
-            self.loop.run_until_complete(self._client_main_get())
+            self._loop.run_until_complete(self._client_main_get())
         finally:
-            self.loop.close()
-            self.loop = None
+            self._loop.close()
+            self._loop = None
     #------------------------------------------------------------------------------------
     async def _client_main_get(self):
         async with VirtualDJClient() as client:
