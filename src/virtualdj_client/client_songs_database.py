@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.19'
+__version__ = '1.0.20'
 
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
@@ -132,6 +132,7 @@ class VdjSong:
 class VirtualDJSongsDatabase():
     def __init__(self):
         self.vdj_utils = VirtualDJUtils()
+        self.songs_list_count: int | None = None
         self.XML_DATABASE_NAME = VDJ_XML_DATABASE_NAME
         self.SQLITE_CACHE_DB = VDJ_SQLITE_CACHE_DB
         self.SQLITE_CACHE_DB_WAVEFORMS = VDJ_SQLITE_CACHE_DB_WAVEFORMS
@@ -177,11 +178,9 @@ class VirtualDJSongsDatabase():
         try:
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
-            print(f"VirtualDJ database reading {database_path} => Invalid XML file")
             self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Invalid XML file")
             return []
         except OSError as exc:
-            print(f"VirtualDJ database reading {database_path} => Cannot read database")
             self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Cannot read database")
             return []
 
@@ -189,23 +188,22 @@ class VirtualDJSongsDatabase():
         root_tag = root.tag
         root_attrib = root.attrib
         if root_tag != "VirtualDJ_Database":
-            print(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
             self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
             return []
 
         songs_list = root.findall(".//Song")        
-        songs_list_count = len(songs_list)
+        self.songs_list_count = len(songs_list)
 
-        print(f"VirtualDJ database reading => {root_attrib}")
         self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => {root_attrib}")
-
-        print(f"VirtualDJ database reading => Number of songs found = {songs_list_count}")
-        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
+        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {self.songs_list_count}")
 
 
         VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
 
         return VdjSong_list
+    #------------------------------------------------------------------------------------
+    def get_songs_count_xml_database(self) -> Optional[int]:
+            return self.songs_list_count
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_float(value: Optional[str]) -> Optional[float]:

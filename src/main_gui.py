@@ -5,6 +5,7 @@ import threading
 import dataclasses
 import queue
 import sys
+import os
 
 __version__ = "1.0.8"
 
@@ -44,25 +45,25 @@ class VirtualDJMonitor(tk.Tk):
         self.destroy()
     #------------------------------------------------------------------------------------
     def _init_client(self):
-        client = VirtualDJClient()
-        self.client = client
+        self.client = VirtualDJClient()
+        self.songsDB = VirtualDJSongsDatabase()
 
         # Check if VirtualDJ is running
-        client_running = client.is_app_running()
+        client_running = self.client.is_app_running()
         print(f"VirtualDJ running => {client_running}")
 
         # Launch VirtualDJ if not running
         if client_running == False:
             print("Launching VirtualDJ...")
-            client_launched = client.open_app()
+            client_launched = self.client.open_app()
             print(f"VirtualDJ launched => {client_launched}")
-            client_running = client.is_app_running()
+            client_running = self.client.is_app_running()
             print(f"VirtualDJ running => {client_running}")
             if (client_running == False):
                 sys.exit()
 
         # Check the NetWork Control plugin
-        client_connected = client.is_connected()
+        client_connected = self.client.is_connected()
         print(f"VirtualDJ NetWork Control plugin connected => {client_connected}")
         if (client_connected == False):
             print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
@@ -182,8 +183,72 @@ class VirtualDJMonitor(tk.Tk):
 
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
-        songsDB = VirtualDJSongsDatabase()
-        database_list = songsDB.get_local_database_list()
+        database_list = self.songsDB.get_local_database_list()
+
+        database_list_comboDB = ["--- Select a database ---"]
+        database_list_comboDB.extend(database_list)
+        
+        self.choixDB = tk.StringVar()
+        comboDB = ttk.Combobox(parent, textvariable=self.choixDB, values=database_list_comboDB, width=100)
+        comboDB.grid(row=0, column=0, sticky="nw", padx=10,pady=10)
+        comboDB.current(0)
+        comboDB.bind("<<ComboboxSelected>>", self.on_selectDB)
+
+        self.frameDBcount = ttk.LabelFrame(parent, text="Number of items")
+        self.frameDBcount.grid(row=1,column=0, sticky="nsew",padx=10,pady=5)
+        text = tk.Text(self.frameDBcount, height=1, state='disabled', font=("Consolas",10))
+        text.pack(fill="both", expand=True)
+        self.frameDBcount.text_widget = text
+
+        self.frameDB = ttk.LabelFrame(parent, text="Result[0]")
+        self.frameDB.grid(row=2,column=0, sticky="nsew",padx=10,pady=5)
+        text = tk.Text(self.frameDB, height=1, state='disabled', font=("Consolas",10))
+        text.pack(fill="both", expand=True)
+        self.frameDB.text_widget = text
+    #------------------------------------------------------------------------------------
+    def on_selectDB(self, event):
+        db_path = self.choixDB.get()
+        database_name = os.path.basename(db_path)
+
+        if (database_name == self.songsDB.XML_DATABASE_NAME):
+            songs_database = self.songsDB.read_local_xml_database(db_path, filepath_only=False)
+            n = len(songs_database)
+            total_items = {"total_items": n}
+            self._update_frame_text(self.frameDBcount, total_items)
+            if n >= 1:
+                item_1 = songs_database[0]
+                self._update_frame_text(self.frameDB,item_1)
+        elif (database_name == self.songsDB.SQLITE_CACHE_DB):
+            table_name = self.songsDB.SQLITE_CACHE_DB_WAVEFORMS
+            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            total_items = {"total_items": n}
+            if n >= 1:
+                item_1 = result_list[0]
+                self._update_frame_text(self.frameDB,item_1)
+        elif (database_name == self.songsDB.SQLITE_EXTRA_DB):
+            table_name = self.songsDB.SQLITE_EXTRA_DB_LYRICS
+            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            total_items = {"total_items": n}
+            if n >= 1:
+                item_1 = result_list[0]
+                self._update_frame_text(self.frameDB,item_1)
+            table_name = self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS
+            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            total_items = {"total_items": n}
+            if n >= 1:
+                item_1 = result_list[0]
+                self._update_frame_text(self.frameDB,item_1)
+            table_name = self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA
+            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
+            n = len(result_list)
+            total_items = {"total_items": n}
+            if n >= 1:
+                item_1 = result_list[0]
+                self._update_frame_text(self.frameDB,item_1)
+
     #------------------------------------------------------------------------------------
     def _send_vdjscript(self):
         vdjscript = self.vdjscript_entry.get().strip()
@@ -295,6 +360,8 @@ class VirtualDJMonitor(tk.Tk):
         else:
             if dataclasses.is_dataclass(vdjdata):
                 data = dataclasses.asdict(vdjdata)
+            elif isinstance(vdjdata, dict):
+                data = vdjdata
             else:
                 data = vars(vdjdata)
 
