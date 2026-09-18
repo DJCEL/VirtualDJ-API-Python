@@ -192,18 +192,15 @@ class VirtualDJSongsDatabase():
             return []
 
         songs_list = root.findall(".//Song")        
-        self.songs_list_count = len(songs_list)
+        songs_list_count = len(songs_list)
 
         self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => {root_attrib}")
-        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {self.songs_list_count}")
+        self.vdj_utils.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
 
 
         VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
 
         return VdjSong_list
-    #------------------------------------------------------------------------------------
-    def get_songs_count_xml_database(self) -> Optional[int]:
-            return self.songs_list_count
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_float(value: Optional[str]) -> Optional[float]:

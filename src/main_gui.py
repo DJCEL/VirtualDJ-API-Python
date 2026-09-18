@@ -200,7 +200,7 @@ class VirtualDJMonitor(tk.Tk):
         text.pack(fill="both", expand=True)
         self.frameDBcount.text_widget = text
 
-        self.frameDB = ttk.LabelFrame(parent, text="Result[0]")
+        self.frameDB = ttk.LabelFrame(parent, text="First item")
         self.frameDB.grid(row=2,column=0, sticky="nsew",padx=10,pady=5)
         text = tk.Text(self.frameDB, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)
@@ -223,6 +223,7 @@ class VirtualDJMonitor(tk.Tk):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
+            self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
@@ -231,6 +232,7 @@ class VirtualDJMonitor(tk.Tk):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
+            self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
@@ -238,6 +240,7 @@ class VirtualDJMonitor(tk.Tk):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
+            self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
@@ -245,6 +248,7 @@ class VirtualDJMonitor(tk.Tk):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
             total_items = {"total_items": n}
+            self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
