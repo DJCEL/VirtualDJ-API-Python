@@ -6,6 +6,8 @@ import dataclasses
 import queue
 import sys
 
+__version__ = "1.0.8"
+
 from virtualdj_client import (
     VirtualDJClient, 
     VdjDeckSong,
@@ -15,6 +17,7 @@ from virtualdj_client import (
     VdjBrowserFile,
     VirtualDJSongsDatabase,
 )
+from virtualdj_client import __version__ as __vdjclient_version__
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
@@ -77,7 +80,8 @@ class VirtualDJMonitor(tk.Tk):
      #------------------------------------------------------------------------------------
     def _show_about(self):
         messagebox.showinfo("About VirtualDJ Client",
-                            "version: 1.1.8\n\n"
+                            f"GUI version: {__version__}\n"
+                            f"VirtualDJClient version: {__vdjclient_version__}\n\n"
                             "developped by DJCEL")
     #------------------------------------------------------------------------------------
     def _define_tab(self):
