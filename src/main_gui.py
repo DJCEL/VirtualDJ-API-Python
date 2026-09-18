@@ -102,26 +102,25 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     def _define_tab_get(self, parent):
         frames_get_definition = [
-            ("leftdecksong", "leftdecksong_frame", "Left Deck - Song", lambda client: client.get_DeckSong_async("left")),
-            ("leftdeckengine", "leftdeckengine_frame", "Left Deck - Engine", lambda client: client.get_DeckEngine_async("left")),
-            ("rightdecksong", "rightdecksong_frame", "Right Deck - Song", lambda client: client.get_DeckSong_async("right")),
-            ("rightdeckengine", "rightdeckengine_frame", "Rigth Deck - Engine", lambda client: client.get_DeckEngine_async("right")),
-            ("mixer", "mixer_frame", "Mixer", lambda client: client.get_Mixer_async()),
-            ("browserfolder", "browserfolder_frame", "Browser - Folder", lambda client: client.get_BrowserFolder_async()),
-            ("browserfile", "browserfile_frame", "Browser - File", lambda client: client.get_BrowserFile_async()),
+            ("leftdecksong_frame", "Left Deck - Song", lambda client: client.get_DeckSong_async("left")),
+            ("leftdeckengine_frame", "Left Deck - Engine", lambda client: client.get_DeckEngine_async("left")),
+            ("rightdecksong_frame", "Right Deck - Song", lambda client: client.get_DeckSong_async("right")),
+            ("rightdeckengine_frame", "Rigth Deck - Engine", lambda client: client.get_DeckEngine_async("right")),
+            ("mixer_frame", "Mixer", lambda client: client.get_Mixer_async()),
+            ("browserfolder_frame", "Browser - Folder", lambda client: client.get_BrowserFolder_async()),
+            ("browserfile_frame", "Browser - File", lambda client: client.get_BrowserFile_async()),
         ]
 
         self.frames_get = {}
 
-        for row, (name, frame_id, frame_title, getter) in enumerate(frames_get_definition):
-            frame = ttk.LabelFrame(parent,text=frame_title)
+        for row, (name, frame_title, getter) in enumerate(frames_get_definition):
+            frame = ttk.LabelFrame(parent, text=frame_title)
             text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
             text.pack(fill="both", expand=True)
             frame.text_widget = text
-            setattr(self, frame_id, frame)
-            self.frames_get[name] = {"frame": frame, "getter": getter}
             parent.grid_rowconfigure(row, weight=1,minsize=0)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
+            self.frames_get[name] = {"frame": frame, "getter": getter}
 
         parent.grid_columnconfigure(0,weight=1)
     #------------------------------------------------------------------------------------
@@ -202,23 +201,7 @@ class VirtualDJMonitor(tk.Tk):
             result = future.result()
         except Exception as e:
             pass
-    #------------------------------------------------------------------------------------
-    def _update_frame_text(self, frame, vdjdata):
-        widget = frame.text_widget
-        widget.configure(state="normal")
-        widget.delete("1.0", "end")
-        
-        if vdjdata is None:
-            widget.insert("end", "No data yet...")
-        else:
-            if dataclasses.is_dataclass(vdjdata):
-                data = dataclasses.asdict(vdjdata)
-            else:
-                data = vars(vdjdata)
-
-            widget.insert("end", data)
-
-        widget.configure(state="disabled")
+   
     #------------------------------------------------------------------------------------
     def _run_async_client(self):
         self._loop = asyncio.new_event_loop()
@@ -279,6 +262,23 @@ class VirtualDJMonitor(tk.Tk):
 
         if not self._stopping.is_set():
             self.after(self.interval_refresh, self.refresh_ui)
+    #------------------------------------------------------------------------------------
+    def _update_frame_text(self, frame, vdjdata):
+        widget = frame.text_widget
+        widget.configure(state="normal")
+        widget.delete("1.0", "end")
+        
+        if vdjdata is None:
+            widget.insert("end", "No data yet...")
+        else:
+            if dataclasses.is_dataclass(vdjdata):
+                data = dataclasses.asdict(vdjdata)
+            else:
+                data = vars(vdjdata)
+
+            widget.insert("end", data)
+
+        widget.configure(state="disabled")
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     app = VirtualDJMonitor()
