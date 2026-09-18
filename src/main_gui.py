@@ -114,7 +114,10 @@ class VirtualDJMonitor(tk.Tk):
         self.frames_get = {}
 
         for row, (name, frame_id, frame_title, getter) in enumerate(frames_get_definition):
-            frame = self._make_frame(parent, frame_title)
+            frame = ttk.LabelFrame(parent,text=frame_title)
+            text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
+            text.pack(fill="both", expand=True)
+            frame.text_widget = text
             setattr(self, frame_id, frame)
             self.frames_get[name] = {"frame": frame, "getter": getter}
             parent.grid_rowconfigure(row, weight=1,minsize=0)
@@ -123,41 +126,44 @@ class VirtualDJMonitor(tk.Tk):
         parent.grid_columnconfigure(0,weight=1)
     #------------------------------------------------------------------------------------
     def _define_tab_send(self, parent):
-        self.vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
-        self.vdjscript_frame.pack(fill="x",padx=10,pady=5)
-        self.vdjscript_entry = ttk.Entry(self.vdjscript_frame)
-        self.vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
-        self.send_button = ttk.Button(self.vdjscript_frame, text="Send", command=self._send_vdjscript)
-        self.send_button.pack(side="right",padx=5,pady=5)
+        vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
+        vdjscript_frame.pack(fill="x",padx=10,pady=5)
+        vdjscript_entry = ttk.Entry(vdjscript_frame)
+        vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
+        send_button = ttk.Button(vdjscript_frame, text="Send", command=self._send_vdjscript)
+        send_button.pack(side="right",padx=5,pady=5)
 
-        self.browser_frame = ttk.LabelFrame(parent, text="Browser")
-        self.browser_frame.pack(fill="both",padx=10,pady=5)
-        self.browser_folders_button = ttk.Button(self.browser_frame, text="FOLDERS", command=lambda: self._send_command("browser_window 'folders'"))
-        self.browser_folders_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_songs_button = ttk.Button(self.browser_frame, text="SONGS", command=lambda: self._send_command("browser_window 'songs'"))
-        self.browser_songs_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_sideview_button = ttk.Button(self.browser_frame, text="SIDEVIEW", command=lambda: self._send_command("browser_window 'sideview'"))
-        self.browser_sideview_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_sidelist_button = ttk.Button(self.browser_frame, text="SIDELIST", command=lambda: self._send_command("browser_window 'sidelist'"))
-        self.browser_sidelist_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_remixes_button = ttk.Button(self.browser_frame, text="REMIXES", command=lambda: self._send_command("browser_window 'remixes'"))
-        self.browser_remixes_button.pack(side="left", fill="both", padx=5, pady=5)
-        self.browser_sampler_button = ttk.Button(self.browser_frame, text="SAMPLER", command=lambda: self._send_command("browser_window 'sampler'"))
-        self.browser_sampler_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_automix_button = ttk.Button(self.browser_frame, text="AUTOMIX", command=lambda: self._send_command("browser_window 'automix'"))
-        self.browser_automix_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_karaoke_button = ttk.Button(self.browser_frame, text="KARAOKE", command=lambda: self._send_command("browser_window 'karaoke'"))
-        self.browser_karaoke_button.pack(side="left", fill="both", padx=5,pady=5)
-        
+        browser_frame = ttk.LabelFrame(parent, text="Browser")
+        browser_frame.pack(fill="both", padx=10, pady=5)
+        browser_folders_button = ttk.Button(browser_frame, text="FOLDERS", command=lambda: self._send_command("browser_window 'folders'"))
+        browser_folders_button.grid(row=0, column=0, padx=5,pady=5)
+        browser_songs_button = ttk.Button(browser_frame, text="SONGS", command=lambda: self._send_command("browser_window 'songs'"))
+        browser_songs_button.grid(row=0, column=1, padx=5,pady=5)
+        browser_sidelist_button = ttk.Button(browser_frame, text="SIDELIST", command=lambda: self._send_command("browser_window 'sidelist'"))
+        browser_sidelist_button.grid(row=0, column=3, padx=5,pady=5)
+        browser_remixes_button = ttk.Button(browser_frame, text="REMIXES", command=lambda: self._send_command("browser_window 'remixes'"))
+        browser_remixes_button.grid(row=0, column=4, padx=5, pady=5)
+        browser_sampler_button = ttk.Button(browser_frame, text="SAMPLER", command=lambda: self._send_command("browser_window 'sampler'"))
+        browser_sampler_button.grid(row=0, column=5, padx=5,pady=5)
+        browser_automix_button = ttk.Button(browser_frame, text="AUTOMIX", command=lambda: self._send_command("browser_window 'automix'"))
+        browser_automix_button.grid(row=0, column=6, padx=5,pady=5)
+        browser_karaoke_button = ttk.Button(browser_frame, text="KARAOKE", command=lambda: self._send_command("browser_window 'karaoke'"))
+        browser_karaoke_button.grid(row=0, column=7, padx=5,pady=5)
+        browser_up_button = ttk.Button(browser_frame, text="UP", command=lambda: self._send_command("browser_scroll -1"))
+        browser_up_button.grid(row=1, column=0, padx=5,pady=5)
+        browser_down_button = ttk.Button(browser_frame, text="DOWN", command=lambda: self._send_command("browser_scroll +1"))
+        browser_down_button.grid(row=1, column=1, padx=5,pady=5)
+        browser_open_button = ttk.Button(browser_frame, text="OPEN/CLOSE FOLDER", command=lambda: self._send_command("browser_open_folder"))
+        browser_open_button.grid(row=1, column=2, padx=5,pady=5)
+        browser_load_button = ttk.Button(browser_frame, text="LOAD", command=lambda: self._send_command("load"))
+        browser_load_button.grid(row=1, column=3, padx=5,pady=5)
 
-        self.browser_open_button = ttk.Button(self.browser_frame, text="OPEN/CLOSE FOLDER", command=lambda: self._send_command("browser_open_folder"))
-        self.browser_open_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_up_button = ttk.Button(self.browser_frame, text="UP", command=lambda: self._send_command("browser_scroll -1"))
-        self.browser_up_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_down_button = ttk.Button(self.browser_frame, text="DOWN", command=lambda: self._send_command("browser_scroll +1"))
-        self.browser_down_button.pack(side="left", fill="both", padx=5,pady=5)
-        self.browser_load_button = ttk.Button(self.browser_frame, text="LOAD", command=lambda: self._send_command("load"))
-        self.browser_load_button.pack(side="left", fill="both", padx=5,pady=5)
+        leftdeck_frame = ttk.LabelFrame(parent, text="Left Deck")
+        leftdeck_frame.pack(fill="both", padx=10, pady=5)
+
+        rightdeck_frame = ttk.LabelFrame(parent, text="Right Deck")
+        rightdeck_frame.pack(fill="both", padx=10, pady=5)
+
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
         songsDB = VirtualDJSongsDatabase()
@@ -196,13 +202,6 @@ class VirtualDJMonitor(tk.Tk):
             result = future.result()
         except Exception as e:
             pass
-    #------------------------------------------------------------------------------------
-    def _make_frame(self, parent, title: str):
-        frame = ttk.LabelFrame(parent,text=title)
-        text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
-        text.pack(fill="both", expand=True)
-        frame.text_widget = text
-        return frame
     #------------------------------------------------------------------------------------
     def _update_frame_text(self, frame, vdjdata):
         widget = frame.text_widget
