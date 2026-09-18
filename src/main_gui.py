@@ -84,18 +84,18 @@ class VirtualDJMonitor(tk.Tk):
         """ we define 2 tabs """
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both",expand=True)
-        self.get_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.get_tab,text="Get")
         self.send_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.send_tab,text="Send")
+        self.get_tab = ttk.Frame(self.notebook)
+        self.notebook.add(self.get_tab,text="Get")
         self.songDB_tab = ttk.Frame(self.notebook)
         self.notebook.add(self.songDB_tab,text="Songs database")
 
-        """ GET tab """
-        self._define_tab_get(self.get_tab)
-
         """ SEND tab """
         self._define_tab_send(self.send_tab)
+
+        """ GET tab """
+        self._define_tab_get(self.get_tab)
 
         """ SONGSDB tab """
         self._define_tab_songsdb(self.songDB_tab)
@@ -111,18 +111,16 @@ class VirtualDJMonitor(tk.Tk):
             ("browserfile_frame", "Browser - File", lambda client: client.get_BrowserFile_async()),
         ]
 
-        self.frames_get = {}
-
-        for row, (name, frame_title, getter) in enumerate(frames_get_definition):
+        self.get_frames = {}
+        for row, (frame_name, frame_title, frame_function) in enumerate(frames_get_definition):
             frame = ttk.LabelFrame(parent, text=frame_title)
             text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
             text.pack(fill="both", expand=True)
             frame.text_widget = text
             parent.grid_rowconfigure(row, weight=1,minsize=0)
+            parent.grid_columnconfigure(0,weight=1)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
-            self.frames_get[name] = {"frame": frame, "getter": getter}
-
-        parent.grid_columnconfigure(0,weight=1)
+            self.get_frames[frame_name] = {"frame": frame, "function": frame_function}
     #------------------------------------------------------------------------------------
     def _define_tab_send(self, parent):
         vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
@@ -159,9 +157,13 @@ class VirtualDJMonitor(tk.Tk):
 
         leftdeck_frame = ttk.LabelFrame(parent, text="Left Deck")
         leftdeck_frame.pack(fill="both", padx=10, pady=5)
+        leftdeck_play_button = ttk.Button(leftdeck_frame, text="PLAY", command=lambda: self._send_command("deck left play_button"))
+        leftdeck_play_button.grid(row=0, column=0, padx=5,pady=5)
 
         rightdeck_frame = ttk.LabelFrame(parent, text="Right Deck")
         rightdeck_frame.pack(fill="both", padx=10, pady=5)
+        rightdeck_play_button = ttk.Button(rightdeck_frame, text="PLAY", command=lambda: self._send_command("deck right play_button"))
+        rightdeck_play_button.grid(row=0, column=0, padx=5,pady=5)
 
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
@@ -215,7 +217,11 @@ class VirtualDJMonitor(tk.Tk):
     async def _client_main_get(self):
         async with VirtualDJClient() as client:
             self.client = client
-            tasks = [asyncio.create_task(self._poll_data(client, name, config["getter"])) for name, config in self.frames_get.items()]
+            tasks = []
+            for name, config in self.get_frames.items():
+                getter = config["function"]
+                task = asyncio.create_task(self._poll_data(client, name, getter))
+                tasks.append(task)
                    
             try:
                 await asyncio.gather(*tasks)
@@ -252,10 +258,11 @@ class VirtualDJMonitor(tk.Tk):
             while True:
                 result = self._result_queue.get_nowait()
                 name = result["name"]
-                value = result["value"]
-                config = self.frames_get.get(name)
+                data = result["value"]
+                config = self.get_frames.get(name)
                 if config is not None:
-                    self._update_frame_text(config["frame"], value)
+                    frame = config["frame"]
+                    self._update_frame_text(frame, data)
                  
         except queue.Empty:
             pass
