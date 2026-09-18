@@ -342,7 +342,6 @@ class VirtualDJSongsDatabase():
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
                 else:
-                    print(f"child_tag < {child_tag} > not defined")
                     self.vdj_utils.save_client_log(f"child_tag < {child_tag} > not defined")
             
             # We add Poi list outside of the loop
@@ -377,8 +376,6 @@ class VirtualDJSongsDatabase():
         if sql_script == "":
             return []
 
-        result_list = []
-        print(sql_script)
         result_list = self._sqlite_query(database_path, sql_script)
 
         return result_list
@@ -395,7 +392,6 @@ class VirtualDJSongsDatabase():
                         result.append(value)
         except Exception as e:
             msg = str(e)
-            print(f"Failed to query the sqlite database: {msg}")
             self.vdj_utils.save_client_log(f"Failed to query the sqlite database: {msg}")
             result = []
 
