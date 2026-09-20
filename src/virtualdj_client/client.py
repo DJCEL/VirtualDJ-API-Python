@@ -164,12 +164,22 @@ class VdjAutomix:
     IsAutomixDualDeck: Optional[bool] = None
     playlist_time: Optional[str] = None
     playlist_repeat: Optional[bool] = None
+    playlist_randomize: Optional[bool] = None
     automix_crossfader: Optional[float] = None
     automix_position: Optional[int] = None
     automix_song_artist: Optional[str] = None
     automix_song_title: Optional[str] = None
     automix_nextsong_artist: Optional[str] = None
     automix_nextsong_title: Optional[str] = None
+    AutomixType: Optional[str] = None
+    AutomixLength: Optional[str] = None
+    repeat_song: Optional[bool] = None
+    automixSkipLength: Optional[float] = None
+    automixMaxLength: Optional[int] = None
+    automixAutoRemovePlayed: Optional[str] = None
+    automixTempoMode: Optional[str] = None
+    automixBeatMatchOnFade: Optional[bool] = None
+    automixDoubleClick: Optional[str] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjVideo:
@@ -445,6 +455,36 @@ class VirtualDJClient():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
+    @staticmethod
+    def to_AutomixType(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        if value == "smart":
+            return "Smart"
+        elif value == "force fade":
+            return "Fade (remove intro/outro)"
+        elif value == "skip silence":
+            return "Fade (remove silence)"
+        elif value == "full songs":
+            return "Fade (remove nothing)"
+        elif value == "radio":
+            return "Fade out, Cut in (remove silence)"
+        elif value == "no mix":
+            return "None (back-to-back)"
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def to_AutomixLength(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        try:
+            val = int(value)
+            if val < 0:
+                return str(abs(val)) + "s gap"
+            else:
+                return str(val) + "s"
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
     #  Get_Result / Get_Result_Deck
     #------------------------------------------------------------------------------------  
     async def _get_result(self, vdjscript: str) -> str:
@@ -628,12 +668,22 @@ class VirtualDJClient():
         automix.IsAutomixDualDeck = self.to_bool(await self._get_result("automix_dualdeck"))
         automix.playlist_time = self.to_str(await self._get_result("get_playlist_time"))
         automix.playlist_repeat = self.to_bool(await self._get_result("playlist_repeat"))
+        automix.playlist_randomize = self.to_bool(await self._get_result("playlist_randomize"))
         automix.automix_crossfader = self.to_float(await self._get_result("get_automix"))
         automix.automix_position = self.to_int(await self._get_result("get_automix_position"))
         automix.automix_song_artist = self.to_str(await self._get_result("get_automix_song 'artist' 0"))
         automix.automix_song_title = self.to_str(await self._get_result("get_automix_song 'title' 0"))
         automix.automix_nextsong_artist = self.to_str(await self._get_result("get_automix_song 'artist' 1"))
         automix.automix_nextsong_title = self.to_str(await self._get_result("get_automix_song 'title' 1"))
+        automix.AutomixType = self.to_AutomixType(await self._get_result("setting 'automixMode'"))
+        automix.AutomixLength = self.to_AutomixLength(await self._get_result("setting 'fadeLength'"))
+        automix.repeat_song = self.to_bool(await self._get_result("repeat_song"))
+        automix.automixSkipLength = self.to_float(await self._get_result("setting 'automixSkipLength'"))
+        automix.automixMaxLength = self.to_int(await self._get_result("setting 'automixMaxLength'"))
+        automix.automixAutoRemovePlayed = self.to_str(await self._get_result("setting 'automixAutoRemovePlayed'"))
+        automix.automixTempoMode = self.to_str(await self._get_result("setting 'automixTempoMode'"))
+        automix.automixBeatMatchOnFade = self.to_bool(await self._get_result("setting 'autoMixBeatMatchOnFade'"))
+        automix.automixDoubleClick = self.to_str(await self._get_result("setting 'automixDoubleClick'"))
         return automix
     #------------------------------------------------------------------------------------
     #  Video

@@ -135,8 +135,8 @@ class VirtualDJMonitor(tk.Tk):
     def _define_tab_send(self, parent):
         vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
         vdjscript_frame.pack(fill="x",padx=10,pady=5)
-        vdjscript_entry = ttk.Entry(vdjscript_frame)
-        vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
+        self.vdjscript_entry = ttk.Entry(vdjscript_frame)
+        self.vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
         send_button = ttk.Button(vdjscript_frame, text="Send", command=self._send_vdjscript)
         send_button.pack(side="right",padx=5,pady=5)
 
@@ -228,7 +228,6 @@ class VirtualDJMonitor(tk.Tk):
         self.frameDB.text_widget = text
     #------------------------------------------------------------------------------------
     def on_selectDB(self, event):
-
         self._update_frame_text(self.frameDBcount,"")
         self._update_frame_text(self.frameDB,"")
 
@@ -283,24 +282,8 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
-
-    #------------------------------------------------------------------------------------
-    def _send_vdjscript(self):
-        vdjscript = self.vdjscript_entry.get().strip()
-        if not vdjscript:
-            return
-        if self.client is None:
-            return
-        if self._loop is None:
-            return
-        try:
-            future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self._loop)
-            future.add_done_callback(self._vdjscript_done)
-        except Exception as e:
-            pass
     #------------------------------------------------------------------------------------
     def _send_command(self, vdjscript: str):
-        #vdjscript = "browser_scroll +1"
         if not vdjscript:
             return
         if self.client is None:
@@ -318,7 +301,10 @@ class VirtualDJMonitor(tk.Tk):
             result = future.result()
         except Exception as e:
             pass
-   
+   #------------------------------------------------------------------------------------
+    def _send_vdjscript(self):
+        vdjscript = self.vdjscript_entry.get().strip()
+        self._send_command(vdjscript)
     #------------------------------------------------------------------------------------
     def _run_async_client(self):
         self._loop = asyncio.new_event_loop()
