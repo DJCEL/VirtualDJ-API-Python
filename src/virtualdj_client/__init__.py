@@ -1,6 +1,6 @@
-__version__ = "1.1.8"
+__version__ = "1.1.9"
 
-from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckSong, VdjDeckEngine, VdjDeckData, VdjMixer, VdjBrowser, VdjBrowserFolder, VdjBrowserFile
+from .client import VirtualDJClient, VdjResponse, VdjDeck, VdjDeckSong, VdjDeckEngine, VdjDeckData, VdjMixer, VdjBrowser, VdjBrowserFolder, VdjBrowserFile, VdjAutomix, VdjVideo
 from .client_utils import VirtualDJUtils
 from .client_settings import VirtualDJSettings
 from .client_songs_database import VirtualDJSongsDatabase
@@ -24,6 +24,8 @@ __all__ = [
     "VdjBrowserFolder",
     "VdjBrowserFile",
     "VdjBrowser",
+    "VdjAutomix",
+    "VdjVideo",
     "VirtualDJUtils", 
     "VirtualDJSettings",
     "VirtualDJSongsDatabase",

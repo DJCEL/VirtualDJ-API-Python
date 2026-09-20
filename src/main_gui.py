@@ -8,7 +8,7 @@ import sys
 import os
 from pathlib import Path
 
-__version__ = "1.0.8"
+__version__ = "1.0.9"
 
 from virtualdj_client import (
     VirtualDJClient, 
@@ -17,6 +17,8 @@ from virtualdj_client import (
     VdjMixer, 
     VdjBrowserFolder, 
     VdjBrowserFile,
+    VdjAutomix,
+    VdjVideo,
     VirtualDJSongsDatabase,
 )
 from virtualdj_client import __version__ as __vdjclient_version__
@@ -115,6 +117,8 @@ class VirtualDJMonitor(tk.Tk):
             ("mixer_frame", "Mixer", lambda client: client.get_Mixer_async()),
             ("browserfolder_frame", "Browser - Folder", lambda client: client.get_BrowserFolder_async()),
             ("browserfile_frame", "Browser - File", lambda client: client.get_BrowserFile_async()),
+            ("automix_frame", "Automix", lambda client: client.get_Automix_async()),
+            ("video_frame", "Video", lambda client: client.get_Video_async()),
         ]
 
         self.get_frames = {}
@@ -352,15 +356,26 @@ class VirtualDJMonitor(tk.Tk):
             except Exception as e:
                 value = e
             
+            end_time1 = asyncio.get_running_loop().time()
+            elapsed1_ms = int((end_time1 - start_time) * 1000)
+
+            #print(f"elapsed1_ms = {elapsed1_ms}")
+
             result_dict = {"name": name, "value": value}
             self._result_queue.put(result_dict)
 
-            elapsed = asyncio.get_running_loop().time() - start_time
-            delay = max(0.0, (self.interval_refresh / 1000) - elapsed)
+            end_time2 = asyncio.get_running_loop().time()
 
-            if delay > 0:
+            elapsed2_ms = int((end_time2 - start_time) * 1000)
+            delay_ms = max(0, self.interval_refresh - elapsed2_ms)
+
+            #print(f"elapsed2_ms = {elapsed2_ms}")
+            #print(f"delay_ms = {delay_ms}")
+
+            if delay_ms > 0:
+                timeout = delay_ms / 1000
                 try:
-                    await asyncio.wait_for(self._stopping.wait(), timeout=delay)
+                    await asyncio.wait_for(self._stopping.wait(), timeout=timeout)
                 except asyncio.TimeoutError:
                     pass
     #------------------------------------------------------------------------------------

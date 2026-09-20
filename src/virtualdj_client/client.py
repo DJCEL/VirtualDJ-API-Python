@@ -1,12 +1,13 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.27"
+__version__ = "1.0.28"
 
 import asyncio
 import time
 from typing import Optional, Literal
 from dataclasses import dataclass
+from datetime import datetime,timedelta
 
 from .client_http import VirtualDJClientHttp, VdjResponse
 from .client_utils import VirtualDJUtils
@@ -34,7 +35,8 @@ class VdjDeckSong:
     Bpm: Optional[float] = None    
     Key: Optional[str] = None
     KeyHarmonic: Optional[str] = None
-    Duration: Optional[float] = None   
+    SongLength: Optional[str] = None   
+    TimeTotal: Optional[str] = None  
     HasStems: Optional[bool] = None
     HasStemsV1: Optional[bool] = None
     HasStemsV2: Optional[bool] = None
@@ -46,6 +48,7 @@ class VdjDeckEngine:
     HasError: Optional[str] = None
     IsPfl: Optional[bool] = None
     IsPlaying: Optional[bool] = None
+    IsAudible: Optional[bool] = None
     IsLooping: Optional[bool] = None
     IsReverse: Optional[bool] = None
     IsSync: Optional[bool] = None
@@ -60,7 +63,9 @@ class VdjDeckEngine:
     KeyCurrent: Optional[str] = None
     KeyCurrentHarmonic: Optional[str] = None
     Position: Optional[float] = None
-    Time: Optional[float] = None
+    Time: Optional[str] = None
+    TimeElapsed: Optional[str] = None
+    TimeRemaining: Optional[str] = None
     Beat: Optional[float] = None
     Beatgrid: Optional[float] = None 
     Beatpos: Optional[float] = None
@@ -70,6 +75,7 @@ class VdjDeckEngine:
     Volume: Optional[float] = None
     VolumeTotal: Optional[float] = None
     Pitch: Optional[float] = None
+    PitchValue: Optional[float] = None
     Gain: Optional[float] = None
     FilterName: Optional[str] = None
     Filter: Optional[float] = None
@@ -96,6 +102,7 @@ class VdjMixer:
     MasterVolume: Optional[float] = None
     MicVolume:  Optional[float] = None
     Mic2Volume:  Optional[float] = None
+    MicFxName: Optional[str] = None
     HeadphoneVolume: Optional[float] = None
     HeadphoneMix: Optional[float] = None
     HeadphoneGain: Optional[float] = None
@@ -111,7 +118,6 @@ class VdjMixer:
     EqCrossfaderHigh: Optional[float] = None
     EqCrossfaderMid: Optional[float] = None
     EqCrossfaderLow: Optional[float] = None
-    MicFxName: Optional[str] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckData:
@@ -151,6 +157,30 @@ class VdjBrowserFile:
 class VdjBrowser:
     Folder: Optional[VdjBrowserFolder] = None
     File: Optional[VdjBrowserFile] = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjAutomix:
+    IsAutomixing: Optional[bool] = None
+    IsAutomixDualDeck: Optional[bool] = None
+    playlist_time: Optional[str] = None
+    playlist_repeat: Optional[bool] = None
+    automix_crossfader: Optional[float] = None
+    automix_position: Optional[int] = None
+    automix_song_artist: Optional[str] = None
+    automix_song_title: Optional[str] = None
+    automix_nextsong_artist: Optional[str] = None
+    automix_nextsong_title: Optional[str] = None
+#------------------------------------------------------------------------------------------------------------------------------------
+@dataclass
+class VdjVideo:
+    IsVideoActive: Optional[bool] = None
+    video_crossfader: Optional[float] = None
+    video_crossfader_link: Optional[bool] = None
+    video_crossfader_auto: Optional[bool] = None
+    video_fadetoblack: Optional[bool] = None
+    has_video_mix: Optional[bool] = None
+    video_transition_name: Optional[str] = None
+    video_fx_name: Optional[str] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
@@ -350,6 +380,28 @@ class VirtualDJClient():
             return None
     #------------------------------------------------------------------------------------
     @staticmethod
+    def _to_milliseconds(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        try:
+            sec = float(value)
+            ms = int(sec * 1000)
+            return str(ms)
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @staticmethod
+    def _to_strtime(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        try:
+            milliseconds = int(value)
+            time = timedelta(milliseconds=milliseconds)
+            return str(time)
+        except ValueError:
+            return None
+    #------------------------------------------------------------------------------------
+    @staticmethod
     def to_crossfaderCurve(value: Optional[str]) -> Optional[str]:
         if value is None:
             return None
@@ -393,8 +445,15 @@ class VirtualDJClient():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    #  Deck
+    #  Get_Result / Get_Result_Deck
     #------------------------------------------------------------------------------------  
+    async def _get_result(self, vdjscript: str) -> str:
+        result = await self.get_async(vdjscript)
+        result_check = result[0:5]
+        if result_check == 'error':
+            return None
+        return result
+    #------------------------------------------------------------------------------------
     async def _get_result_deck(self, deck: str, verb: str) -> str:
         vdjscript = f"deck {deck} {verb}"
         result = await self.get_async(vdjscript)
@@ -403,6 +462,8 @@ class VirtualDJClient():
             return None
         return result
     #------------------------------------------------------------------------------------
+    #  Deck
+    #------------------------------------------------------------------------------------  
     async def get_DeckSong_async(self, deck: str) -> VdjDeckSong:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         song = VdjDeckSong()
@@ -418,7 +479,8 @@ class VirtualDJClient():
         song.Rating = self.to_int(await self._get_result_deck(deck, "rating"))
         song.Comment = self.to_str(await self._get_result_deck(deck, "get_comment"))
         song.Bpm = self.to_float(await self._get_result_deck(deck, "get_bpm absolute"))
-        song.Duration = self.to_float(await self._get_result_deck(deck, "get_songlength"))     
+        song.SongLength = self._to_strtime(self._to_milliseconds(await self._get_result_deck(deck, "get_songlength")))
+        song.TimeTotal = self._to_strtime(await self._get_result_deck(deck, "get_time total absolute"))
         song.HasStems = self.to_bool(await self._get_result_deck(deck, "has_stems"))
         song.HasLyrics = self.to_bool(await self._get_result_deck(deck, "has_lyrics"))
         song.HasLinkedTracks = self.to_bool(await self._get_result_deck(deck, "has_linked_tracks"))
@@ -436,7 +498,9 @@ class VirtualDJClient():
         deckengine.KeyCurrent = self.to_str(await self._get_result_deck(deck, "get_key 'musical'"))
         deckengine.KeyCurrentHarmonic = self.to_str(await self._get_result_deck(deck, "get_harmonic"))
         deckengine.Position = self.to_float(await self._get_result_deck(deck, "get_position"))
-        deckengine.Time = self.to_float(await self._get_result_deck(deck, "get_time"))
+        deckengine.Time = self._to_strtime(await self._get_result_deck(deck, "get_time"))
+        deckengine.TimeElapsed = self._to_strtime(await self._get_result_deck(deck, "get_time elapsed absolute"))
+        deckengine.TimeRemaining = self._to_strtime(await self._get_result_deck(deck, "get_time remaining absolute"))
         deckengine.Beat = self.to_float(await self._get_result_deck(deck, "get_beat"))
         deckengine.Beatgrid = self.to_float(await self._get_result_deck(deck, "get_beatgrid"))
         deckengine.Beatpos = self.to_float(await self._get_result_deck(deck, "get_beatpos"))
@@ -446,7 +510,9 @@ class VirtualDJClient():
         deckengine.Level = self.to_float(await self._get_result_deck(deck, "get_level"))
         deckengine.LoopSize = self.to_int(await self._get_result_deck(deck, "get_loop"))
         deckengine.Pitch = self.to_float(await self._get_result_deck(deck, "get_pitch"))
+        deckengine.PitchValue = self.to_float(await self._get_result_deck(deck, "get_pitch_value"))
         deckengine.IsPlaying = self.to_bool(await self._get_result_deck(deck, "play"))
+        deckengine.IsAudible = self.to_bool(await self._get_result_deck(deck, "is_audible"))
         deckengine.IsLooping = self.to_bool(await self._get_result_deck(deck, "loop"))
         deckengine.IsReverse = self.to_bool(await self._get_result_deck(deck, "reverse"))
         deckengine.IsSync = self.to_bool(await self._get_result_deck(deck, "sync"))
@@ -476,89 +542,75 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     #  Mixer
     #------------------------------------------------------------------------------------  
-    async def _get_result_mixer(self, vdjscript: str) -> str:
-        result = await self.get_async(vdjscript)
-        result_check = result[0:5]
-        if result_check == 'error':
-            return None
-        return result
-    #------------------------------------------------------------------------------------
     async def get_Mixer_async(self) -> VdjMixer:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         mixer = VdjMixer()
-        limiter = await self._get_result_mixer("get_limiter")
-        mixer.Limiter = self.to_float(await self._get_result_mixer("get_limiter"))
-        mixer.IsMic = self.to_bool(await self._get_result_mixer("mic"))
-        mixer.IsMicFx = self.to_bool(await self._get_result_mixer("effect_active 'mic'"))
-        mixer.IsMixFx = self.to_bool(await self._get_result_mixer("effect_mixfx_activate"))
-        mixer.IsInternalMixer = self.to_bool(await self._get_result_mixer("mixermode"))
-        mixer.HasSystemVolume = self.to_bool(await self._get_result_mixer("has_system_volume"))
-        mixer.Crossfader = self.to_float(await self._get_result_mixer("crossfader"))
-        mixer.CrossfaderDisable = self.to_bool(await self._get_result_mixer("crossfader_disable"))
-        mixer.CrossfaderHamster = self.to_bool(await self._get_result_mixer("crossfader_hamster"))
-        mixer.CrossfaderCurve = self.to_crossfaderCurve(await self._get_result_mixer("setting 'crossfaderCurve'"))
-        mixer.CrossfaderCustom = self.to_str(await self._get_result_mixer("setting 'crossfaderCustom'"))
-        mixer.MasterVolume = self.to_float(await self._get_result_mixer("master_volume"))
-        mixer.MicVolume = self.to_float(await self._get_result_mixer("mic_volume"))
-        mixer.Mic2Volume = self.to_float(await self._get_result_mixer("mic2_volume"))
-        mixer.HeadphoneVolume = self.to_float(await self._get_result_mixer("headphone_volume"))
-        mixer.HeadphoneMix = self.to_float(await self._get_result_mixer("headphone_mix"))
-        mixer.HeadphoneGain = self.to_float(await self._get_result_mixer("headphone_gain"))
-        mixer.HeadphoneCrossfader = self.to_float(await self._get_result_mixer("headphone_crossfader"))
-        mixer.SamplerVolumeMaster = self.to_float(await self._get_result_mixer("sampler_volume_master"))
-        mixer.MasterBalance = self.to_float(await self._get_result_mixer("master_balance"))
-        mixer.BoothVolume = self.to_float(await self._get_result_mixer("booth_volume"))
-        mixer.MixFxName = self.to_str(await self._get_result_mixer("get_text `effect_mixfx`"))
-        mixer.ZeroDB = self.to_zeroDB(await self._get_result_mixer("setting 'zeroDB'"))
-        mixer.SystemVolume = self.to_float(await self._get_result_mixer("system_volume"))
-        mixer.MasterVuMeterLeft = self.to_float(await self._get_result_mixer("get_vu_meter_left 'master'"))
-        mixer.MasterVuMeterRight = self.to_float(await self._get_result_mixer("get_vu_meter_right 'master'"))
-        mixer.EqCrossfaderHigh = self.to_float(await self._get_result_mixer("eq_crossfader_high"))
-        mixer.EqCrossfaderMid = self.to_float(await self._get_result_mixer("eq_crossfader_mid"))
-        mixer.EqCrossfaderLow = self.to_float(await self._get_result_mixer("eq_crossfader_low"))
-        mixer.MicFxName = self.to_str(await self._get_result_mixer("get_effect_name 'mic'"))
+        limiter = await self._get_result("get_limiter")
+        mixer.Limiter = self.to_float(await self._get_result("get_limiter"))
+        mixer.IsMic = self.to_bool(await self._get_result("mic"))
+        mixer.IsMicFx = self.to_bool(await self._get_result("effect_active 'mic'"))
+        mixer.IsMixFx = self.to_bool(await self._get_result("effect_mixfx_activate"))
+        mixer.IsInternalMixer = self.to_bool(await self._get_result("mixermode"))
+        mixer.HasSystemVolume = self.to_bool(await self._get_result("has_system_volume"))
+        mixer.Crossfader = self.to_float(await self._get_result("crossfader"))
+        mixer.CrossfaderDisable = self.to_bool(await self._get_result("crossfader_disable"))
+        mixer.CrossfaderHamster = self.to_bool(await self._get_result("crossfader_hamster"))
+        mixer.CrossfaderCurve = self.to_crossfaderCurve(await self._get_result("setting 'crossfaderCurve'"))
+        mixer.CrossfaderCustom = self.to_str(await self._get_result("setting 'crossfaderCustom'"))
+        mixer.MasterVolume = self.to_float(await self._get_result("master_volume"))
+        mixer.MicVolume = self.to_float(await self._get_result("mic_volume"))
+        mixer.Mic2Volume = self.to_float(await self._get_result("mic2_volume"))
+        mixer.HeadphoneVolume = self.to_float(await self._get_result("headphone_volume"))
+        mixer.HeadphoneMix = self.to_float(await self._get_result("headphone_mix"))
+        mixer.HeadphoneGain = self.to_float(await self._get_result("headphone_gain"))
+        mixer.HeadphoneCrossfader = self.to_float(await self._get_result("headphone_crossfader"))
+        mixer.SamplerVolumeMaster = self.to_float(await self._get_result("sampler_volume_master"))
+        mixer.MasterBalance = self.to_float(await self._get_result("master_balance"))
+        mixer.BoothVolume = self.to_float(await self._get_result("booth_volume"))
+        mixer.MixFxName = self.to_str(await self._get_result("get_text `effect_mixfx`"))
+        mixer.ZeroDB = self.to_zeroDB(await self._get_result("setting 'zeroDB'"))
+        mixer.SystemVolume = self.to_float(await self._get_result("system_volume"))
+        mixer.MasterVuMeterLeft = self.to_float(await self._get_result("get_vu_meter_left 'master'"))
+        mixer.MasterVuMeterRight = self.to_float(await self._get_result("get_vu_meter_right 'master'"))
+        mixer.EqCrossfaderHigh = self.to_float(await self._get_result("eq_crossfader_high"))
+        mixer.EqCrossfaderMid = self.to_float(await self._get_result("eq_crossfader_mid"))
+        mixer.EqCrossfaderLow = self.to_float(await self._get_result("eq_crossfader_low"))
+        mixer.MicFxName = self.to_str(await self._get_result("get_effect_name 'mic'"))
         return mixer
     #------------------------------------------------------------------------------------
     #  Browser
     #------------------------------------------------------------------------------------  
-    async def _get_result_browser(self, vdjscript: str) -> str:
-        result = await self.get_async(vdjscript)
-        result_check = result[0:5]
-        if result_check == 'error':
-            return None
-        return result
-    #------------------------------------------------------------------------------------
     async def get_BrowserFolder_async(self) -> VdjBrowserFolder:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         browserfolder = VdjBrowserFolder()
-        browserfolder.browsed_folder = self.to_str(await self._get_result_browser("get_browsed_folder"))
-        browserfolder.browsed_folder_icon = self.to_int(await self._get_result_browser("get_browsed_folder_icon"))
-        browserfolder.browsed_folder_path = self.to_str(await self._get_result_browser("get_browsed_folder_path"))
-        browserfolder.browsed_folder_scrollpos = self.to_int(await self._get_result_browser("get_browsed_folder_scrollpos"))
-        browserfolder.browsed_folder_scrollsize = self.to_int(await self._get_result_browser("get_browsed_folder_scrollsize"))
-        browserfolder.browsed_folder_selection_index = self.to_int(await self._get_result_browser("get_browsed_folder_selection_index"))
-        browserfolder.browsed_folder_tab = self.to_int(await self._get_result_browser("get_browsed_folder_tab"))
-        browserfolder.browsed_header = self.to_str(await self._get_result_browser("get_browsed_header"))
-        browserfolder.file_count = self.to_int(await self._get_result_browser("file_count"))
+        browserfolder.browsed_folder = self.to_str(await self._get_result("get_browsed_folder"))
+        browserfolder.browsed_folder_icon = self.to_int(await self._get_result("get_browsed_folder_icon"))
+        browserfolder.browsed_folder_path = self.to_str(await self._get_result("get_browsed_folder_path"))
+        browserfolder.browsed_folder_scrollpos = self.to_int(await self._get_result("get_browsed_folder_scrollpos"))
+        browserfolder.browsed_folder_scrollsize = self.to_int(await self._get_result("get_browsed_folder_scrollsize"))
+        browserfolder.browsed_folder_selection_index = self.to_int(await self._get_result("get_browsed_folder_selection_index"))
+        browserfolder.browsed_folder_tab = self.to_int(await self._get_result("get_browsed_folder_tab"))
+        browserfolder.browsed_header = self.to_str(await self._get_result("get_browsed_header"))
+        browserfolder.file_count = self.to_int(await self._get_result("file_count"))
         return browserfolder
     #------------------------------------------------------------------------------------
     async def get_BrowserFile_async(self) -> VdjBrowserFile:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         browserfile = VdjBrowserFile()
-        browserfile.browsed_scrollpos = self.to_int(await self._get_result_browser("get_browsed_scrollpos"))
-        browserfile.browsed_scrollsize = self.to_int(await self._get_result_browser("get_browsed_scrollsize"))
-        browserfile.browsed_selection_index = self.to_int(await self._get_result_browser("get_browsed_selection_index"))
-        browserfile.browsed_filepath = self.to_str(await self._get_result_browser("get_browsed_filepath"))
-        browserfile.browsed_artist = self.to_str(await self._get_result_browser("get_browsed_artist"))
-        browserfile.browsed_title = self.to_str(await self._get_result_browser("get_browsed_title"))
-        browserfile.browsed_title_artist = self.to_str(await self._get_result_browser("get_browsed_title_artist "))
-        browserfile.browsed_bpm = self.to_float(await self._get_result_browser("get_browsed_bpm"))
-        browserfile.browsed_key = self.to_str(await self._get_result_browser("get_browsed_key"))
-        browserfile.browsed_genre = self.to_str(await self._get_result_browser("get_browsed_genre"))
-        browserfile.browsed_comment = self.to_str(await self._get_result_browser("get_browsed_comment"))
-        browserfile.browsed_composer = self.to_str(await self._get_result_browser("get_browsed_composer"))
-        browserfile.browsed_color = self.to_str(await self._get_result_browser("get_browsed_color"))
-        browserfile.browsed_album = self.to_str(await self._get_result_browser("get_browsed_album"))
+        browserfile.browsed_scrollpos = self.to_int(await self._get_result("get_browsed_scrollpos"))
+        browserfile.browsed_scrollsize = self.to_int(await self._get_result("get_browsed_scrollsize"))
+        browserfile.browsed_selection_index = self.to_int(await self._get_result("get_browsed_selection_index"))
+        browserfile.browsed_filepath = self.to_str(await self._get_result("get_browsed_filepath"))
+        browserfile.browsed_artist = self.to_str(await self._get_result("get_browsed_artist"))
+        browserfile.browsed_title = self.to_str(await self._get_result("get_browsed_title"))
+        browserfile.browsed_title_artist = self.to_str(await self._get_result("get_browsed_title_artist "))
+        browserfile.browsed_bpm = self.to_float(await self._get_result("get_browsed_bpm"))
+        browserfile.browsed_key = self.to_str(await self._get_result("get_browsed_key"))
+        browserfile.browsed_genre = self.to_str(await self._get_result("get_browsed_genre"))
+        browserfile.browsed_comment = self.to_str(await self._get_result("get_browsed_comment"))
+        browserfile.browsed_composer = self.to_str(await self._get_result("get_browsed_composer"))
+        browserfile.browsed_color = self.to_str(await self._get_result("get_browsed_color"))
+        browserfile.browsed_album = self.to_str(await self._get_result("get_browsed_album"))
         return browserfile
     #------------------------------------------------------------------------------------
     async def get_Browser_async(self) -> VdjBrowser:
@@ -566,6 +618,38 @@ class VirtualDJClient():
         browser.Folder = await self.get_BrowserFolder_async()
         browser.File = await self.get_BrowserFile_async()
         return browser
+    #------------------------------------------------------------------------------------
+    #  Automix
+    #------------------------------------------------------------------------------------ 
+    async def get_Automix_async(self) -> VdjAutomix:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+        automix = VdjAutomix()
+        automix.IsAutomixing = self.to_bool(await self._get_result("automix"))
+        automix.IsAutomixDualDeck = self.to_bool(await self._get_result("automix_dualdeck"))
+        automix.playlist_time = self.to_str(await self._get_result("get_playlist_time"))
+        automix.playlist_repeat = self.to_bool(await self._get_result("playlist_repeat"))
+        automix.automix_crossfader = self.to_float(await self._get_result("get_automix"))
+        automix.automix_position = self.to_int(await self._get_result("get_automix_position"))
+        automix.automix_song_artist = self.to_str(await self._get_result("get_automix_song 'artist' 0"))
+        automix.automix_song_title = self.to_str(await self._get_result("get_automix_song 'title' 0"))
+        automix.automix_nextsong_artist = self.to_str(await self._get_result("get_automix_song 'artist' 1"))
+        automix.automix_nextsong_title = self.to_str(await self._get_result("get_automix_song 'title' 1"))
+        return automix
+    #------------------------------------------------------------------------------------
+    #  Video
+    #------------------------------------------------------------------------------------ 
+    async def get_Video_async(self) -> VdjVideo:
+        # TODO: check if we can use asyncio.gather() to decrease the latency
+        video = VdjVideo()
+        video.IsVideoActive = self.to_bool(await self._get_result("video"))
+        video.video_crossfader = self.to_float(await self._get_result("video_crossfader"))
+        video.video_crossfader_link = self.to_bool(await self._get_result("video_crossfader_link"))
+        video.video_crossfader_auto = self.to_bool(await self._get_result("video_crossfader_auto"))
+        video.video_fadetoblack = self.to_bool(await self._get_result("video_fadetoblack"))
+        video.has_video_mix = self.to_bool(await self._get_result("has_video_mix"))
+        video.video_transition_name = self.to_str(await self._get_result("get_videotrans_name"))
+        video.video_fx_name = self.to_str(await self._get_result("get_videofx_name"))
+        return video
     #------------------------------------------------------------------------------------
     #  asyncio.run()
     #------------------------------------------------------------------------------------
@@ -607,3 +691,9 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     def get_Browser(self) -> VdjBrowser:
         return asyncio.run(self.get_Browser_async())
+    #------------------------------------------------------------------------------------
+    def get_Automix(self) -> VdjAutomix:
+        return asyncio.run(self.get_Automix_async())
+    #------------------------------------------------------------------------------------
+    def get_Video(self) -> VdjVideo:
+        return asyncio.run(self.get_Video_async())
