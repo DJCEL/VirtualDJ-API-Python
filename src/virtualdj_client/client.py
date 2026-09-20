@@ -42,6 +42,7 @@ class VdjDeckSong:
     HasStemsV2: Optional[bool] = None
     HasLyrics: Optional[bool] = None
     HasLinkedTracks: Optional[bool] = None
+    HasCover: Optional[bool] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckEngine:
@@ -59,6 +60,7 @@ class VdjDeckEngine:
     IsLineIn: Optional[bool] = None
     IsMute: Optional[bool] = None
     IsStemsReady: Optional[bool] = None
+    IsMasterDeck: Optional[bool] = None
     BpmCurrent: Optional[float] = None
     KeyCurrent: Optional[str] = None
     KeyCurrentHarmonic: Optional[str] = None
@@ -190,7 +192,23 @@ class VdjVideo:
     video_fadetoblack: Optional[bool] = None
     has_video_mix: Optional[bool] = None
     video_transition_name: Optional[str] = None
+    videoRandomTransition: Optional[bool] = None
     video_fx_name: Optional[str] = None
+    video_delay: Optional[int] = None
+    useVideoSkin: Optional[bool] = None
+    videoSkin: Optional[str] = None
+    showVideoSkinOnPreview: Optional[bool] = None
+    letterBoxing: Optional[str] = None
+    videoMicroFrames: Optional[str] = None
+    FPS: Optional[int] = None
+    video_source_select: Optional[str] = None
+    videoAudioOnlyVisualisation: Optional[str] = None
+    videoDriver: Optional[str] = None
+    videoMaxMemory: Optional[int] = None
+    videoUseDXVA: Optional[bool] = None
+    videoShaderQuality: Optional[str] = None
+    startVideoOnLoad: Optional[bool] = None
+
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
@@ -395,10 +413,11 @@ class VirtualDJClient():
             return None
         try:
             sec = float(value)
-            ms = int(sec * 1000)
-            return str(ms)
         except ValueError:
-            return None
+                    return None
+
+        ms = int(sec * 1000)
+        return str(ms)
     #------------------------------------------------------------------------------------
     @staticmethod
     def _to_strtime(value: Optional[str]) -> Optional[str]:
@@ -417,20 +436,21 @@ class VirtualDJClient():
             return None
         try:
             val = float(value)
-            if val == 0.5:
-                return 'Full'
-            elif val == 0.33:
-                return 'Smooth'
-            elif val == 0.99:
-                return 'Scratch'
-            elif val == -1:
-                return 'Cut'
-            elif val == -2:
-                return 'Custom'
-            else:
-                return value
         except ValueError:
             return None
+
+        if val == 0.5:
+            return 'Full'
+        elif val == 0.33:
+            return 'Smooth'
+        elif val == 0.99:
+            return 'Scratch'
+        elif val == -1:
+            return 'Cut'
+        elif val == -2:
+            return 'Custom'
+        else:
+            return value
     #------------------------------------------------------------------------------------
     @staticmethod
     def to_zeroDB(value: Optional[str]) -> Optional[str]:
@@ -438,22 +458,23 @@ class VirtualDJClient():
             return None
         try:
             val = float(value)
-            if val == 1:
-                return 'Default'
-            elif val == 0.89:
-                return '-1dB'
-            elif val == 0.71:
-                return '-3dB'
-            elif val == 0.5:
-                return '-6dB'
-            elif val == 0.35:
-                return '-9dB'
-            elif val == 0.25:
-                return '-12dB'
-            else:
-                return value
         except ValueError:
             return None
+
+        if val == 1:
+            return 'Default'
+        elif val == 0.89:
+            return '-1dB'
+        elif val == 0.71:
+            return '-3dB'
+        elif val == 0.5:
+            return '-6dB'
+        elif val == 0.35:
+            return '-9dB'
+        elif val == 0.25:
+            return '-12dB'
+        else:
+            return value
     #------------------------------------------------------------------------------------
     @staticmethod
     def to_AutomixType(value: Optional[str]) -> Optional[str]:
@@ -485,21 +506,49 @@ class VirtualDJClient():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
+    @staticmethod
+    def to_VideoSourceSelect(value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return None
+        try:
+            val = float(value)
+        except ValueError:
+            return None
+
+        if val == 0:
+            return 'Slideshow'
+        elif val == 0.2:
+            return 'Visuals'
+        elif val == 0.4:
+            return 'Lottery'
+        elif val == 0.6:
+            return 'Camera'
+        elif val == 0.8:
+            return 'Cover'
+        else:
+            return value
+    #------------------------------------------------------------------------------------
     #  Get_Result / Get_Result_Deck
     #------------------------------------------------------------------------------------  
     async def _get_result(self, vdjscript: str) -> str:
         result = await self.get_async(vdjscript)
-        result_check = result[0:5]
-        if result_check == 'error':
-            return None
+        len_result = len(result)
+        if len_result >= 5:
+            result_check = result[0:5]
+            if result_check == 'error':
+                return None
+  
         return result
     #------------------------------------------------------------------------------------
     async def _get_result_deck(self, deck: str, verb: str) -> str:
         vdjscript = f"deck {deck} {verb}"
         result = await self.get_async(vdjscript)
-        result_check = result[0:5]
-        if result_check == 'error':
-            return None
+        len_result = len(result)
+        if len_result >= 5:
+            result_check = result[0:5]
+            if result_check == 'error':
+                return None
+
         return result
     #------------------------------------------------------------------------------------
     #  Deck
@@ -527,6 +576,7 @@ class VirtualDJClient():
         song.IsVideo = self.to_bool(await self._get_result_deck(deck, "is_video"))
         song.HasStemsV1 = self.to_bool(await self._get_result_deck(deck, "has_stems '1.0'"))
         song.HasStemsV2 = self.to_bool(await self._get_result_deck(deck, "has_stems '2.0'"))
+        song.HasCover = self.to_bool(await self._get_result_deck(deck, "has_cover"))
         return song
     #------------------------------------------------------------------------------------
     async def get_DeckEngine_async(self, deck: str) -> VdjDeckEngine:
@@ -572,6 +622,7 @@ class VirtualDJClient():
         deckengine.FilterName = self.to_str(await self._get_result_deck(deck, "filter_selectcolorfx"))
         deckengine.Filter = self.to_float(await self._get_result_deck(deck, "filter"))
         deckengine.IsStemsReady = self.to_bool(await self._get_result_deck(deck, "has_stems 'ready'"))
+        deckengine.IsMasterDeck = self.to_bool(await self._get_result_deck(deck, "masterdeck"))
         return deckengine
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
@@ -699,6 +750,21 @@ class VirtualDJClient():
         video.has_video_mix = self.to_bool(await self._get_result("has_video_mix"))
         video.video_transition_name = self.to_str(await self._get_result("get_videotrans_name"))
         video.video_fx_name = self.to_str(await self._get_result("get_videofx_name"))
+        video.video_delay = self.to_int(await self._get_result("video_delay"))
+        video.videoRandomTransition = self.to_bool(await self._get_result("setting 'videoRandomTransition'"))
+        video.useVideoSkin = self.to_bool(await self._get_result("setting 'useVideoSkin'"))
+        video.videoSkin = self.to_str(await self._get_result("setting 'videoSkin'"))
+        video.showVideoSkinOnPreview = self.to_bool(await self._get_result("setting 'showVideoSkinOnPreview'"))
+        video.letterBoxing = self.to_str(await self._get_result("setting 'letterBoxing'"))
+        video.videoMicroFrames = self.to_str(await self._get_result("setting 'videoMicroFrames'"))
+        video.FPS = self.to_int(await self._get_result("setting 'videoFPS'"))
+        video.videoAudioOnlyVisualisation = self.to_str(await self._get_result("setting 'videoAudioOnlyVisualisation'"))
+        video.video_source_select = self.to_VideoSourceSelect(await self._get_result("video_source_select"))
+        video.videoDriver = self.to_str(await self._get_result("setting 'videoDriver'"))
+        video.videoMaxMemory = self.to_int(await self._get_result("setting 'videoMaxMemory'"))
+        video.videoUseDXVA = self.to_bool(await self._get_result("setting 'videoUseDXVA'"))
+        video.videoShaderQuality = self.to_str(await self._get_result("setting 'videoShaderQuality'"))
+        video.startVideoOnLoad = self.to_bool(await self._get_result("setting 'startVideoOnLoad'"))
         return video
     #------------------------------------------------------------------------------------
     #  asyncio.run()
