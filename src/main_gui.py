@@ -138,7 +138,7 @@ class VirtualDJMonitor(tk.Tk):
         vdjscript_frame.pack(fill="x",padx=10,pady=5)
         self.vdjscript_entry = ttk.Entry(vdjscript_frame)
         self.vdjscript_entry.pack(side="left",fill="x",expand=True,padx=5,pady=5)
-        send_button = ttk.Button(vdjscript_frame, text="Send", command=self._send_vdjscript)
+        send_button = ttk.Button(vdjscript_frame, text="Send", command=self._send_vdjscript_input)
         send_button.pack(side="right",padx=5,pady=5)
 
         decks_frame_list = [
@@ -350,7 +350,7 @@ class VirtualDJMonitor(tk.Tk):
         except Exception as e:
             pass
    #------------------------------------------------------------------------------------
-    def _send_vdjscript(self):
+    def _send_vdjscript_input(self):
         vdjscript = self.vdjscript_entry.get().strip()
         self._send_command(vdjscript)
     #------------------------------------------------------------------------------------

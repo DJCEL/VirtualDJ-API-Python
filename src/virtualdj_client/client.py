@@ -232,10 +232,10 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
-        self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
         if status == "ok":
            return True
         else:
+            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
             return False
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
@@ -339,10 +339,11 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
-        self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
-        if status == "ok": 
+        if status == "ok":
+            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
             return result
         else:
+            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
             return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
@@ -351,10 +352,11 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
-        self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
         if status == "ok":
+            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
             return (result.lower() == "true")
         else:
+            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}")
             return False
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper

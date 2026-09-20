@@ -7,8 +7,12 @@ import httpx
 from typing import Literal
 from dataclasses import dataclass
 from urllib.parse import quote as encodeURI
+import logging
 
 from .client_config import VDJ_NETWORK_CONTROL_HOST, VDJ_NETWORK_CONTROL_PORT, VDJ_NETWORK_CONTROL_PASSWORD, VDJ_NETWORK_CONTROL_TIMEOUT
+
+# To limit the number of entries in the log file:
+logging.getLogger("httpx").setLevel(logging.WARNING)
 
 #------------------------------------------------------------------------------------
 @dataclass
