@@ -171,31 +171,45 @@ class VirtualDJMonitor(tk.Tk):
         browser_preparestems_button = ttk.Button(browser_frame, text="PREPARE\nSTEMS", command=lambda: self._send_command("browsed_file_prepare_stems"))
         browser_preparestems_button.grid(row=1, column=6, padx=5,pady=5)
 
-        leftdeck_frame = ttk.LabelFrame(parent, text="Left Deck")
-        leftdeck_frame.pack(fill="both", padx=10, pady=5)
-        rightdeck_frame = ttk.LabelFrame(parent, text="Right Deck")
-        rightdeck_frame.pack(fill="both", padx=10, pady=5)
+      
 
-        frames_deck_definition = [
-            (leftdeck_frame,"left"),
-            (rightdeck_frame,"right"),
-        ]
+        frame_title = "Left Deck"
+        deck = "left"
+        frame = ttk.LabelFrame(parent, text=frame_title)
+        frame.pack(fill="both", padx=10, pady=5)
+        select_button = ttk.Button(frame, text="SELECT", command=lambda: self._send_command(f"deck {deck} select"))
+        select_button.grid(row=0, column=0, padx=5,pady=5)
+        pfl_button = ttk.Button(frame, text="PFL", command=lambda: self._send_command(f"deck {deck} pfl"))
+        pfl_button.grid(row=0, column=1, padx=5,pady=5)
+        cue_button = ttk.Button(frame, text="CUE", command=lambda: self._send_command(f"deck {deck} cue_button"))
+        cue_button.grid(row=0, column=2, padx=5,pady=5)
+        play_button = ttk.Button(frame, text="PLAY", command=lambda: print(f"{deck.upper()} BUTTON") or self._send_command(f"deck {deck} play_button"))
+        play_button.grid(row=0, column=3, padx=5,pady=5)
+        sync_button = ttk.Button(frame, text="SYNC", command=lambda: self._send_command(f"deck {deck} sync"))
+        sync_button.grid(row=0, column=4, padx=5,pady=5)
+        stop_button = ttk.Button(frame, text="STOP", command=lambda: self._send_command(f"deck {deck} stop_button"))
+        stop_button.grid(row=0, column=5, padx=5,pady=5)
+        unload_button = ttk.Button(frame, text="UNLOAD", command=lambda: self._send_command(f"deck {deck} unload"))
+        unload_button.grid(row=0, column=6, padx=5,pady=5)
 
-        for row, (frame, deck) in enumerate(frames_deck_definition):
-            select_button = ttk.Button(frame, text="SELECT", command=lambda: self._send_command(f"deck {deck} select"))
-            select_button.grid(row=0, column=0, padx=5,pady=5)
-            pfl_button = ttk.Button(frame, text="PFL", command=lambda: self._send_command(f"deck {deck} pfl"))
-            pfl_button.grid(row=0, column=1, padx=5,pady=5)
-            cue_button = ttk.Button(frame, text="CUE", command=lambda: self._send_command(f"deck {deck} cue_button"))
-            cue_button.grid(row=0, column=2, padx=5,pady=5)
-            play_button = ttk.Button(frame, text="PLAY", command=lambda: self._send_command(f"deck {deck} play_button"))
-            play_button.grid(row=0, column=3, padx=5,pady=5)
-            sync_button = ttk.Button(frame, text="SYNC", command=lambda: self._send_command(f"deck {deck} sync"))
-            sync_button.grid(row=0, column=4, padx=5,pady=5)
-            stop_button = ttk.Button(frame, text="STOP", command=lambda: self._send_command(f"deck {deck} stop_button"))
-            stop_button.grid(row=0, column=5, padx=5,pady=5)
-            unload_button = ttk.Button(frame, text="UNLOAD", command=lambda: self._send_command(f"deck {deck} unload"))
-            unload_button.grid(row=0, column=6, padx=5,pady=5)
+        frame_title = "Right Deck"
+        deck = "right"
+        frame = ttk.LabelFrame(parent, text=frame_title)
+        frame.pack(fill="both", padx=10, pady=5)
+        select_button = ttk.Button(frame, text="SELECT", command=lambda: self._send_command(f"deck {deck} select"))
+        select_button.grid(row=0, column=0, padx=5,pady=5)
+        pfl_button = ttk.Button(frame, text="PFL", command=lambda: self._send_command(f"deck {deck} pfl"))
+        pfl_button.grid(row=0, column=1, padx=5,pady=5)
+        cue_button = ttk.Button(frame, text="CUE", command=lambda: self._send_command(f"deck {deck} cue_button"))
+        cue_button.grid(row=0, column=2, padx=5,pady=5)
+        play_button = ttk.Button(frame, text="PLAY", command=lambda: print(f"{deck.upper()} BUTTON") or self._send_command(f"deck {deck} play_button"))
+        play_button.grid(row=0, column=3, padx=5,pady=5)
+        sync_button = ttk.Button(frame, text="SYNC", command=lambda: self._send_command(f"deck {deck} sync"))
+        sync_button.grid(row=0, column=4, padx=5,pady=5)
+        stop_button = ttk.Button(frame, text="STOP", command=lambda: self._send_command(f"deck {deck} stop_button"))
+        stop_button.grid(row=0, column=5, padx=5,pady=5)
+        unload_button = ttk.Button(frame, text="UNLOAD", command=lambda: self._send_command(f"deck {deck} unload"))
+        unload_button.grid(row=0, column=6, padx=5,pady=5)
            
             
 
