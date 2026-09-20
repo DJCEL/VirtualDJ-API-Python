@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.10 (2026-09-20)
+
+* Definition of VdjBrowserFolder, VdjBrowserFile, VdjAutomix to query VirtualDJ
+* Some fixes to decrease the log file size
+* More work on main_gui.py
+
 ## 1.1.8 (2026-09-16)
 
 * Add main_gui.py to launch a graphical user interface (tkinter)
@@ -21,7 +27,7 @@
 
 * Support of songs database (database.xml, extra.db, cache.db)
 * Support of history file (tracklist.txt)
-* more support for mac (not yet finished)
+* More support for mac (not yet finished)
 
 ## 1.0.10 (2026-08-29)
 

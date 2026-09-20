@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.28"
+__version__ = "1.0.29"
 
 import asyncio
 import time
@@ -100,7 +100,6 @@ class VdjMixer:
     CrossfaderDisable: Optional[bool] = None
     CrossfaderHamster: Optional[bool] = None
     CrossfaderCurve: Optional[str] = None
-    CrossfaderCustom: Optional[str] = None
     MasterVolume: Optional[float] = None
     MicVolume:  Optional[float] = None
     Mic2Volume:  Optional[float] = None
@@ -173,6 +172,8 @@ class VdjAutomix:
     automix_song_title: Optional[str] = None
     automix_nextsong_artist: Optional[str] = None
     automix_nextsong_title: Optional[str] = None
+    automix_nextsong2_artist: Optional[str] = None
+    automix_nextsong2_title: Optional[str] = None
     AutomixType: Optional[str] = None
     AutomixLength: Optional[str] = None
     repeat_song: Optional[bool] = None
@@ -562,7 +563,7 @@ class VirtualDJClient():
         song.Filesize = self.to_int(await self._get_result_deck(deck, "get_filesize"))
         song.Artist = self.to_str(await self._get_result_deck(deck, "get_artist"))
         song.Title = self.to_str(await self._get_result_deck(deck, "get_title"))
-        song.Remix = self.to_str(await self._get_result_deck(deck, "get_remix"))
+        song.Remix = self.to_str(await self._get_result_deck(deck, "get_remix_after_title"))
         song.Genre = self.to_str(await self._get_result_deck(deck, "get_genre"))
         song.Album = self.to_str(await self._get_result_deck(deck, "get_album"))
         year_tmp = self.to_int(await self._get_result_deck(deck, "get_year"))
@@ -649,7 +650,6 @@ class VirtualDJClient():
         mixer.CrossfaderDisable = self.to_bool(await self._get_result("crossfader_disable"))
         mixer.CrossfaderHamster = self.to_bool(await self._get_result("crossfader_hamster"))
         mixer.CrossfaderCurve = self.to_crossfaderCurve(await self._get_result("setting 'crossfaderCurve'"))
-        mixer.CrossfaderCustom = self.to_str(await self._get_result("setting 'crossfaderCustom'"))
         mixer.MasterVolume = self.to_float(await self._get_result("master_volume"))
         mixer.MicVolume = self.to_float(await self._get_result("mic_volume"))
         mixer.Mic2Volume = self.to_float(await self._get_result("mic2_volume"))
@@ -692,7 +692,7 @@ class VirtualDJClient():
         browserfile = VdjBrowserFile()
         browserfile.browsed_scrollpos = self.to_int(await self._get_result("get_browsed_scrollpos"))
         browserfile.browsed_scrollsize = self.to_int(await self._get_result("get_browsed_scrollsize"))
-        browserfile.browsed_selection_index = self.to_int(await self._get_result("get_browsed_selection_index"))
+        #browserfile.browsed_selection_index = self.to_int(await self._get_result("get_browsed_selection_index"))
         browserfile.browsed_filepath = self.to_str(await self._get_result("get_browsed_filepath"))
         browserfile.browsed_artist = self.to_str(await self._get_result("get_browsed_artist"))
         browserfile.browsed_title = self.to_str(await self._get_result("get_browsed_title"))
@@ -702,7 +702,7 @@ class VirtualDJClient():
         browserfile.browsed_genre = self.to_str(await self._get_result("get_browsed_genre"))
         browserfile.browsed_comment = self.to_str(await self._get_result("get_browsed_comment"))
         browserfile.browsed_composer = self.to_str(await self._get_result("get_browsed_composer"))
-        browserfile.browsed_color = self.to_str(await self._get_result("get_browsed_color"))
+        browserfile.browsed_color = self.to_str(await self._get_result("get_browsed_song color"))
         browserfile.browsed_album = self.to_str(await self._get_result("get_browsed_album"))
         return browserfile
     #------------------------------------------------------------------------------------
@@ -723,11 +723,6 @@ class VirtualDJClient():
         automix.playlist_repeat = self.to_bool(await self._get_result("playlist_repeat"))
         automix.playlist_randomize = self.to_bool(await self._get_result("playlist_randomize"))
         automix.automix_crossfader = self.to_float(await self._get_result("get_automix"))
-        automix.automix_position = self.to_int(await self._get_result("get_automix_position"))
-        automix.automix_song_artist = self.to_str(await self._get_result("get_automix_song 'artist' 0"))
-        automix.automix_song_title = self.to_str(await self._get_result("get_automix_song 'title' 0"))
-        automix.automix_nextsong_artist = self.to_str(await self._get_result("get_automix_song 'artist' 1"))
-        automix.automix_nextsong_title = self.to_str(await self._get_result("get_automix_song 'title' 1"))
         automix.AutomixType = self.to_AutomixType(await self._get_result("setting 'automixMode'"))
         automix.AutomixLength = self.to_AutomixLength(await self._get_result("setting 'fadeLength'"))
         automix.repeat_song = self.to_bool(await self._get_result("repeat_song"))
@@ -737,6 +732,14 @@ class VirtualDJClient():
         automix.automixTempoMode = self.to_str(await self._get_result("setting 'automixTempoMode'"))
         automix.automixBeatMatchOnFade = self.to_bool(await self._get_result("setting 'autoMixBeatMatchOnFade'"))
         automix.automixDoubleClick = self.to_str(await self._get_result("setting 'automixDoubleClick'"))
+        # To limit the HTTP errors, we only request when automix is on
+        if automix.IsAutomixing:
+            automix.automix_position = self.to_int(await self._get_result("get_automix_position"))
+            automix.automix_nextsong_artist = self.to_str(await self._get_result("get_automix_song 'artist' 1"))
+            automix.automix_nextsong_title = self.to_str(await self._get_result("get_automix_song 'title' 1"))
+            automix.automix_nextsong2_artist = self.to_str(await self._get_result("get_automix_song 'artist' 2"))
+            automix.automix_nextsong2_title = self.to_str(await self._get_result("get_automix_song 'title' 2"))
+
         return automix
     #------------------------------------------------------------------------------------
     #  Video
