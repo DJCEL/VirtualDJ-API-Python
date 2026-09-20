@@ -141,43 +141,10 @@ class VirtualDJMonitor(tk.Tk):
         send_button = ttk.Button(vdjscript_frame, text="Send", command=self._send_vdjscript)
         send_button.pack(side="right",padx=5,pady=5)
 
-        browser_frame = ttk.LabelFrame(parent, text="Browser")
-        browser_frame.pack(fill="x", padx=10, pady=5)
-        browser_folders_button = ttk.Button(browser_frame, text="FOLDERS", command=lambda: self._send_command("browser_window 'folders'"))
-        browser_folders_button.grid(row=0, column=0, padx=5,pady=5)
-        browser_songs_button = ttk.Button(browser_frame, text="SONGS", command=lambda: self._send_command("browser_window 'songs'"))
-        browser_songs_button.grid(row=0, column=1, padx=5,pady=5)
-        browser_sidelist_button = ttk.Button(browser_frame, text="SIDELIST", command=lambda: self._send_command("browser_window 'sidelist'"))
-        browser_sidelist_button.grid(row=0, column=2, padx=5,pady=5)
-        browser_remixes_button = ttk.Button(browser_frame, text="REMIXES", command=lambda: self._send_command("browser_window 'remixes'"))
-        browser_remixes_button.grid(row=0, column=3, padx=5, pady=5)
-        browser_sampler_button = ttk.Button(browser_frame, text="SAMPLER", command=lambda: self._send_command("browser_window 'sampler'"))
-        browser_sampler_button.grid(row=0, column=4, padx=5,pady=5)
-        browser_automix_button = ttk.Button(browser_frame, text="AUTOMIX", command=lambda: self._send_command("browser_window 'automix'"))
-        browser_automix_button.grid(row=0, column=5, padx=5,pady=5)
-        browser_karaoke_button = ttk.Button(browser_frame, text="KARAOKE", command=lambda: self._send_command("browser_window 'karaoke'"))
-        browser_karaoke_button.grid(row=0, column=6, padx=5,pady=5)
-        browser_up_button = ttk.Button(browser_frame, text="UP", command=lambda: self._send_command("browser_scroll -1"))
-        browser_up_button.grid(row=1, column=0, padx=5,pady=5)
-        browser_down_button = ttk.Button(browser_frame, text="DOWN", command=lambda: self._send_command("browser_scroll +1"))
-        browser_down_button.grid(row=1, column=1, padx=5,pady=5)
-        browser_open_button = ttk.Button(browser_frame, text="OPEN/CLOSE\nFOLDER", command=lambda: self._send_command("browser_open_folder"))
-        browser_open_button.grid(row=1, column=2, padx=5,pady=5)
-        browser_load_button = ttk.Button(browser_frame, text="LOAD", command=lambda: self._send_command("load"))
-        browser_load_button.grid(row=1, column=3, padx=5,pady=5)
-        browser_analyse_button = ttk.Button(browser_frame, text="ANALYSE", command=lambda: self._send_command("browsed_file_analyze"))
-        browser_analyse_button.grid(row=1, column=4, padx=5,pady=5)
-        browser_analysefluid_button = ttk.Button(browser_frame, text="FLUID\nANALYSE", command=lambda: self._send_command("browsed_file_analyze fluid"))
-        browser_analysefluid_button.grid(row=1, column=5, padx=5,pady=5)
-        browser_preparestems_button = ttk.Button(browser_frame, text="PREPARE\nSTEMS", command=lambda: self._send_command("browsed_file_prepare_stems"))
-        browser_preparestems_button.grid(row=1, column=6, padx=5,pady=5)
-
-      
         decks_frame_list = [
             ("Left Deck","left"),
-            ("Rigth Deck","right")
+            ("Right Deck","right")
             ]
-
 
         for row, (frame_title,deck) in enumerate(decks_frame_list):
             frame = ttk.LabelFrame(parent, text=frame_title)
@@ -198,11 +165,47 @@ class VirtualDJMonitor(tk.Tk):
             unload_button.grid(row=0, column=6, padx=5,pady=5)
             loop_button = ttk.Button(frame, text="LOOP", command=partial(self._send_command_deck,"loop",deck))
             loop_button.grid(row=0, column=7, padx=5,pady=5)
+            loop_half_button = ttk.Button(frame, text="LOOP-", command=partial(self._send_command_deck,"loop_half",deck))
+            loop_half_button.grid(row=0, column=8, padx=5,pady=5)
+            loop_double_button = ttk.Button(frame, text="LOOP+", command=partial(self._send_command_deck,"loop_double",deck))
+            loop_double_button.grid(row=0, column=9, padx=5,pady=5)
 
         
+        mixer_frame = ttk.LabelFrame(parent, text="Mixer")
+        mixer_frame.pack(fill="x", padx=10, pady=5)
+        crossfader = ttk.Scale(mixer_frame,from_=0.0,to=1.0,orient="horizontal", command=partial(self._send_command,"crossfader"))
+        crossfader.grid(row=0, column=0, padx=5,pady=5)
 
-
-       
+        browser_frame = ttk.LabelFrame(parent, text="Browser")
+        browser_frame.pack(fill="x", padx=10, pady=5)
+        browser_folders_button = ttk.Button(browser_frame, text="FOLDERS", command=partial(self._send_command,"browser_window 'folders'"))
+        browser_folders_button.grid(row=0, column=0, padx=5,pady=5)
+        browser_songs_button = ttk.Button(browser_frame, text="SONGS", command=partial(self._send_command,"browser_window 'songs'"))
+        browser_songs_button.grid(row=0, column=1, padx=5,pady=5)
+        browser_sidelist_button = ttk.Button(browser_frame, text="SIDELIST", command=partial(self._send_command,"browser_window 'sidelist'"))
+        browser_sidelist_button.grid(row=0, column=2, padx=5,pady=5)
+        browser_remixes_button = ttk.Button(browser_frame, text="REMIXES", command=partial(self._send_command,"browser_window 'remixes'"))
+        browser_remixes_button.grid(row=0, column=3, padx=5, pady=5)
+        browser_sampler_button = ttk.Button(browser_frame, text="SAMPLER", command=partial(self._send_command,"browser_window 'sampler'"))
+        browser_sampler_button.grid(row=0, column=4, padx=5,pady=5)
+        browser_automix_button = ttk.Button(browser_frame, text="AUTOMIX", command=partial(self._send_command,"browser_window 'automix'"))
+        browser_automix_button.grid(row=0, column=5, padx=5,pady=5)
+        browser_karaoke_button = ttk.Button(browser_frame, text="KARAOKE", command=partial(self._send_command,"browser_window 'karaoke'"))
+        browser_karaoke_button.grid(row=0, column=6, padx=5,pady=5)
+        browser_up_button = ttk.Button(browser_frame, text="UP", command=partial(self._send_command,"browser_scroll -1"))
+        browser_up_button.grid(row=1, column=0, padx=5,pady=5)
+        browser_down_button = ttk.Button(browser_frame, text="DOWN", command=partial(self._send_command,"browser_scroll +1"))
+        browser_down_button.grid(row=1, column=1, padx=5,pady=5)
+        browser_open_button = ttk.Button(browser_frame, text="OPEN/CLOSE\nFOLDER", command=partial(self._send_command,"browser_open_folder"))
+        browser_open_button.grid(row=1, column=2, padx=5,pady=5)
+        browser_load_button = ttk.Button(browser_frame, text="LOAD", command=partial(self._send_command,"load"))
+        browser_load_button.grid(row=1, column=3, padx=5,pady=5)
+        browser_analyse_button = ttk.Button(browser_frame, text="ANALYSE", command=partial(self._send_command,"browsed_file_analyze"))
+        browser_analyse_button.grid(row=1, column=4, padx=5,pady=5)
+        browser_analysefluid_button = ttk.Button(browser_frame, text="FLUID\nANALYSE", command=partial(self._send_command,"browsed_file_analyze fluid"))
+        browser_analysefluid_button.grid(row=1, column=5, padx=5,pady=5)
+        browser_preparestems_button = ttk.Button(browser_frame, text="PREPARE\nSTEMS", command=partial(self._send_command,"browsed_file_prepare_stems"))
+        browser_preparestems_button.grid(row=1, column=6, padx=5,pady=5)
 
     #------------------------------------------------------------------------------------
     def _define_tab_songsdb(self, parent):
@@ -301,20 +304,26 @@ class VirtualDJMonitor(tk.Tk):
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
     #------------------------------------------------------------------------------------
-    def _send_command(self, vdjscript: str):
-        if not vdjscript:
+    def _send_command(self, vdjverb: str, value: float = None):
+        if not vdjverb:
             return
         if self.client is None:
             return
         if self._loop is None:
             return
+
+        if value is None:
+            vdjscript = f"{vdjverb}"
+        else:
+            vdjscript = f"{vdjverb} {value}"
+
         try:
             future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self._loop)
             future.add_done_callback(self._vdjscript_done)
         except Exception as e:
             pass
     #------------------------------------------------------------------------------------
-    def _send_command_deck(self, vdjverb: str, deck:str):
+    def _send_command_deck(self, vdjverb: str, deck:str, value: float = None):
         if not vdjverb:
             return
         if not deck:
@@ -324,7 +333,11 @@ class VirtualDJMonitor(tk.Tk):
         if self._loop is None:
             return
 
-        vdjscript = f"deck {deck} {vdjverb}"
+        if value is None:
+            vdjscript = f"deck {deck} {vdjverb}"
+        else:
+            vdjscript = f"deck {deck} {vdjverb} {value}"
+
         try:
             future = asyncio.run_coroutine_threadsafe(self.client.send_async(vdjscript), self._loop)
             future.add_done_callback(self._vdjscript_done)
