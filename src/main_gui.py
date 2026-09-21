@@ -27,26 +27,6 @@ from virtualdj_client import (
 from virtualdj_client import __version__ as __vdjclient_version__
 
 
-# A distinct color per band (v0, v1, v2, ...). Extend if you have more bands.
-BAND_COLORS = [
-    "#4FC3F7",  # light blue
-    "#81C784",  # green
-    "#FFD54F",  # yellow
-    "#FF8A65",  # orange
-    "#BA68C8",  # purple
-    "#4DB6AC",  # teal
-    "#F06292",  # pink
-    "#A1887F",  # brown
-    "#90A4AE",  # gray-blue
-]
-
-BG_COLOR = "#1e1e1e"
-CENTER_LINE_COLOR = "#3a3a3a"
-RULER_COLOR = "#5a5a5a"
-RULER_TEXT_COLOR = "#9a9a9a"
-PLAYHEAD_COLOR = "#ffffff"
-RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
-
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
@@ -56,7 +36,7 @@ class VirtualDJMonitor(tk.Tk):
 
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
-        self.configure(bg=BG_COLOR)
+        self.configure(bg="#1e1e1e")
         style = ttk.Style()
         try:
             style.theme_use("clam")
@@ -504,6 +484,24 @@ class WaveformViewer(ttk.Frame):
         self.max_height = 260
         self._build_ui(parent_frame)
 
+        # A distinct color per band (v0, v1, v2, ...). Extend if you have more bands.
+        self.BAND_COLORS = [
+            "#4FC3F7",  # light blue
+            "#81C784",  # green
+            "#FFD54F",  # yellow
+            "#FF8A65",  # orange
+            "#BA68C8",  # purple
+            "#4DB6AC",  # teal
+            "#F06292",  # pink
+            "#A1887F",  # brown
+            "#90A4AE",  # gray-blue
+        ]
+        self.CENTER_LINE_COLOR = "#3a3a3a"
+        self.RULER_COLOR = "#5a5a5a"
+        self.RULER_TEXT_COLOR = "#9a9a9a"
+        self.PLAYHEAD_COLOR = "#ffffff"
+        self.RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
+
 
     def draw_waveform(self, waveform, valuesPerSecond): 
         samples = self._decode_vdj_waveform(waveform)
@@ -569,7 +567,7 @@ class WaveformViewer(ttk.Frame):
         canvas_frame = ttk.Frame(parent_frame)
         canvas_frame.pack(side="top", fill="x", expand=True)
 
-        self.canvas = tk.Canvas(canvas_frame, bg=BG_COLOR, highlightthickness=0)
+        self.canvas = tk.Canvas(canvas_frame, bg="#1e1e1e", highlightthickness=0)
         hscroll = ttk.Scrollbar(canvas_frame, orient="horizontal", command=self.canvas.xview)
         self.canvas.configure(xscrollcommand=hscroll.set)
         self.canvas.pack(side="top", fill="x", expand=True)
@@ -591,11 +589,11 @@ class WaveformViewer(ttk.Frame):
         n = len(samples)
         step = self.bar_width + self.gap
         total_width = max(n * step, 1)
-        ruler_h = RULER_HEIGHT if self.seconds_per_sample is not None else 0
+        ruler_h = self.RULER_HEIGHT if self.seconds_per_sample is not None else 0
         self.canvas.configure(scrollregion=(0, 0, total_width, self.max_height + 40 + ruler_h))
 
         center_y = (self.max_height // 2) + 20
-        self.canvas.create_line(0, center_y, total_width, center_y, fill=CENTER_LINE_COLOR)
+        self.canvas.create_line(0, center_y, total_width, center_y, fill=self.CENTER_LINE_COLOR)
 
         self._draw_curve(step, center_y, samples)
 
@@ -615,7 +613,7 @@ class WaveformViewer(ttk.Frame):
             total = sum(values) or 1
             sample_scale = min(sum(values) / (n_bands * self.global_max), 1.0)
             y_top = center_y
-            for v, color in zip(values, BAND_COLORS):
+            for v, color in zip(values, self.BAND_COLORS):
                 if v <= 0:
                     continue
                 seg_h = (v / total) * sample_scale * half_h
@@ -626,7 +624,7 @@ class WaveformViewer(ttk.Frame):
                 y_top = y_new_top
             # mirror below the center line for a classic waveform silhouette
             y_bot = center_y
-            for v, color in zip(values, BAND_COLORS):
+            for v, color in zip(values, self.BAND_COLORS):
                 if v <= 0:
                     continue
                 seg_h = (v / total) * sample_scale * half_h
@@ -638,7 +636,7 @@ class WaveformViewer(ttk.Frame):
 
     def _draw_ruler(self, step, total_width, y):
         """Draw a time axis (mm:ss ticks) below the waveform."""
-        self.canvas.create_line(0, y, total_width, y, fill=RULER_COLOR)
+        self.canvas.create_line(0, y, total_width, y, fill=self.RULER_COLOR)
 
         # Pick a tick spacing that yields a reasonable number of on-screen
         # labels regardless of zoom level (bar width / sample count).
@@ -649,9 +647,9 @@ class WaveformViewer(ttk.Frame):
         t = 0.0
         while t <= self.duration:
             x = (t / self.seconds_per_sample) * step
-            self.canvas.create_line(x, y, x, y + 5, fill=RULER_COLOR)
+            self.canvas.create_line(x, y, x, y + 5, fill=self.RULER_COLOR)
             self.canvas.create_text(
-                x + 2, y + 7, text=self.format_time(t), fill=RULER_TEXT_COLOR,
+                x + 2, y + 7, text=self.format_time(t), fill=self.RULER_TEXT_COLOR,
                 anchor="nw", font=("TkDefaultFont", 8)
             )
             t += tick_seconds
