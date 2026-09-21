@@ -8,6 +8,8 @@ import sys
 import os
 from pathlib import Path
 from functools import partial
+from PIL import Image, ImageTk
+import struct
 
 __version__ = "1.0.9"
 
@@ -23,16 +25,48 @@ from virtualdj_client import (
     VirtualDJSongsDatabase,
 )
 from virtualdj_client import __version__ as __vdjclient_version__
+
+
+# A distinct color per band (v0, v1, v2, ...). Extend if you have more bands.
+BAND_COLORS = [
+    "#4FC3F7",  # light blue
+    "#81C784",  # green
+    "#FFD54F",  # yellow
+    "#FF8A65",  # orange
+    "#BA68C8",  # purple
+    "#4DB6AC",  # teal
+    "#F06292",  # pink
+    "#A1887F",  # brown
+    "#90A4AE",  # gray-blue
+]
+
+BG_COLOR = "#1e1e1e"
+CENTER_LINE_COLOR = "#3a3a3a"
+RULER_COLOR = "#5a5a5a"
+RULER_TEXT_COLOR = "#9a9a9a"
+PLAYHEAD_COLOR = "#ffffff"
+RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
+
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
         super().__init__()
         self.client: VirtualDJClient | None = None
         self._init_client()
+
         self.title("VirtualDJ Client")
         self.geometry("1024x768")
+        self.configure(bg=BG_COLOR)
+        style = ttk.Style()
+        try:
+            style.theme_use("clam")
+        except tk.TclError:
+            pass
+
         self._define_menu()
         self._define_tab()
+
+
         self.interval_refresh = 100  # ms
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
@@ -247,6 +281,11 @@ class VirtualDJMonitor(tk.Tk):
         text = tk.Text(self.frameDB, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)
         self.frameDB.text_widget = text
+
+        self.waveform_frame = ttk.LabelFrame(parent, text="Waveform")
+        self.waveform_frame.grid(row=3,column=0, sticky="nsew",padx=10,pady=5)
+        self.waveform_viewer = WaveformViewer(self.waveform_frame)
+
     #------------------------------------------------------------------------------------
     def on_selectDB(self, event):
         self._update_frame_text(self.frameDBcount,"")
@@ -279,6 +318,9 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0]
                 self._update_frame_text(self.frameDB,item_1)
+                waveform = item_1["waveform"]
+                valuesPerSecond = item_1["valuesPerSecond"]
+                self.waveform_viewer.draw_waveform(waveform, valuesPerSecond)
         elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
@@ -302,7 +344,7 @@ class VirtualDJMonitor(tk.Tk):
             self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
                 item_1 = result_list[0]
-                self._update_frame_text(self.frameDB,item_1)
+                self._update_frame_text(self.frameDB,item_1)    
     #------------------------------------------------------------------------------------
     def _send_command(self, vdjverb: str, value: float = None):
         if not vdjverb:
@@ -444,12 +486,192 @@ class VirtualDJMonitor(tk.Tk):
                 data = vdjdata
             elif isinstance(vdjdata, str):
                 data = vdjdata
+            elif isinstance(vdjdata, (bytes, bytearray)):
+                data = vdjdata
             else:
                 data = vars(vdjdata)
 
             widget.insert("end", data)
 
         widget.configure(state="disabled")
+#------------------------------------------------------------------------------------------------------------------------------------
+class WaveformViewer(ttk.Frame):
+    def __init__(self, parent_frame):
+        super().__init__(parent_frame)
+        self.parent_frame = parent_frame
+        self.bar_width = 4
+        self.gap = 1
+        self.max_height = 260
+        self._build_ui(parent_frame)
+
+
+    def draw_waveform(self, waveform, valuesPerSecond): 
+        samples = self._decode_vdj_waveform(waveform)
+        self.keys = sorted(samples[0].keys(), key=lambda k: int("".join(ch for ch in k if ch.isdigit()) or 0),)
+        self.duration = len(samples) / valuesPerSecond
+        self.values_per_second = valuesPerSecond
+        self.seconds_per_sample = 1 / valuesPerSecond
+
+        # Normalize against the global max across all bands/samples so bar heights are comparable sample-to-sample.
+        self.global_max = max((v for s in samples for v in s.values() if isinstance(v, (int, float))), default=1,) or 1
+
+        self.toobar_text_data.set(f"valuesPerSecond={self.values_per_second} / Duration={self.duration} seconds / {len(samples)} samples")
+        self._draw(samples)
+
+    def _decode_vdj_waveform(self, waveformDB):
+        waveform = waveformDB.hex()
+        if isinstance(waveform, str):
+            waveform = waveform.strip()
+
+            # Remove optional 0x prefix
+            if waveform.startswith("0x"):
+                waveform = waveform[2:]
+
+            data = bytes.fromhex(waveform)
+
+        elif isinstance(waveform, bytes):
+            data = waveform
+
+        elif isinstance(waveform, bytearray):
+            data = bytes(waveform)
+
+        else:
+            raise TypeError(f"Unsupported waveform type: {type(waveform).__name__}")
+
+        if len(data) % 28:
+            raise ValueError(f"Invalid waveform size: {len(data)} bytes")
+
+        samples = []
+
+        for offset in range(0, len(data), 28):
+            v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
+
+            samples.append({
+                "v0": v0 / 2**24,
+                "v1": v1 / 2**24,
+                "v2": v2 / 2**24,
+                "v3": v3 / 2**24,
+                "v4": v4 / 2**24,
+                "v5": v5 / 2**24,
+                "v6": v6,
+            })
+
+        return samples
+
+    def _build_ui(self, parent_frame):
+        toolbar = ttk.Frame(parent_frame)
+        toolbar.pack(side="top", fill="x", padx=6, pady=6)
+       
+        self.toobar_text_data = tk.StringVar(value="")
+        toobar_text = ttk.Label(toolbar, textvariable=self.toobar_text_data)
+        toobar_text.pack(side="left")
+
+        canvas_frame = ttk.Frame(parent_frame)
+        canvas_frame.pack(side="top", fill="x", expand=True)
+
+        self.canvas = tk.Canvas(canvas_frame, bg=BG_COLOR, highlightthickness=0)
+        hscroll = ttk.Scrollbar(canvas_frame, orient="horizontal", command=self.canvas.xview)
+        self.canvas.configure(xscrollcommand=hscroll.set)
+        self.canvas.pack(side="top", fill="x", expand=True)
+        hscroll.pack(side="bottom", fill="x")
+
+        # Mouse wheel horizontal scroll (Shift+wheel on most platforms, plain wheel on trackpads)
+        self.canvas.bind("<MouseWheel>", self._on_mousewheel)
+        self.canvas.bind("<Shift-MouseWheel>", self._on_mousewheel)
+        self.canvas.bind("<Button-4>", lambda e: self.canvas.xview_scroll(-3, "units"))
+        self.canvas.bind("<Button-5>", lambda e: self.canvas.xview_scroll(3, "units"))
+        self.pack(fill="both", expand=True)
+
+    def _on_mousewheel(self, event):
+        delta = -1 if event.delta > 0 else 1
+        self.canvas.xview_scroll(delta * 3, "units")
+
+    def _draw(self, samples):
+        self.canvas.delete("all")
+        n = len(samples)
+        step = self.bar_width + self.gap
+        total_width = max(n * step, 1)
+        ruler_h = RULER_HEIGHT if self.seconds_per_sample is not None else 0
+        self.canvas.configure(scrollregion=(0, 0, total_width, self.max_height + 40 + ruler_h))
+
+        center_y = (self.max_height // 2) + 20
+        self.canvas.create_line(0, center_y, total_width, center_y, fill=CENTER_LINE_COLOR)
+
+        self._draw_curve(step, center_y, samples)
+
+        if self.seconds_per_sample is not None:
+            self._draw_ruler(step, total_width, self.max_height + 40)
+
+    def _draw_curve(self, step, center_y, samples):
+        """Each sample = one x position, bands stacked as mirrored segments."""
+        half_h = (self.max_height // 2)
+        n_bands = len(self.keys)
+        for i, sample in enumerate(samples):
+            x0 = i * step
+            x1 = x0 + self.bar_width
+            # allocate height per band proportional to its share of a
+            # per-sample max, scaled against the global max
+            values = [max(0.0, float(sample.get(k, 0) or 0)) for k in self.keys]
+            total = sum(values) or 1
+            sample_scale = min(sum(values) / (n_bands * self.global_max), 1.0)
+            y_top = center_y
+            for v, color in zip(values, BAND_COLORS):
+                if v <= 0:
+                    continue
+                seg_h = (v / total) * sample_scale * half_h
+                y_new_top = y_top - seg_h
+                self.canvas.create_rectangle(
+                    x0, y_new_top, x1, y_top, fill=color, width=0
+                )
+                y_top = y_new_top
+            # mirror below the center line for a classic waveform silhouette
+            y_bot = center_y
+            for v, color in zip(values, BAND_COLORS):
+                if v <= 0:
+                    continue
+                seg_h = (v / total) * sample_scale * half_h
+                y_new_bot = y_bot + seg_h
+                self.canvas.create_rectangle(
+                    x0, y_bot, x1, y_new_bot, fill=color, width=0, stipple="gray50"
+                )
+                y_bot = y_new_bot
+
+    def _draw_ruler(self, step, total_width, y):
+        """Draw a time axis (mm:ss ticks) below the waveform."""
+        self.canvas.create_line(0, y, total_width, y, fill=RULER_COLOR)
+
+        # Pick a tick spacing that yields a reasonable number of on-screen
+        # labels regardless of zoom level (bar width / sample count).
+        px_per_second = step / self.seconds_per_sample if self.seconds_per_sample else 1
+        target_seconds_per_tick = 80 / max(px_per_second, 0.001)  # ~80px between labels
+        tick_seconds = self._nice_tick_seconds(target_seconds_per_tick)
+
+        t = 0.0
+        while t <= self.duration:
+            x = (t / self.seconds_per_sample) * step
+            self.canvas.create_line(x, y, x, y + 5, fill=RULER_COLOR)
+            self.canvas.create_text(
+                x + 2, y + 7, text=self.format_time(t), fill=RULER_TEXT_COLOR,
+                anchor="nw", font=("TkDefaultFont", 8)
+            )
+            t += tick_seconds
+
+    def format_time(self,seconds):
+        seconds = max(0, seconds)
+        m = int(seconds // 60)
+        s = seconds - m * 60
+        if seconds < 60:
+            return f"{s:.1f}s"
+        return f"{m}:{s:04.1f}"
+
+
+    def _nice_tick_seconds(self,target):
+        """Round `target` seconds up to a 'nice' tick interval (1,2,5,10,15,30,60...)."""
+        nice_steps = [0.1, 0.2, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300, 600]
+        for step in nice_steps:
+            if step >= target:
+                return step
+        return nice_steps[-1]
 #------------------------------------------------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     app = VirtualDJMonitor()
