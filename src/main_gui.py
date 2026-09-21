@@ -8,7 +8,6 @@ import sys
 import os
 from pathlib import Path
 from functools import partial
-from PIL import Image, ImageTk
 import struct
 
 __version__ = "1.0.10"
