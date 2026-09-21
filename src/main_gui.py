@@ -11,7 +11,7 @@ from functools import partial
 from PIL import Image, ImageTk
 import struct
 
-__version__ = "1.0.9"
+__version__ = "1.0.10"
 
 from virtualdj_client import (
     VirtualDJClient, 
