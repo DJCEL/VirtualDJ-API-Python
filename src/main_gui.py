@@ -10,7 +10,7 @@ from pathlib import Path
 from functools import partial
 import struct
 
-__version__ = "1.0.10"
+__version__ = "1.0.11"
 
 from virtualdj_client import (
     VirtualDJClient, 
