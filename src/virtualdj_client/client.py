@@ -589,16 +589,8 @@ class VirtualDJClient():
         deckengine.HasError = self.to_str(await self._get_result_deck(deck, "deck_has_error"))
         deckengine.IsPfl = self.to_bool(await self._get_result_deck(deck, "pfl"))
         deckengine.BpmCurrent = self.to_float(await self._get_result_deck(deck, "get_bpm"))
-        deckengine.KeyCurrent = self.to_str(await self._get_result_deck(deck, "get_key 'musical'"))
-        deckengine.KeyCurrentHarmonic = self.to_str(await self._get_result_deck(deck, "get_harmonic"))
         deckengine.Position = self.to_float(await self._get_result_deck(deck, "get_position"))
-        deckengine.Time = self._to_strtime(await self._get_result_deck(deck, "get_time"))
-        deckengine.TimeElapsed = self._to_strtime(await self._get_result_deck(deck, "get_time elapsed absolute"))
-        deckengine.TimeRemaining = self._to_strtime(await self._get_result_deck(deck, "get_time remaining absolute"))
         deckengine.Beat = self.to_float(await self._get_result_deck(deck, "get_beat"))
-        deckengine.Beatgrid = self.to_float(await self._get_result_deck(deck, "get_beatgrid"))
-        deckengine.Beatpos = self.to_float(await self._get_result_deck(deck, "get_beatpos"))
-        deckengine.Firstbeat = self.to_float(await self._get_result_deck(deck, "get_firstbeat"))
         deckengine.Volume = self.to_float(await self._get_result_deck(deck, "volume"))
         deckengine.VolumeTotal = self.to_float(await self._get_result_deck(deck, "get_volume"))
         deckengine.Level = self.to_float(await self._get_result_deck(deck, "get_level"))
@@ -627,6 +619,17 @@ class VirtualDJClient():
         deckengine.Filter = self.to_float(await self._get_result_deck(deck, "filter"))
         deckengine.IsStemsReady = self.to_bool(await self._get_result_deck(deck, "has_stems 'ready'"))
         deckengine.IsMasterDeck = self.to_bool(await self._get_result_deck(deck, "masterdeck"))
+        check_status = self.to_str(await self._get_result_deck(deck, "get_title"))
+        if check_status != "Drag a song on this deck to load it":  # to limit exceptions in log file
+            deckengine.KeyCurrent = self.to_str(await self._get_result_deck(deck, "get_key 'musical'"))
+            deckengine.KeyCurrentHarmonic = self.to_str(await self._get_result_deck(deck, "get_harmonic"))
+            deckengine.Time = self._to_strtime(await self._get_result_deck(deck, "get_time"))
+            deckengine.TimeElapsed = self._to_strtime(await self._get_result_deck(deck, "get_time elapsed absolute"))
+            deckengine.TimeRemaining = self._to_strtime(await self._get_result_deck(deck, "get_time remaining absolute"))
+            deckengine.Beatgrid = self.to_float(await self._get_result_deck(deck, "get_beatgrid"))
+            deckengine.Beatpos = self.to_float(await self._get_result_deck(deck, "get_beatpos"))
+            deckengine.Firstbeat = self.to_float(await self._get_result_deck(deck, "get_firstbeat"))
+
         return deckengine
     #------------------------------------------------------------------------------------
     async def get_DeckData_async(self, deck: str) -> VdjDeckData:
