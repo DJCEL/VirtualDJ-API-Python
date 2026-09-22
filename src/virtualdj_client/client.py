@@ -21,6 +21,7 @@ class VdjDeck:
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckSong:
+    IsLoaded: Optional[bool] = None
     Filepath: Optional[str] = None
     Filesize: Optional[int] = None
     IsVideo: Optional[bool] = None
@@ -46,9 +47,10 @@ class VdjDeckSong:
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjDeckEngine:
+    IsLoaded: Optional[bool] = None
     HasError: Optional[str] = None
     IsPfl: Optional[bool] = None
-    IsPlaying: Optional[bool] = None
+    IsPlaying: Optional[bool] = None    
     IsAudible: Optional[bool] = None
     IsLooping: Optional[bool] = None
     IsReverse: Optional[bool] = None
@@ -560,7 +562,8 @@ class VirtualDJClient():
         # TODO: check if we can use asyncio.gather() to decrease the latency
         song = VdjDeckSong() 
         song.Title = self.to_str(await self._get_result_deck(deck, "get_title"))
-        if song.Title != "Drag a song on this deck to load it":  # to limit exceptions in log file
+        song.IsLoaded = self.to_bool(await self._get_result_deck(deck, "loaded"))
+        if song.IsLoaded == True:  # to limit exceptions in log file
             song.Filepath = self.to_str(await self._get_result_deck(deck, "get_filepath"))
             song.Filesize = self.to_int(await self._get_result_deck(deck, "get_filesize"))
             song.Artist = self.to_str(await self._get_result_deck(deck, "get_artist"))
@@ -619,8 +622,8 @@ class VirtualDJClient():
         deckengine.Filter = self.to_float(await self._get_result_deck(deck, "filter"))
         deckengine.IsStemsReady = self.to_bool(await self._get_result_deck(deck, "has_stems 'ready'"))
         deckengine.IsMasterDeck = self.to_bool(await self._get_result_deck(deck, "masterdeck"))
-        check_status = self.to_str(await self._get_result_deck(deck, "get_title"))
-        if check_status != "Drag a song on this deck to load it":  # to limit exceptions in log file
+        deckengine.IsLoaded = self.to_bool(await self._get_result_deck(deck, "loaded"))
+        if deckengine.IsLoaded == True:  # to limit exceptions in log file
             deckengine.KeyCurrent = self.to_str(await self._get_result_deck(deck, "get_key 'musical'"))
             deckengine.KeyCurrentHarmonic = self.to_str(await self._get_result_deck(deck, "get_harmonic"))
             deckengine.Time = self._to_strtime(await self._get_result_deck(deck, "get_time"))
