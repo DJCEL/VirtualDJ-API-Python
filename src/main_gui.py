@@ -537,12 +537,14 @@ class WaveformViewer(ttk.Frame):
         else:
             raise TypeError(f"Unsupported waveform type: {type(waveform).__name__}")
 
-        if len(data) % 28:
-            raise ValueError(f"Invalid waveform size: {len(data)} bytes")
+        block_size = 28
+        data_len = len(data)
+        if data_len % block_size:
+            raise ValueError(f"Invalid waveform size: {data_len} bytes")
 
         samples = []
 
-        for offset in range(0, len(data), 28):
+        for offset in range(0, data_len, block_size):
             v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
             sample = {
                 "v0": v0 / 2**24,
