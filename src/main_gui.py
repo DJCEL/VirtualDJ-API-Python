@@ -299,9 +299,9 @@ class VirtualDJMonitor(tk.Tk):
             if n >= 1:
                 item_1 = result_list[0] # type: VdjWaveform
                 self._update_frame_text(self.frameDB,item_1)
-                waveform = item_1["waveform"]
+                waveform_bytes = item_1["waveform"]
                 valuesPerSecond = item_1["valuesPerSecond"]
-                self.waveform_viewer.draw_waveform(waveform, valuesPerSecond)
+                self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
         elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS):
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
             n = len(result_list)
