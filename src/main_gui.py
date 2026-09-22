@@ -545,7 +545,7 @@ class WaveformViewer(ttk.Frame):
         for offset in range(0, len(data), 28):
             v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
 
-            samples.append({
+            sample = {
                 "v0": v0 / 2**24,
                 "v1": v1 / 2**24,
                 "v2": v2 / 2**24,
@@ -553,7 +553,8 @@ class WaveformViewer(ttk.Frame):
                 "v4": v4 / 2**24,
                 "v5": v5 / 2**24,
                 "v6": v6,
-            })
+            }
+            samples.append(sample)
 
         return samples
 
