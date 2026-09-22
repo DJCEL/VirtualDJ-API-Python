@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.20'
+__version__ = '1.0.21'
 
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
@@ -128,6 +128,17 @@ class VdjSong:
         KARAOKE_FILE = 32  # [0x20]
         VIDEO_FILE = 64  # [0x40]
         NETSEARCH_FILE = 256 # [0x100]
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjWaveform:
+    id: int
+    filepath: str
+    filename: str
+    filesize: int
+    type: int
+    version: int
+    valuesPerSecond: float
+    waveform: str
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
     def __init__(self):
