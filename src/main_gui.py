@@ -22,6 +22,8 @@ from virtualdj_client import (
     VdjAutomix,
     VdjVideo,
     VirtualDJSongsDatabase,
+    VdjSong,
+    VdjWaveform
 )
 from virtualdj_client import __version__ as __vdjclient_version__
 
