@@ -47,37 +47,12 @@ class VirtualDJClientHttp:
         encoded_vdjscript = encodeURI(vdjscript)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
+       
+        if self._client is None:
+            self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
+
         try:
-            if self._client  is None:
-                 self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
-
             response = await self._client.get(vdj_url_full, headers=headers)
-            status_code = response.status_code
-            if status_code == 200:
-                encoding = response.encoding
-                content_type =  response.headers["content-type"]
-                result = response.text.strip()
-                if is_query:
-                    result_len = len(result)
-                    bErr = False 
-                    if (result_len >= 6):
-                        ext_result = result[0:6]
-                        bErr = (ext_result.lower() == "error:")
-                    status = "error" if bErr else "ok"
-                    return VdjResponse(status=status, status_code=status_code, result=result)
-                else:
-                    bErr = (result.lower() != "true")
-                    status = "error" if bErr else "ok"
-                    return VdjResponse(status=status, status_code=status_code, result=result)
-            elif status_code == 401:
-                status = "error"
-                result = "Authentication failed - check password"
-                return VdjResponse(status=status, status_code=status_code, result=result)
-            else:
-                status = "error"
-                result = f"{response.text}"
-                return VdjResponse(status=status, status_code=status_code, result=result)
-
         except httpx.ConnectError:
             status = "error"
             status_code = -1
@@ -97,6 +72,32 @@ class VirtualDJClientHttp:
             status = "error"
             status_code = -4
             result = str(e)
+            return VdjResponse(status=status, status_code=status_code, result=result)
+
+        status_code = response.status_code
+        if status_code == 200:
+            encoding = response.encoding
+            content_type =  response.headers["content-type"]
+            result = response.text.strip()
+            if is_query:
+                result_len = len(result)
+                bErr = False 
+                if (result_len >= 6):
+                    ext_result = result[0:6]
+                    bErr = (ext_result.lower() == "error:")
+                status = "error" if bErr else "ok"
+                return VdjResponse(status=status, status_code=status_code, result=result)
+            else:
+                bErr = (result.lower() != "true")
+                status = "error" if bErr else "ok"
+                return VdjResponse(status=status, status_code=status_code, result=result)
+        elif status_code == 401:
+            status = "error"
+            result = "Authentication failed - check password"
+            return VdjResponse(status=status, status_code=status_code, result=result)
+        else:
+            status = "error"
+            result = f"{response.text}"
             return VdjResponse(status=status, status_code=status_code, result=result)
     #------------------------------------------------------------------------------------
     async def query(self, vdjscript: str) -> VdjResponse:

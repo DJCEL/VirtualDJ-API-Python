@@ -46,12 +46,12 @@ class VirtualDJMonitor(tk.Tk):
 
         self._define_menu()
         self._define_tab()
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
-
+       
         self.interval_refresh = 100  # ms
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
         self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self._async_thread.start()
         self.after(self.interval_refresh, self.refresh_ui)
@@ -431,7 +431,7 @@ class VirtualDJMonitor(tk.Tk):
             if delay_ms > 0:
                 timeout = delay_ms / 1000
                 try:
-                    await asyncio.wait_for(self._stopping.wait(), timeout=timeout)
+                    await asyncio.wait_for(asyncio.to_thread(self._stopping.wait), timeout=timeout)
                 except asyncio.TimeoutError:
                     pass
     #------------------------------------------------------------------------------------

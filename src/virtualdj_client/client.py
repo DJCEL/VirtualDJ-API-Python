@@ -213,7 +213,7 @@ class VdjVideo:
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
     def __init__(self):
-        self.vdj_client = VirtualDJClientHttp()
+        self.vdj_client_http = VirtualDJClientHttp()
         self.vdj_utils = VirtualDJUtils()
         self.vdj_settings = VirtualDJSettings()
     #------------------------------------------------------------------------------------
@@ -229,7 +229,7 @@ class VirtualDJClient():
         """ 
         Check if Network Control Plugin is responding 
         """
-        vdj_response = await self.vdj_client.query("get_version")
+        vdj_response = await self.vdj_client_http.query("get_version")
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
@@ -336,12 +336,12 @@ class VirtualDJClient():
         """ 
         Query VirtualDJ with a vdjscript 
         """
-        vdj_response = await self.vdj_client.query(vdjscript)
+        vdj_response = await self.vdj_client_http.query(vdjscript)
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
+            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
             return result
         else:
             self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
@@ -349,12 +349,12 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
         """ Execute a vdjscript and return status """
-        vdj_response = await self.vdj_client.execute(vdjscript)
+        vdj_response = await self.vdj_client_http.execute(vdjscript)
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
+            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
             return (result.lower() == "true")
         else:
             self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}")
@@ -533,7 +533,7 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------
     #  Get_Result / Get_Result_Deck
     #------------------------------------------------------------------------------------  
-    async def _get_result(self, vdjscript: str) -> str:
+    async def _get_result(self, vdjscript: str) -> Optional[str]:
         result = await self.get_async(vdjscript)
         len_result = len(result)
         if len_result >= 5:
@@ -543,7 +543,7 @@ class VirtualDJClient():
   
         return result
     #------------------------------------------------------------------------------------
-    async def _get_result_deck(self, deck: str, verb: str) -> str:
+    async def _get_result_deck(self, deck: str, verb: str) -> Optional[str]:
         vdjscript = f"deck {deck} {verb}"
         result = await self.get_async(vdjscript)
         len_result = len(result)
@@ -558,28 +558,29 @@ class VirtualDJClient():
     #------------------------------------------------------------------------------------  
     async def get_DeckSong_async(self, deck: str) -> VdjDeckSong:
         # TODO: check if we can use asyncio.gather() to decrease the latency
-        song = VdjDeckSong()
-        song.Filepath = self.to_str(await self._get_result_deck(deck, "get_filepath"))
-        song.Filesize = self.to_int(await self._get_result_deck(deck, "get_filesize"))
-        song.Artist = self.to_str(await self._get_result_deck(deck, "get_artist"))
+        song = VdjDeckSong() 
         song.Title = self.to_str(await self._get_result_deck(deck, "get_title"))
-        song.Remix = self.to_str(await self._get_result_deck(deck, "get_remix_after_title"))
-        song.Genre = self.to_str(await self._get_result_deck(deck, "get_genre"))
-        song.Album = self.to_str(await self._get_result_deck(deck, "get_album"))
-        year_tmp = self.to_int(await self._get_result_deck(deck, "get_year"))
-        song.Year = None if year_tmp == 0 else year_tmp
-        song.Rating = self.to_int(await self._get_result_deck(deck, "rating"))
-        song.Comment = self.to_str(await self._get_result_deck(deck, "get_comment"))
-        song.Bpm = self.to_float(await self._get_result_deck(deck, "get_bpm absolute"))
-        song.SongLength = self._to_strtime(self._to_milliseconds(await self._get_result_deck(deck, "get_songlength")))
-        song.TimeTotal = self._to_strtime(await self._get_result_deck(deck, "get_time total absolute"))
-        song.HasStems = self.to_bool(await self._get_result_deck(deck, "has_stems"))
-        song.HasLyrics = self.to_bool(await self._get_result_deck(deck, "has_lyrics"))
-        song.HasLinkedTracks = self.to_bool(await self._get_result_deck(deck, "has_linked_tracks"))
-        song.IsVideo = self.to_bool(await self._get_result_deck(deck, "is_video"))
-        song.HasStemsV1 = self.to_bool(await self._get_result_deck(deck, "has_stems '1.0'"))
-        song.HasStemsV2 = self.to_bool(await self._get_result_deck(deck, "has_stems '2.0'"))
-        song.HasCover = self.to_bool(await self._get_result_deck(deck, "has_cover"))
+        if song.Title != "Drag a song on this deck to load it":  # to limit exceptions in log file
+            song.Filepath = self.to_str(await self._get_result_deck(deck, "get_filepath"))
+            song.Filesize = self.to_int(await self._get_result_deck(deck, "get_filesize"))
+            song.Artist = self.to_str(await self._get_result_deck(deck, "get_artist"))
+            song.Remix = self.to_str(await self._get_result_deck(deck, "get_remix_after_title"))
+            song.Genre = self.to_str(await self._get_result_deck(deck, "get_genre"))
+            song.Album = self.to_str(await self._get_result_deck(deck, "get_album"))
+            year_tmp = self.to_int(await self._get_result_deck(deck, "get_year"))
+            song.Year = None if year_tmp == 0 else year_tmp
+            song.Rating = self.to_int(await self._get_result_deck(deck, "rating"))
+            song.Comment = self.to_str(await self._get_result_deck(deck, "get_comment"))
+            song.Bpm = self.to_float(await self._get_result_deck(deck, "get_bpm absolute"))
+            song.SongLength = self._to_strtime(self._to_milliseconds(await self._get_result_deck(deck, "get_songlength")))
+            song.TimeTotal = self._to_strtime(await self._get_result_deck(deck, "get_time total absolute"))
+            song.HasStems = self.to_bool(await self._get_result_deck(deck, "has_stems"))
+            song.HasLyrics = self.to_bool(await self._get_result_deck(deck, "has_lyrics"))
+            song.HasLinkedTracks = self.to_bool(await self._get_result_deck(deck, "has_linked_tracks"))
+            song.IsVideo = self.to_bool(await self._get_result_deck(deck, "is_video"))
+            song.HasStemsV1 = self.to_bool(await self._get_result_deck(deck, "has_stems '1.0'"))
+            song.HasStemsV2 = self.to_bool(await self._get_result_deck(deck, "has_stems '2.0'"))
+            song.HasCover = self.to_bool(await self._get_result_deck(deck, "has_cover"))
         return song
     #------------------------------------------------------------------------------------
     async def get_DeckEngine_async(self, deck: str) -> VdjDeckEngine:

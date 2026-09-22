@@ -29,8 +29,9 @@ class VirtualDJUtils:
             if not os.path.exists(self.LOG_FOLDER):
                 os.makedirs(self.LOG_FOLDER)
             
+            FORMAT = '%(asctime)s - %(message)s'
+
             """
-            FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
             file_handler = logging.FileHander(filename=filepath)
             file_handler.setLevel(logging.INFO)
             formatter = logging.Formatter(FORMAT)
@@ -38,7 +39,7 @@ class VirtualDJUtils:
             logging.addHandler(file_handler)
             """
 
-            logging.basicConfig(filename=filepath, level=logging.INFO)
+            logging.basicConfig(filename=filepath, level=logging.INFO, format=FORMAT)
     #------------------------------------------------------------------------------------
     def save_client_log(self, msg):
         if VDJ_CLIENT_DEBUG:
