@@ -46,13 +46,12 @@ class VirtualDJMonitor(tk.Tk):
 
         self._define_menu()
         self._define_tab()
-
+        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
         self.interval_refresh = 100  # ms
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
         self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self._async_thread.start()
         self.after(self.interval_refresh, self.refresh_ui)
@@ -504,7 +503,7 @@ class WaveformViewer(ttk.Frame):
         self.RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
 
 
-    def draw_waveform(self, waveform_bytes, valuesPerSecond): 
+    def draw_waveform(self, waveform_bytes: bytes, valuesPerSecond: float): 
         samples = self._decode_vdj_waveform(waveform_bytes)
         self.keys = sorted(samples[0].keys(), key=lambda k: int("".join(ch for ch in k if ch.isdigit()) or 0),)
         self.duration = len(samples) / valuesPerSecond
@@ -517,7 +516,7 @@ class WaveformViewer(ttk.Frame):
         self.toobar_text_data.set(f"valuesPerSecond={self.values_per_second} / Duration={self.duration} seconds / {len(samples)} samples")
         self._draw(samples)
 
-    def _decode_vdj_waveform(self, waveform_bytes):
+    def _decode_vdj_waveform(self, waveform_bytes: bytes):
         waveform = waveform_bytes.hex()
         if isinstance(waveform, str):
             waveform = waveform.strip()
