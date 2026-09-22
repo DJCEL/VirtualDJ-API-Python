@@ -138,7 +138,7 @@ class VdjWaveform:
     type: int
     version: int
     valuesPerSecond: float
-    waveform: str
+    waveform: bytes
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
     def __init__(self):
