@@ -297,7 +297,7 @@ class VirtualDJMonitor(tk.Tk):
             total_items = {"total_items": n}
             self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
-                item_1 = result_list[0] # tyoe: VdjWaveform
+                item_1 = result_list[0] # type: VdjWaveform
                 self._update_frame_text(self.frameDB,item_1)
                 waveform = item_1["waveform"]
                 valuesPerSecond = item_1["valuesPerSecond"]
