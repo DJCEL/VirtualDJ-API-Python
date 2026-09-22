@@ -289,7 +289,7 @@ class VirtualDJMonitor(tk.Tk):
             total_items = {"total_items": n}
             self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
-                item_1 = songs_database[0]
+                item_1 = songs_database[0] # type: VdjSong
                 self._update_frame_text(self.frameDB,item_1)
         elif (database_name == self.songsDB.SQLITE_CACHE_DB and table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS):   
             result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
@@ -297,7 +297,7 @@ class VirtualDJMonitor(tk.Tk):
             total_items = {"total_items": n}
             self._update_frame_text(self.frameDBcount, total_items)
             if n >= 1:
-                item_1 = result_list[0]
+                item_1 = result_list[0] # tyoe: VdjWaveform
                 self._update_frame_text(self.frameDB,item_1)
                 waveform = item_1["waveform"]
                 valuesPerSecond = item_1["valuesPerSecond"]
