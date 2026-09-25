@@ -1,5 +1,6 @@
 import logging
 from typing import Literal
+import os
 
 from .client_config import VDJ_CLIENT_DEBUG
 
