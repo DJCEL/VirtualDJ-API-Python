@@ -26,7 +26,7 @@ def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITIC
             logging.basicConfig(filename=filepath, level=level, format=FORMAT)
 
             #logging.basicConfig(level=level, format=FORMAT, handlers=handlers)
-    #------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
 def get_client_log(name: str) -> logging.Logger:
         return logging.getLogger(str)
 #------------------------------------------------------------------------------------
@@ -38,6 +38,6 @@ def save_client_log(level: str = "INFO", msg: str) -> None:
 
         if level == "INFO":
             logger.info(msg)
-    #------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------
 def close_client_log():
         logging.shutdown()
