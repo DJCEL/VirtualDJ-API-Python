@@ -44,7 +44,7 @@ class VirtualDJUtils:
 
             logging.basicConfig(filename=filepath, level=level, format=FORMAT)
 
-#logging.basicConfig(level=level, format=FORMAT, handlers=handlers)
+            #logging.basicConfig(level=level, format=FORMAT, handlers=handlers)
     #------------------------------------------------------------------------------------
     def get_client_log(self, name: str) -> logging.Logger:
         return logging.getLogger(str)
