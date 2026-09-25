@@ -20,7 +20,6 @@ class VirtualDJUtils:
         self.LOG_FOLDER = './log'
         self.LOG_FILENAME = 'client.log'
         self.logger = self.get_client_log(__name__)
-
         self._configure_client_log()
     #------------------------------------------------------------------------------------
     def _configure_client_log(self,level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO") -> None:
