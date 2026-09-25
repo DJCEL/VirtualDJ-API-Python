@@ -23,23 +23,29 @@ class VirtualDJUtils:
 
         self._create_client_log()
     #------------------------------------------------------------------------------------
-    def _create_client_log(self):
+    def _create_client_log(self,level="INFO") -> None:
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
                 os.makedirs(self.LOG_FOLDER)
             
             FORMAT = '%(asctime)s - %(message)s'
+            handlers = list[logging.Handler] = []
 
             """
             file_handler = logging.FileHander(filename=filepath)
-            file_handler.setLevel(logging.INFO)
+            file_handler.setLevel(level)
             formatter = logging.Formatter(FORMAT)
             file_handler.setFormatter(formatter)
             logging.addHandler(file_handler)
             """
 
-            logging.basicConfig(filename=filepath, level=logging.INFO, format=FORMAT)
+            if not handlers:
+               handlers.append(logging.StreamHandler())
+
+            logging.basicConfig(filename=filepath, level=level, format=FORMAT)
+
+#logging.basicConfig(filename=filepath, level=level, format=FORMAT, handlers=handlers)
     #------------------------------------------------------------------------------------
     def save_client_log(self, msg):
         if VDJ_CLIENT_DEBUG:
