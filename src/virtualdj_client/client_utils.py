@@ -23,7 +23,7 @@ class VirtualDJUtils:
 
         self._configure_client_log()
     #------------------------------------------------------------------------------------
-    def _configure_client_log(self,level="INFO") -> None:
+    def _configure_client_log(self,level: str = "INFO") -> None:
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
