@@ -30,11 +30,12 @@ def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITIC
 def get_client_log(name: str) -> logging.Logger:
         return logging.getLogger(str)
 #------------------------------------------------------------------------------------
-def save_client_log(msg: str, level: str = "INFO", name: str = "__name__") -> None:
+def save_client_log(msg: str, logger: logging.Logger = None, level: str = "INFO", name: str = "__name__") -> None:
         if VDJ_CLIENT_DEBUG == False:
             return
-
-        logger = get_client_log(name)
+        
+        if logger is None:
+            logger = get_client_log(name)
 
         if level == "INFO":
             logger.info(msg)
