@@ -3,13 +3,13 @@ from typing import Literal
 
 from .client_config import VDJ_CLIENT_DEBUG
 
-LOG_FOLDER = './log'
-LOG_FILENAME = 'client.log'
+CLIENT_LOG_FOLDER = './log'
+CLIENT_LOG_FILENAME = 'client.log'
 
 def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO") -> None:
-            filepath = f"{LOG_FOLDER}/{LOG_FILENAME}"
+            filepath = f"{CLIENT_LOG_FOLDER}/{CLIENT_LOG_FILENAME}"
             if not os.path.exists(LOG_FOLDER):
-                os.makedirs(LOG_FOLDER)
+                os.makedirs(CLIENT_LOG_FOLDER)
             
             FORMAT = '%(asctime)s - %(message)s'
             handlers = list[logging.Handler] = []
