@@ -4,13 +4,13 @@ import os
 
 from .client_config import VDJ_CLIENT_DEBUG
 
-CLIENT_LOG_FOLDER = './log'
-CLIENT_LOG_FILENAME = 'client.log'
+VDJ_CLIENT_LOG_FOLDER = './log'
+VDJ_CLIENT_LOG_FILENAME = 'client.log'
 
 def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO") -> None:
-            filepath = f"{CLIENT_LOG_FOLDER}/{CLIENT_LOG_FILENAME}"
-            if not os.path.exists(LOG_FOLDER):
-                os.makedirs(CLIENT_LOG_FOLDER)
+            filepath = f"{VDJ_CLIENT_LOG_FOLDER}/{VDJ_CLIENT_LOG_FILENAME}"
+            if not os.path.exists(VDJ_CLIENT_LOG_FOLDER):
+                os.makedirs(VDJ_CLIENT_LOG_FOLDER)
             
             FORMAT = '%(asctime)s - %(message)s'
             handlers = list[logging.Handler] = []
