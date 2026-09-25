@@ -50,10 +50,12 @@ class VirtualDJUtils:
     def get_client_log(self, name: str) -> logging.Logger:
         return logging.getLogger(str)
 #------------------------------------------------------------------------------------
-    def save_client_log(self, level: str = "INFO", msg: str):
-        if VDJ_CLIENT_DEBUG:
-            if level == "INFO":
-                self.logger.info(msg)
+    def save_client_log(self, level: str = "INFO", msg: str) -> None:
+        if VDJ_CLIENT_DEBUG == False:
+            return
+
+        if level == "INFO":
+            self.logger.info(msg)
     #------------------------------------------------------------------------------------
     def close_client_log(self):
         logging.shutdown()
