@@ -47,7 +47,10 @@ class VirtualDJUtils:
 
 #logging.basicConfig(level=level, format=FORMAT, handlers=handlers)
     #------------------------------------------------------------------------------------
-    def save_client_log(self, msg):
+    def get_client_log(self, name: str) -> logging.Logger:
+        return logging.getLogger(str)
+#------------------------------------------------------------------------------------
+    def save_client_log(self, msg: str):
         if VDJ_CLIENT_DEBUG:
             self.logger.info(msg)
     #------------------------------------------------------------------------------------
