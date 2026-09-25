@@ -35,7 +35,7 @@ def save_client_log(msg: str, level: Literal["DEBUG","INFO","WARNING","ERROR","C
         if logger is None:
             logger = get_client_log(name)
 
-        if level == "INFO":
+        if level == logging.INFO:
             logger.info(msg)
 #------------------------------------------------------------------------------------
 def close_client_log():
