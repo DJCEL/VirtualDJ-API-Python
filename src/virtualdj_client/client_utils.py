@@ -7,7 +7,7 @@ __version__ = '1.0.3'
 import os
 import platform
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Literal
 import psutil
 import subprocess
 import logging
@@ -23,7 +23,7 @@ class VirtualDJUtils:
 
         self._configure_client_log()
     #------------------------------------------------------------------------------------
-    def _configure_client_log(self,level: str = "INFO") -> None:
+    def _configure_client_log(self,level: Literal["DEBUG","INFO","WARNING,"ERROR","CRITICAL"] = "INFO") -> None:
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
