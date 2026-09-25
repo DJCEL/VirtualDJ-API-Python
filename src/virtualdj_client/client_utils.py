@@ -21,9 +21,9 @@ class VirtualDJUtils:
         self.LOG_FILENAME = 'client.log'
         self.logger = self.get_client_log(__name__)
 
-        self._create_client_log()
+        self._configure_client_log()
     #------------------------------------------------------------------------------------
-    def _create_client_log(self,level="INFO") -> None:
+    def _configure_client_log(self,level="INFO") -> None:
         if VDJ_CLIENT_DEBUG:
             filepath = f"{self.LOG_FOLDER}/{self.LOG_FILENAME}"
             if not os.path.exists(self.LOG_FOLDER):
