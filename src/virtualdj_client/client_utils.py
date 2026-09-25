@@ -37,7 +37,7 @@ class VirtualDJUtils:
             file_handler.setLevel(level)
             formatter = logging.Formatter(FORMAT)
             file_handler.setFormatter(formatter)
-            logging.addHandler(file_handler)
+            handlers.append(file_handler)
             """
 
             if not handlers:
