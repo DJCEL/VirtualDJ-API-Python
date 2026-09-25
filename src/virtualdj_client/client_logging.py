@@ -2,10 +2,7 @@ import logging
 from typing import Literal
 import os
 
-from .client_config import VDJ_CLIENT_DEBUG
-
-VDJ_CLIENT_LOG_FOLDER = './log'
-VDJ_CLIENT_LOG_FILENAME = 'client.log'
+from .client_config import VDJ_CLIENT_DEBUG, VDJ_CLIENT_LOG_FOLDER, VDJ_CLIENT_LOG_FILENAME
 
 def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO") -> None:
             filepath = f"{VDJ_CLIENT_LOG_FOLDER}/{VDJ_CLIENT_LOG_FILENAME}"
