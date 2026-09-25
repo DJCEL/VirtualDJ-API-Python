@@ -1,5 +1,7 @@
 # Client - Debug
 VDJ_CLIENT_DEBUG = True # default (bool): True
+VDJ_CLIENT_LOG_FOLDER = './log'
+VDJ_CLIENT_LOG_FILENAME = 'client.log'
 
 
 # VirtualDJ - Network Control Plugin (HTTP Server)
