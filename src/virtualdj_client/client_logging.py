@@ -19,7 +19,8 @@ def configure_client_log(level: Literal["DEBUG","INFO","WARNING","ERROR","CRITIC
             handlers.append(file_handler)
             
             if not handlers:
-               handlers.append(logging.StreamHandler())
+               stream_handler = logging.StreamHandler()
+               handlers.append(stream_handler)
 
             logging.basicConfig(filename=filepath, level=level, format=FORMAT)
 
