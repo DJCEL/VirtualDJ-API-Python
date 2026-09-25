@@ -54,8 +54,7 @@ class VirtualDJUtils:
         if VDJ_CLIENT_DEBUG:
             self.logger.info(msg)
     #------------------------------------------------------------------------------------
-    @staticmethod
-    def close_client_log():
+    def close_client_log(self):
         logging.shutdown()
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_list(self) -> list[Path]:
