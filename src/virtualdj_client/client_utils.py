@@ -29,7 +29,6 @@ class VirtualDJUtils:
             
             FORMAT = '%(asctime)s - %(message)s'
             handlers = list[logging.Handler] = []
-
             
             file_handler = logging.FileHander(filename=filepath)
             file_handler.setLevel(level)
@@ -37,7 +36,6 @@ class VirtualDJUtils:
             file_handler.setFormatter(formatter)
             handlers.append(file_handler)
             
-
             if not handlers:
                handlers.append(logging.StreamHandler())
 
