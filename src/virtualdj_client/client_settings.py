@@ -940,6 +940,10 @@ class VirtualDJSettings():
                 elif child_tag == "browser":
                     if subchild_tag == "lastSelectedFolder":
                         settings.browser.lastSelectedBrowser = subchild_text
+                    elif subchild_tag == "browserColumns":
+                        settings.browser.browserColumns = subchild_text
+
+
                 elif child_tag == "tags":
                     a = 0
                 elif child_tag == "automix":
