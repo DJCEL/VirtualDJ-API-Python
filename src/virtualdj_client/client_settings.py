@@ -6,6 +6,7 @@ __version__ = '1.0.1'
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
 from datetime import datetime
 
@@ -349,6 +350,22 @@ class VdjSettingsSampler:
     shoutoutStyle: Optional[str] = None
     shoutoutVoice: Optional[str] = None
     shoutoutOver: Optional[str] = None
+#------------------------------------------------------------------------------------
+class browserColumns(str, Enum):
+    ONLINEMUSIC_SPOTIFY = "file(spot)"
+    VIRTUAL_FOLDER = "file(virt)"
+    LOCALMUSIC_SAMPLER = "file(samp)"
+    LOCALMUSIC_SAMPLER_BANK = "file(sbnk)"
+    IDEAS_HISTORY = "file(hist)"
+    IDEAS_ASK_THE_DJ = "file(ask)"
+    IDEAS_AI_PROMPT = "file(ai)"
+    M3U_PLAYLISTS = "file(play)"
+    FILES = "file"
+    SIDEVIEW_SIDELIST = "side"
+    SIDEVIEW_REMIXES = "side(rmix)"
+    SIDEVIEW_SAMPLER_BANK = "side(sbnk)"
+    SIDEVIEW_AUTOMIX = "side(auto)"
+    SIDEVIEW_KARAOKE = "side(kara)"
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSettingsBrowser:
