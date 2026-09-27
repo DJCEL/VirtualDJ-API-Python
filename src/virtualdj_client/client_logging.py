@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # Logging
 #------------------------------------------------------------------------------------
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 import logging
 from logging.handlers import RotatingFileHandler
@@ -13,31 +13,33 @@ from .client_config import VDJ_CLIENT_DEBUG, VDJ_CLIENT_LOG_FOLDER, VDJ_CLIENT_L
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VdjClientLog:
-    def __init__(self, controller = None, parent_name: str | None = None):
+    def __init__(self, controller = None, parent_name: str | None = None, level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO", useRichConsole: bool = False):
         self.filepath = f"{VDJ_CLIENT_LOG_FOLDER}/{VDJ_CLIENT_LOG_FILENAME}"
         if not os.path.exists(VDJ_CLIENT_LOG_FOLDER):
             os.makedirs(VDJ_CLIENT_LOG_FOLDER)
 
-        self.logger = self.create_client_log(controller, parent_name, level="INFO", useRichHandler=True)
+        self.logger = self.create_client_log(controller, parent_name, level, useRichConsole)
     #------------------------------------------------------------------------------------
-    def create_client_log(self, controller, parent_name: str | None = None, level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO", useRichHandler: bool = False) -> logging.Logger | None:
+    def create_client_log(self, controller, parent_name: str | None = None, level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO", useRichConsole: bool = False) -> logging.Logger | None:
         
         if parent_name is None:
             logger = logging.getLogger()
         else:
             logger = logging.getLogger(parent_name)
 
-        #do not propagate messages to the root logger
+        logger.setLevel(logging.INFO)
+
+        # do not propagate messages to the root logger
         logger.propagate = False
 
         # do not add handlers multiple times
         if logger.handlers:
             return logger
 
-        logger.setLevel(logging.INFO)
-
-        FORMAT = '%(asctime)s [%(name)s] %(message)s'
-        formatter = logging.Formatter(FORMAT)
+        # We create the handlers: file + console
+        # %(filename)s - %(lineno)d - %(funcName)s
+        FORMAT = '%(asctime)s - %(levelname)s - [%(name)s] %(message)s'
+        formatter = logging.Formatter(FORMAT,datefmt="%Y/%m/%d %H:%M:%S")
 
         try:
             file_handler = RotatingFileHandler(filename=self.filepath, mode="a", maxBytes=(1024*1024), backupCount=3, encoding='utf-8')
@@ -47,7 +49,7 @@ class VdjClientLog:
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
         
-        if useRichHandler:
+        if useRichConsole:
             from rich.console import Console
             from rich.logging import RichHandler
             console_handler = RichHandler(console=Console(stderr=True), rich_tracebacks=True)

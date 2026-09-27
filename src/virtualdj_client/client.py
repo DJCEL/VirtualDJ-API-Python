@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.30"
+__version__ = "1.0.31"
 
 import asyncio
 import time
@@ -240,7 +240,7 @@ class VirtualDJClient():
         if status == "ok":
            return True
         else:
-            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result}", parent_name=__name__,level="ERROR")
             return False
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
@@ -282,7 +282,7 @@ class VirtualDJClient():
 
         checkUpdates = self.get_checkUpdates()
         if checkUpdates:
-            self.vdj_client_log.save_client_log(f"VirtualDJ checkUpdates option => {checkUpdates}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ checkUpdates option => {checkUpdates}",parent_name=__name__,level="INFO")
             self.set_checkUpdates('off')
 
         bRes = self.vdj_utils.launch_virtualdj_software()
@@ -317,14 +317,14 @@ class VirtualDJClient():
 
         is_vdj_security = await self.get_loadSecurity_async()
         if is_vdj_security:
-            self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is activated",__name__)
+            self.vdj_client_log.save_client_log(msg="VirtualDJ => loadSecurity option is activated",parent_name=__name__,level="INFO")
         else:
-            self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is disable",__name__)
+            self.vdj_client_log.save_client_log(msg="VirtualDJ => loadSecurity option is disable",parent_name=__name__,level="INFO")
 
         if is_vdj_security and force_close:
             result = await self.set_loadSecurity_async("off")
             if result == True:
-                self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is now disable",__name__)
+                self.vdj_client_log.save_client_log(msg="VirtualDJ => loadSecurity option is now disable",parent_name=__name__,level="INFO")
 
 
         close = await self.send_async("close")
@@ -345,10 +345,10 @@ class VirtualDJClient():
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            #self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}",__name__)
+            #self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with query={vdjscript}",parent_name=__name__,level="DEBUG")
             return result
         else:
-            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with query={vdjscript}",parent_name=__name__,level="ERROR")
             return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
@@ -358,10 +358,10 @@ class VirtualDJClient():
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",parent_name=__name__,level="DEBUG")
             return (result.lower() == "true")
         else:
-            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",parent_name=__name__,level="ERROR")
             return False
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper

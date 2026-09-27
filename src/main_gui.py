@@ -42,23 +42,23 @@ class VirtualDJMonitor(tk.Tk):
     def _init_vdj_client(self):
         # Check if VirtualDJ is running
         client_running = self.client.is_app_running()
-        self.vdj_client_log.save_client_log(f"VirtualDJ running => {client_running}",__name__)
+        self.vdj_client_log.save_client_log(msg=f"VirtualDJ running => {client_running}", parent_name=__name__, level="INFO")
 
         # Launch VirtualDJ if not running
         if client_running == False:
-            self.vdj_client_log.save_client_log("Launching VirtualDJ...",__name__)
+            self.vdj_client_log.save_client_log(msg="Launching VirtualDJ...", parent_name=__name__, level="INFO")
             client_launched = self.client.open_app()
-            self.vdj_client_log.save_client_log(f"VirtualDJ launched => {client_launched}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ launched => {client_launched}", parent_name=__name__, level="INFO")
             client_running = self.client.is_app_running()
-            self.vdj_client_log.save_client_log(f"VirtualDJ running => {client_running}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ running => {client_running}", parent_name=__name__, level="INFO")
             if (client_running == False):
                 sys.exit()
 
         # Check the NetWork Control plugin
         client_connected = self.client.is_connected()
-        self.vdj_client_log.save_client_log(f"VirtualDJ NetWork Control plugin connected => {client_connected}",__name__)
+        self.vdj_client_log.save_client_log(msg=f"VirtualDJ NetWork Control plugin connected => {client_connected}", parent_name=__name__, level="INFO")
         if (client_connected == False):
-            self.client_log.save_client_log("Check that the NetWork Control plugin is available and activated in VirtualDJ",__name__)
+            self.client_log.save_client_log(msg="Check that the NetWork Control plugin is available and activated in VirtualDJ", parent_name=__name__, level="ERROR")
             sys.exit()
     #------------------------------------------------------------------------------------
     def _create_window(self, controller):
@@ -72,7 +72,7 @@ class VirtualDJMonitor(tk.Tk):
         try:
             style.theme_use(style_name)
         except tk.TclError:
-            self.vdj_client_log.save_client_log(f"Style {style_name} not found",__name__)
+            self.vdj_client_log.save_client_log(msg=f"Style {style_name} not found", parent_name=__name__, level="ERROR")
             pass
 
         self._define_menubar(controller)
@@ -543,13 +543,13 @@ class WaveformViewer(ttk.Frame):
             data = bytes(waveform)
 
         else:
-            self.vdj_client_log.save_client_log(f"Unsupported waveform type: {type(waveform).__name__}")
+            self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
             raise TypeError(f"Unsupported waveform type: {type(waveform).__name__}")
 
         block_size = 28
         data_len = len(data)
         if data_len % block_size:
-            self.vdj_client_log.save_client_log(f"Invalid waveform size: {data_len} bytes")
+            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
             raise ValueError(f"Invalid waveform size: {data_len} bytes")
 
         samples = []
