@@ -27,6 +27,9 @@ class VdjClientLog:
         else:
             logger = logging.getLogger(parent_name)
 
+        # do not add handlers multiple times
+        if logger.handlers:
+            return logger
 
         logger.setLevel(logging.INFO)
 
@@ -63,11 +66,11 @@ class VdjClientLog:
             if VDJ_CLIENT_DEBUG == False:
                 return None
 
-
             if parent_name is None:
                 logger = logging.getLogger()
             else:
                 logger = logging.getLogger(parent_name)
+
 
             if level == "DEBUG":
                 logger.debug(msg)
