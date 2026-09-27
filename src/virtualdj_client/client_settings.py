@@ -407,7 +407,7 @@ class VdjBrowserColumns(str, Enum):
     LOADED_ON = "load"
     TYPE = "type"
     COLOR = "colo"
-    PLAYLIST_PLAY_TIME = "plti"
+    PLAY_TIME = "plti"
     WILL_PLAY_AT = "plat"
     SINGER = "sing"
     ORDER = "ord"
