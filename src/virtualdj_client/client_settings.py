@@ -938,7 +938,8 @@ class VirtualDJSettings():
                 elif child_tag == "sampler":
                     a = 0
                 elif child_tag == "browser":
-                    a = 0
+                    if subchild_tag == "lastSelectedFolder":
+                        settings.browser.lastSelectedBrowser = subchild_text
                 elif child_tag == "tags":
                     a = 0
                 elif child_tag == "automix":
