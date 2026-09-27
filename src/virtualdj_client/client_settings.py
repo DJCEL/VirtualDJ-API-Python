@@ -942,7 +942,8 @@ class VirtualDJSettings():
                         settings.browser.lastSelectedBrowser = subchild_text
                     elif subchild_tag == "browserColumns":
                         settings.browser.browserColumns = subchild_text
-
+                    elif subchild_tag == "browserSort":
+                        settings.browser.browserSort = subchild_text
 
                 elif child_tag == "tags":
                     a = 0
