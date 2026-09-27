@@ -9,6 +9,7 @@ from typing import Optional, Literal
 from dataclasses import dataclass
 from datetime import datetime,timedelta
 
+from .client_logging import VdjClientLog
 from .client_http import VirtualDJClientHttp, VdjResponse
 from .client_utils import VirtualDJUtils
 from .client_settings import VirtualDJSettings, VdjSettings
@@ -214,10 +215,11 @@ class VdjVideo:
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClient():
-    def __init__(self):
-        self.vdj_client_http = VirtualDJClientHttp()
-        self.vdj_utils = VirtualDJUtils()
-        self.vdj_settings = VirtualDJSettings()
+    def __init__(self, controller = None):
+        self.vdj_client_log = VdjClientLog(controller,__name__)
+        self.vdj_client_http = VirtualDJClientHttp(controller)
+        self.vdj_utils = VirtualDJUtils(controller)
+        self.vdj_settings = VirtualDJSettings(controller)
     #------------------------------------------------------------------------------------
     async def __aenter__(self):
         return self
@@ -238,7 +240,7 @@ class VirtualDJClient():
         if status == "ok":
            return True
         else:
-            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result}")
+            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result}",__name__)
             return False
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
@@ -280,7 +282,7 @@ class VirtualDJClient():
 
         checkUpdates = self.get_checkUpdates()
         if checkUpdates:
-            self.vdj_utils.save_client_log(f"VirtualDJ checkUpdates option => {checkUpdates}")
+            self.vdj_client_log.save_client_log(f"VirtualDJ checkUpdates option => {checkUpdates}",__name__)
             self.set_checkUpdates('off')
 
         bRes = self.vdj_utils.launch_virtualdj_software()
@@ -315,14 +317,14 @@ class VirtualDJClient():
 
         is_vdj_security = await self.get_loadSecurity_async()
         if is_vdj_security:
-            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is activated")
+            self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is activated",__name__)
         else:
-            self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is disable")
+            self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is disable",__name__)
 
         if is_vdj_security and force_close:
             result = await self.set_loadSecurity_async("off")
             if result == True:
-                self.vdj_utils.save_client_log("VirtualDJ => loadSecurity option is now disable")
+                self.vdj_client_log.save_client_log("VirtualDJ => loadSecurity option is now disable",__name__)
 
 
         close = await self.send_async("close")
@@ -343,10 +345,10 @@ class VirtualDJClient():
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
+            #self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}",__name__)
             return result
         else:
-            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
+            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}",__name__)
             return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
@@ -356,10 +358,10 @@ class VirtualDJClient():
         status_code = vdj_response.status_code
         result = vdj_response.result
         if status == "ok":
-            #self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with query={vdjscript}")
+            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",__name__)
             return (result.lower() == "true")
         else:
-            self.vdj_utils.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}")
+            self.vdj_client_log.save_client_log(f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",__name__)
             return False
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper

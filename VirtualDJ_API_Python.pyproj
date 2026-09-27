@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="src\main_gui.py" />
     <Compile Include="src\virtualdj_client\client.py" />
+    <Compile Include="src\virtualdj_client\client_logging.py" />
     <Compile Include="src\virtualdj_client\client_settings.py" />
     <Compile Include="src\virtualdj_client\client_utils.py" />
     <Compile Include="src\virtualdj_client\client_history_files.py" />

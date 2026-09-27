@@ -23,8 +23,8 @@ class VdjHistoryTracklist:
     songs: Optional[list[VdjHistoryTracklistSong]] = None
 #------------------------------------------------------------------------------------
 class VirtualDJHistoryFiles():
-    def __init__(self):
-        self.vdj_utils = VirtualDJUtils()
+    def __init__(self, controller = None):
+        self.vdj_utils = VirtualDJUtils(controller)
         self.FOLDER_HISTORY = VDJ_FOLDER_HISTORY
         self.TRACKLIST_FILENAME = VDJ_TRACKLIST_FILENAME
         self.OTHER_FILES_EXTENSION = ".m3u"

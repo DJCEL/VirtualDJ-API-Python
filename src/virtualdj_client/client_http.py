@@ -22,7 +22,7 @@ class VdjResponse:
     result: str
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJClientHttp:
-    def __init__(self):
+    def __init__(self, controller = None):
         self.vdj_base_url = f"http://{VDJ_NETWORK_CONTROL_HOST}:{VDJ_NETWORK_CONTROL_PORT}"
         self._client: httpx.AsyncClient | None = None
     #------------------------------------------------------------------------------------

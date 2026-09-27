@@ -15,10 +15,14 @@ VDJ_PROCESS_NAME = "virtualdj"
 VDJ_PROCESS_PATH_WINDOWS = r"C:\Program Files\VirtualDJ\virtualdj.exe"
 VDJ_PROCESS_PATH_MAC = "/Applications/VirtualDJ.app"
 
-# VirtualDJ - Settings
+# VirtualDJ - Settings / Logs files
 VDJ_XML_SETTINGS = "settings.xml"
+VDJ_TXT_LOG_REPORT = "Log Report.txt"
+VDJ_TXT_SYSTEMREPORT = "systemreport.txt"
+VDJ_TXT_SYSTEMREPORT_SESSION = "systemreport_session.txt"
+VDJ_TXT_CHANGELOG = "changelog.txt"
 
-# VirtualDJ - Songs database
+# VirtualDJ - Database
 VDJ_XML_DATABASE_NAME = "database.xml"
 VDJ_SQLITE_EXTRA_DB = "extra.db"
 VDJ_SQLITE_EXTRA_DB_LYRICS = "lyrics"
@@ -28,6 +32,6 @@ VDJ_FOLDER_CACHE = 'Cache'
 VDJ_SQLITE_CACHE_DB = "cache.db"
 VDJ_SQLITE_CACHE_DB_WAVEFORMS = "waveforms"
 
-# VirtualDJ - History
+# VirtualDJ - History files
 VDJ_FOLDER_HISTORY = 'History'
 VDJ_TRACKLIST_FILENAME = "tracklist.txt"

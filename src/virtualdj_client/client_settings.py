@@ -819,8 +819,8 @@ class VdjSettings:
     skin: Optional[VdjSettingsSkin] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 class VirtualDJSettings():
-    def __init__(self):
-        self.vdj_utils = VirtualDJUtils()
+    def __init__(self,  controller = None):
+        self.vdj_utils = VirtualDJUtils(controller)
         self.SETTINGS_FILENAME = VDJ_XML_SETTINGS
     #------------------------------------------------------------------------------------
     def get_local_settings_path_list(self) -> list[Path]:

@@ -10,9 +10,10 @@ from pathlib import Path
 from functools import partial
 import struct
 
-__version__ = "1.0.11"
+__version__ = "1.0.12"
 
 from virtualdj_client import (
+    VdjClientLog,
     VirtualDJClient, 
     VdjDeckSong,
     VdjDeckEngine,
@@ -31,67 +32,74 @@ from virtualdj_client import __version__ as __vdjclient_version__
 #---------------------------------------------------------------------------------------
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
-        super().__init__()
-        self.client: VirtualDJClient | None = None
-        self._init_client()
-
-        self.title("VirtualDJ Client")
-        self.geometry("1024x768")
-        self.configure(bg="#1e1e1e")
-        style = ttk.Style()
-        try:
-            style.theme_use("clam")
-        except tk.TclError:
-            pass
-
-        self._define_menu()
-        self._define_tab()
-       
-        self.interval_refresh = 100  # ms
-        self._loop: asyncio.AbstractEventLoop | None = None
-        self._stopping = threading.Event()
-        self._result_queue = queue.Queue(maxsize=1)
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
-        self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
-        self._async_thread.start()
-        self.after(self.interval_refresh, self.refresh_ui)
+        self.controller = self
+        self.vdj_client_log = VdjClientLog(self.controller)
+        self.client = VirtualDJClient(self.controller)
+        self.songsDB = VirtualDJSongsDatabase(self.controller)
+        self._init_vdj_client()
+        self._create_window(self.controller)
     #------------------------------------------------------------------------------------
-    def on_close(self):
-        if self._stopping.is_set():
-            return
-        self._stopping.set()
-        self.destroy()
-    #------------------------------------------------------------------------------------
-    def _init_client(self):
-        self.client = VirtualDJClient()
-        self.songsDB = VirtualDJSongsDatabase()
-
+    def _init_vdj_client(self):
         # Check if VirtualDJ is running
         client_running = self.client.is_app_running()
-        print(f"VirtualDJ running => {client_running}")
+        self.vdj_client_log.save_client_log(f"VirtualDJ running => {client_running}",__name__)
 
         # Launch VirtualDJ if not running
         if client_running == False:
-            print("Launching VirtualDJ...")
+            self.vdj_client_log.save_client_log("Launching VirtualDJ...",__name__)
             client_launched = self.client.open_app()
-            print(f"VirtualDJ launched => {client_launched}")
+            self.vdj_client_log.save_client_log(f"VirtualDJ launched => {client_launched}",__name__)
             client_running = self.client.is_app_running()
-            print(f"VirtualDJ running => {client_running}")
+            self.vdj_client_log.save_client_log(f"VirtualDJ running => {client_running}",__name__)
             if (client_running == False):
                 sys.exit()
 
         # Check the NetWork Control plugin
         client_connected = self.client.is_connected()
-        print(f"VirtualDJ NetWork Control plugin connected => {client_connected}")
+        self.vdj_client_log.save_client_log(f"VirtualDJ NetWork Control plugin connected => {client_connected}",__name__)
         if (client_connected == False):
-            print("Check that the NetWork Control plugin is available and activated in VirtualDJ")
+            self.client_log.save_client_log("Check that the NetWork Control plugin is available and activated in VirtualDJ",__name__)
             sys.exit()
     #------------------------------------------------------------------------------------
-    def _define_menu(self):
+    def _create_window(self, controller):
+        super().__init__()
+        self.grid()
+        self.title("VirtualDJ Client")
+        self.geometry("1024x768")
+        self.configure(bg="#1e1e1e")
+        style = ttk.Style()
+        style_name = "clam"
+        try:
+            style.theme_use(style_name)
+        except tk.TclError:
+            self.vdj_client_log.save_client_log(f"Style {style_name} not found",__name__)
+            pass
+
+        self._define_menubar(controller)
+        self._define_notebook(controller)
+
+
+        """ Refresh loop for the GET tab """
+        self.interval_refresh = 100  # ms
+        self._loop: asyncio.AbstractEventLoop | None = None
+        self._stopping = threading.Event()
+        self.protocol("WM_DELETE_WINDOW", self._destroy_window)
+        self._result_queue = queue.Queue(maxsize=1)
+        self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
+        self._async_thread.start()
+        self.after(self.interval_refresh, self.refresh_ui)
+     #------------------------------------------------------------------------------------
+    def _destroy_window(self):
+        if self._stopping.is_set():
+            return
+        self._stopping.set()
+        self.destroy()
+    #------------------------------------------------------------------------------------
+    def _define_menubar(self, controller):
         menubar = tk.Menu(self)
 
         help_menu = tk.Menu(menubar , tearoff=False)
-        help_menu.add_command(label="Exit", command=self.on_close)
+        help_menu.add_command(label="Exit", command=self._destroy_window)
         help_menu.add_command(label="About", command=self._show_about)
         
         menubar.add_cascade(label="Help", menu=help_menu)
@@ -103,25 +111,26 @@ class VirtualDJMonitor(tk.Tk):
                             f"VirtualDJClient version: {__vdjclient_version__}\n\n"
                             "developped by DJCEL")
     #------------------------------------------------------------------------------------
-    def _define_tab(self):
-        """ we define 2 tabs """
-        self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill="both",expand=True)
-        self.send_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.send_tab,text="Send")
-        self.get_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.get_tab,text="Get")
-        self.songDB_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.songDB_tab,text="Songs database")
+    def _define_notebook(self, controller):
+        """ we define a notebook """
+        notebook = ttk.Notebook(self)
+        notebook.pack(fill="both",expand=True)
 
         """ SEND tab """
-        self._define_tab_send(self.send_tab)
+        self.send_tab = ttk.Frame(notebook)
+        notebook.add(self.send_tab,text="Send")
+        self._define_tab_send(parent=self.send_tab)
 
         """ GET tab """
-        self._define_tab_get(self.get_tab)
+        self.get_tab = ttk.Frame(notebook)
+        notebook.add(self.get_tab,text="Get")
+        self._define_tab_get(parent=self.get_tab)
+
 
         """ SONGSDB tab """
-        self._define_tab_songsdb(self.songDB_tab)
+        self.songDB_tab = ttk.Frame(notebook)
+        notebook.add(self.songDB_tab,text="Databases")
+        self._define_tab_songsdb(controller, parent=self.songDB_tab)
     #------------------------------------------------------------------------------------
     def _define_tab_get(self, parent):
         frames_get_definition = [
@@ -222,7 +231,7 @@ class VirtualDJMonitor(tk.Tk):
         browser_preparestems_button.grid(row=1, column=6, padx=5,pady=5)
 
     #------------------------------------------------------------------------------------
-    def _define_tab_songsdb(self, parent):
+    def _define_tab_songsdb(self, controller, parent):
         database_list = self.songsDB.get_local_database_list()
         database_list_full = []
         for db_path in database_list:
@@ -264,7 +273,7 @@ class VirtualDJMonitor(tk.Tk):
 
         self.waveform_frame = ttk.LabelFrame(parent, text="Waveform")
         self.waveform_frame.grid(row=3,column=0, sticky="nsew",padx=10,pady=5)
-        self.waveform_viewer = WaveformViewer(self.waveform_frame)
+        self.waveform_viewer = WaveformViewer(controller, self.waveform_frame)
 
     #------------------------------------------------------------------------------------
     def on_selectDB(self, event):
@@ -415,7 +424,7 @@ class VirtualDJMonitor(tk.Tk):
             end_time1 = asyncio.get_running_loop().time()
             elapsed1_ms = int((end_time1 - start_time) * 1000)
 
-            #print(f"elapsed1_ms = {elapsed1_ms}")
+            #self.client.save_client_log(f"elapsed1_ms = {elapsed1_ms}")
 
             result_dict = {"name": name, "value": value}
             self._result_queue.put(result_dict)
@@ -425,8 +434,8 @@ class VirtualDJMonitor(tk.Tk):
             elapsed2_ms = int((end_time2 - start_time) * 1000)
             delay_ms = max(0, self.interval_refresh - elapsed2_ms)
 
-            #print(f"elapsed2_ms = {elapsed2_ms}")
-            #print(f"delay_ms = {delay_ms}")
+            #self.client.save_client_log(f"elapsed2_ms = {elapsed2_ms}")
+            #self.client.save_client_log(f"delay_ms = {delay_ms}")
 
             if delay_ms > 0:
                 timeout = delay_ms / 1000
@@ -476,7 +485,7 @@ class VirtualDJMonitor(tk.Tk):
         widget.configure(state="disabled")
 #------------------------------------------------------------------------------------------------------------------------------------
 class WaveformViewer(ttk.Frame):
-    def __init__(self, parent_frame):
+    def __init__(self, controller, parent_frame):
         super().__init__(parent_frame)
         self.parent_frame = parent_frame
         self.bar_width = 4
@@ -534,11 +543,13 @@ class WaveformViewer(ttk.Frame):
             data = bytes(waveform)
 
         else:
+            self.vdj_client_log.save_client_log(f"Unsupported waveform type: {type(waveform).__name__}")
             raise TypeError(f"Unsupported waveform type: {type(waveform).__name__}")
 
         block_size = 28
         data_len = len(data)
         if data_len % block_size:
+            self.vdj_client_log.save_client_log(f"Invalid waveform size: {data_len} bytes")
             raise ValueError(f"Invalid waveform size: {data_len} bytes")
 
         samples = []
