@@ -27,6 +27,9 @@ class VdjClientLog:
         else:
             logger = logging.getLogger(parent_name)
 
+        #do not propagate messages to the root logger
+        logger.propagate = False
+
         # do not add handlers multiple times
         if logger.handlers:
             return logger
