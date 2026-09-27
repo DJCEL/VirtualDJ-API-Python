@@ -13,14 +13,14 @@ from .client_config import VDJ_CLIENT_DEBUG, VDJ_CLIENT_LOG_FOLDER, VDJ_CLIENT_L
 
 #------------------------------------------------------------------------------------------------------------------------------------
 class VdjClientLog:
-    def __init__(self, controller = None, parent_name: str | None = None, level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO", useRichConsole: bool = False):
+    def __init__(self, controller = None, parent_name: str | None = None, useRichConsole: bool = False):
         self.filepath = f"{VDJ_CLIENT_LOG_FOLDER}/{VDJ_CLIENT_LOG_FILENAME}"
         if not os.path.exists(VDJ_CLIENT_LOG_FOLDER):
             os.makedirs(VDJ_CLIENT_LOG_FOLDER)
 
-        self.logger = self.create_client_log(controller, parent_name, level, useRichConsole)
+        self.logger = self.create_client_log(controller, parent_name, useRichConsole)
     #------------------------------------------------------------------------------------
-    def create_client_log(self, controller, parent_name: str | None = None, level: Literal["DEBUG","INFO","WARNING","ERROR","CRITICAL"] = "INFO", useRichConsole: bool = False) -> logging.Logger | None:
+    def create_client_log(self, controller, parent_name: str | None = None, useRichConsole: bool = False) -> logging.Logger | None:
         
         if parent_name is None:
             logger = logging.getLogger()

@@ -191,24 +191,24 @@ class VirtualDJSongsDatabase():
         try:
             tree = ET.parse(database_path)
         except ET.ParseError as exc:
-            self.vdj_client_log.save_client_log(f"VirtualDJ database reading {database_path} => Invalid XML file")
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => Invalid XML file", parent_name=__name__, level="ERROR")
             return []
         except OSError as exc:
-            self.vdj_client_log.save_client_log(f"VirtualDJ database reading {database_path} => Cannot read database")
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => Cannot read database", parent_name=__name__, level="ERROR")
             return []
 
         root = tree.getroot()
         root_tag = root.tag
         root_attrib = root.attrib
         if root_tag != "VirtualDJ_Database":
-            self.vdj_client_log.save_client_log(f"VirtualDJ database reading {database_path} => Not a VirtualDJ database")
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => Not a VirtualDJ database", parent_name=__name__, level="ERROR")
             return []
 
         songs_list = root.findall(".//Song")        
         songs_list_count = len(songs_list)
 
-        self.vdj_client_log.save_client_log(f"VirtualDJ database reading {database_path} => {root_attrib}")
-        self.vdj_client_log.save_client_log(f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}")
+        self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => {root_attrib}", parent_name=__name__, level="INFO")
+        self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}", parent_name=__name__, level="INFO")
 
 
         VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
@@ -352,7 +352,7 @@ class VirtualDJSongsDatabase():
                 elif child_tag  == "Comment":
                     song.Comment = child_attrib.get("Comment")
                 else:
-                    self.vdj_client_log.save_client_log(f"child_tag < {child_tag} > not defined")
+                    self.vdj_client_log.save_client_log(msg=f"child_tag < {child_tag} > not defined", parent_name=__name__, level="ERROR")
             
             # We add Poi list outside of the loop
             song.Poi = poi_list or None
@@ -401,8 +401,8 @@ class VirtualDJSongsDatabase():
                         value = dict(row)
                         result.append(value)
         except Exception as e:
-            msg = str(e)
-            self.vdj_client_log.save_client_log(f"Failed to query the sqlite database: {msg}")
+            message = str(e)
+            self.vdj_client_log.save_client_log(msg=f"Failed to query the sqlite database: {message}", parent_name=__name__, level="ERROR")
             result = []
 
         return result
