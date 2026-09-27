@@ -34,6 +34,8 @@ class VdjClientLog:
 
         # do not add handlers multiple times
         if logger.handlers:
+            # we remove all the handlers
+            #self._remove_handlers(logger)
             return logger
 
         # We create the handlers: file + console
@@ -63,7 +65,12 @@ class VdjClientLog:
 
 
         return logger
-        #------------------------------------------------------------------------------------
+    #------------------------------------------------------------------------------------
+    def _remove_handlers(self, _logger: logging.Logger):
+        for handler in _logger.handlers[:]:
+            handler.close()
+            _logger.removeHandler(handler)
+    #------------------------------------------------------------------------------------
     def get_client_log(self) -> logging.Logger:
         return self.logger
     #------------------------------------------------------------------------------------
