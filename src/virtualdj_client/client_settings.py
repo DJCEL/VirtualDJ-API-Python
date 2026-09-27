@@ -351,7 +351,7 @@ class VdjSettingsSampler:
     shoutoutVoice: Optional[str] = None
     shoutoutOver: Optional[str] = None
 #------------------------------------------------------------------------------------
-class browserSections(str, Enum):
+class VdjBrowserSections(str, Enum):
     ONLINEMUSIC_SPOTIFY = "file(spot)"
     VIRTUAL_FOLDER = "file(virt)"
     LOCALMUSIC_SAMPLER = "file(samp)"
