@@ -367,6 +367,36 @@ class VdjBrowserSections(str, Enum):
     SIDEVIEW_AUTOMIX = "side(auto)"
     SIDEVIEW_KARAOKE = "side(kara)"
 #------------------------------------------------------------------------------------
+class VdjBrowserColumns(str, Enum):
+    ARTIST = "arti"
+    TITLE = "titl"
+    REMIX = "mix"
+    BPM = "bpm"
+    KEY = "key"
+    BPM_DIFFERENCE = "dbpm"
+    KEY_DIFFERENCE = "dkey"
+    COMMENT ="comm"
+    LENGTH = "leng"
+    YEAR = "year"
+    ALBUM = "albu"
+    FIRST_SEEN = "1see"
+    FILE_NAME = "file"
+    WAVEFORM = "wave"
+    WILL_PLAY_AT = "plat"
+    SINGER = "sing"
+    PLAYLIST_PLAY_TIME = "plti"
+    SAMPLER_PLAY = "spla"
+    SAMPLER_POS = "spos"
+    SAMPLER_GROUP = "sgrp"
+    SAMPLER_VOLUME = "svol"
+    SAMPLER_MODE = "smod"
+    SAMPLER_LENGTH = "slen"
+    SAMPLER_EDIT = "sedi"
+    KARAOKE_POSITION = "lpos"
+    ASKTHEDJ_MESSAGE = "msg"
+    ASKTHEDJ_FROM = "from"
+    ASKTHEDJ_WHEN = "askd"
+#------------------------------------------------------------------------------------
 @dataclass
 class VdjSettingsBrowser:
     fileFormats: Optional[str] = None
@@ -391,8 +421,8 @@ class VdjSettingsBrowser:
     showVideo: Optional[str] = None
     showKaraoke: Optional[str] = None
     searchFields: Optional[str] = None
-    browserColumns: Optional[str] = None
-    browserSort: Optional[str] = None
+    browserColumns: Optional[str] = None   # a list of VdjBrowserSections delimited by |
+    browserSort: Optional[str] = None # a list of VdjBrowserSections delimited by |
     browserGridColumns: Optional[str] = None
     infoviewColumns: Optional[str] = None
     showHorizontalSideList: Optional[str] = None
