@@ -66,10 +66,10 @@ class VdjClientLog:
 
         return logger
     #------------------------------------------------------------------------------------
-    def _remove_handlers(self, _logger: logging.Logger):
-        for handler in _logger.handlers[:]:
+    def _remove_handlers(self):
+        for handler in self.logger.handlers[:]:
             handler.close()
-            _logger.removeHandler(handler)
+            self.logger.removeHandler(handler)
     #------------------------------------------------------------------------------------
     def get_client_log(self) -> logging.Logger:
         return self.logger
