@@ -450,8 +450,8 @@ class VdjSettingsBrowser:
     showVideo: Optional[str] = None
     showKaraoke: Optional[str] = None
     searchFields: Optional[str] = None
-    browserColumns: Optional[str] = None   # a list of VdjBrowserSections delimited by |
-    browserSort: Optional[str] = None # a list of VdjBrowserSections delimited by |
+    browserColumns: Optional[str] = None   # a list (delimited by | ) of VdjBrowserSections. Each VdjBrowserSection is a list (delimited by , ) of VdjBrowserColumns
+    browserSort: Optional[str] = None      # a list (delimited by | ) of VdjBrowserSections
     browserGridColumns: Optional[str] = None
     infoviewColumns: Optional[str] = None
     showHorizontalSideList: Optional[str] = None
