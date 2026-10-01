@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.21'
+__version__ = '1.0.22'
 
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
@@ -112,6 +112,7 @@ class VdjSongLink:
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjSong:
+    uid: int
     FilePath: Union[str,Path]
     Flag: Optional[int] = None
     FileSize: Optional[int] = None
@@ -211,7 +212,11 @@ class VirtualDJSongsDatabase():
         self.vdj_client_log.save_client_log(msg=f"VirtualDJ database reading {database_path} => Number of songs found = {songs_list_count}", parent_name=__name__, level="INFO")
 
 
-        VdjSong_list = [self._parse_song(song, filepath_only) for song in songs_list]
+        VdjSong_list = []
+        uid = 0
+        for song in songs_list:
+            VdjSong_list.append(self._parse_song(uid, song, filepath_only))
+            uid = uid + 1
 
         return VdjSong_list
     #------------------------------------------------------------------------------------
@@ -263,11 +268,12 @@ class VirtualDJSongsDatabase():
         except ValueError:
             return None
     #------------------------------------------------------------------------------------
-    def _parse_song(self, song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
+    def _parse_song(self, uid: int, song_el: ET.Element, filepath_only: bool = True) -> VdjSong:
             song_el_tag = song_el.tag
             song_el_attrib = song_el.attrib
             song_el_text = song_el.text
             song = VdjSong(
+                uid = uid,
                 FilePath = song_el_attrib.get("FilePath"),
                 Flag = self._to_int(song_el_attrib.get("Flag"))
             )

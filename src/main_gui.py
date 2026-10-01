@@ -38,6 +38,10 @@ class VirtualDJMonitor(tk.Tk):
         self.songsDB = VirtualDJSongsDatabase(self.controller)
         self._init_vdj_client()
         self._create_window(self.controller)
+        self.database_name = ""
+        self.table_name = ""
+        self.database = []
+        self._pos_db = 0
     #------------------------------------------------------------------------------------
     def _init_vdj_client(self):
         # Check if VirtualDJ is running
@@ -265,75 +269,87 @@ class VirtualDJMonitor(tk.Tk):
         text.pack(fill="both", expand=True)
         self.frameDBcount.text_widget = text
 
+        move_frame = ttk.LabelFrame(parent, text="Move in database")
+        move_frame.grid(row=2,column=0, sticky="nsew",padx=10,pady=5)
+        move_up10_button = ttk.Button(move_frame, text="-10", command=partial(self._on_moveDB,-10))
+        move_up10_button.grid(row=2, column=0, padx=5,pady=5)
+        move_up_button = ttk.Button(move_frame, text="-1", command=partial(self._on_moveDB,-1))
+        move_up_button.grid(row=2, column=1, padx=5,pady=5)
+        move_down_button = ttk.Button(move_frame, text="+1", command=partial(self._on_moveDB,1))
+        move_down_button.grid(row=2, column=2, padx=5,pady=5)
+        move_down10_button = ttk.Button(move_frame, text="+10", command=partial(self._on_moveDB,10))
+        move_down10_button.grid(row=2, column=3, padx=5,pady=5)
+
+
         self.frameDB = ttk.LabelFrame(parent, text="First item")
-        self.frameDB.grid(row=2,column=0, sticky="nsew",padx=10,pady=5)
+        self.frameDB.grid(row=4,column=0, sticky="nsew",padx=10,pady=5)
         text = tk.Text(self.frameDB, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)
         self.frameDB.text_widget = text
 
         self.waveform_frame = ttk.LabelFrame(parent, text="Waveform")
-        self.waveform_frame.grid(row=3,column=0, sticky="nsew",padx=10,pady=5)
+        self.waveform_frame.grid(row=5,column=0, sticky="nsew",padx=10,pady=5)
         self.waveform_viewer = WaveformViewer(controller, self.waveform_frame)
 
+    #------------------------------------------------------------------------------------
+    def _on_moveDB(self,step: int):
+        if step < 0 :
+            pos_db_tmp = self._pos_db - abs(step)
+            if pos_db_tmp < 0:
+                self._pos_db = 0
+            else:
+                self._pos_db = pos_db_tmp
+        elif step > 0 :
+            self._pos_db = self._pos_db + abs(step)
+
+        self._on_readDB_item(self.database,self._pos_db)
+    #------------------------------------------------------------------------------------
+    def _on_readDB_item(self, database:list, pos: int):
+        n = len(database)
+        if n >= 1 and pos < n:
+            if (self.database_name == self.songsDB.SQLITE_CACHE_DB and self.table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS): 
+                item = database[pos]
+                self._update_frame_text(self.frameDB,item)
+                waveform_bytes = item["waveform"]
+                valuesPerSecond = item["valuesPerSecond"]
+                self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
+            else:
+                item = database[pos]
+                self._update_frame_text(self.frameDB, item)
     #------------------------------------------------------------------------------------
     def on_selectDB(self, event):
         self._update_frame_text(self.frameDBcount,"")
         self._update_frame_text(self.frameDB,"")
+        self.database = []
+        self._pos_db = 0
+        
 
         db_path_ext = self.choixDB.get()
         if db_path_ext.endswith("]"):
             part1, part2 = db_path_ext.split(" [", 1)
             db_path = Path(part1)
-            table_name = part2.rstrip("]")
+            self.table_name = part2.rstrip("]")
         else:
             db_path = Path(db_path_ext)
-            table_name = ""
+            self.table_name = ""
 
-        database_name = os.path.basename(db_path)
+        self.database_name = os.path.basename(db_path)
 
-        if (database_name == self.songsDB.XML_DATABASE_NAME):
-            songs_database = self.songsDB.read_local_xml_database(db_path, filepath_only=False)
-            n = len(songs_database)
-            total_items = {"total_items": n}
-            self._update_frame_text(self.frameDBcount, total_items)
-            if n >= 1:
-                item_1 = songs_database[0] # type: VdjSong
-                self._update_frame_text(self.frameDB,item_1)
-        elif (database_name == self.songsDB.SQLITE_CACHE_DB and table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS):   
-            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-            n = len(result_list)
-            total_items = {"total_items": n}
-            self._update_frame_text(self.frameDBcount, total_items)
-            if n >= 1:
-                item_1 = result_list[0] # type: VdjWaveform
-                self._update_frame_text(self.frameDB,item_1)
-                waveform_bytes = item_1["waveform"]
-                valuesPerSecond = item_1["valuesPerSecond"]
-                self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
-        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS):
-            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-            n = len(result_list)
-            total_items = {"total_items": n}
-            self._update_frame_text(self.frameDBcount, total_items)
-            if n >= 1:
-                item_1 = result_list[0]
-                self._update_frame_text(self.frameDB,item_1)
-        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS):
-            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-            n = len(result_list)
-            total_items = {"total_items": n}
-            self._update_frame_text(self.frameDBcount, total_items)
-            if n >= 1:
-                item_1 = result_list[0]
-                self._update_frame_text(self.frameDB,item_1)
-        elif (database_name == self.songsDB.SQLITE_EXTRA_DB and table_name == self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA):
-            result_list = self.songsDB.read_local_sqlite_database(db_path,database_name,table_name)
-            n = len(result_list)
-            total_items = {"total_items": n}
-            self._update_frame_text(self.frameDBcount, total_items)
-            if n >= 1:
-                item_1 = result_list[0]
-                self._update_frame_text(self.frameDB,item_1)    
+        if (self.database_name == self.songsDB.XML_DATABASE_NAME):
+            self.database = self.songsDB.read_local_xml_database(db_path, filepath_only=False)
+        elif (self.database_name == self.songsDB.SQLITE_CACHE_DB and self.table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS):   
+            self.database = self.songsDB.read_local_sqlite_database(db_path,self.database_name,self.table_name)
+        elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS):
+            self.database = self.songsDB.read_local_sqlite_database(db_path,self.database_name,self.table_name)
+        elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_RELATED_TRACKS):
+            self.database = self.songsDB.read_local_sqlite_database(db_path,self.database_name,self.table_name)
+        elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_TRACK_DATA):
+            self.database = self.songsDB.read_local_sqlite_database(db_path,self.database_name,self.table_name)
+
+        n = len(self.database)
+        total_items = {"total_items": n}
+        self._update_frame_text(self.frameDBcount, total_items)
+        self._on_readDB_item(self.database, self._pos_db)
     #------------------------------------------------------------------------------------
     def _send_command(self, vdjverb: str, value: float = None):
         if not vdjverb:
@@ -492,6 +508,7 @@ class WaveformViewer(ttk.Frame):
         self.gap = 1
         self.max_height = 260
         self._build_ui(parent_frame)
+        self.vdj_client_log = VdjClientLog(controller)
 
         # A distinct color per band (v0, v1, v2, ...). Extend if you have more bands.
         self.BAND_COLORS = [
@@ -514,16 +531,19 @@ class WaveformViewer(ttk.Frame):
 
     def draw_waveform(self, waveform_bytes: bytes, valuesPerSecond: float): 
         samples = self._decode_vdj_waveform(waveform_bytes)
-        self.keys = sorted(samples[0].keys(), key=lambda k: int("".join(ch for ch in k if ch.isdigit()) or 0),)
         self.duration = len(samples) / valuesPerSecond
         self.values_per_second = valuesPerSecond
         self.seconds_per_sample = 1 / valuesPerSecond
 
-        # Normalize against the global max across all bands/samples so bar heights are comparable sample-to-sample.
-        self.global_max = max((v for s in samples for v in s.values() if isinstance(v, (int, float))), default=1,) or 1
-
         self.toobar_text_data.set(f"valuesPerSecond={self.values_per_second} / Duration={self.duration} seconds / {len(samples)} samples")
-        self._draw(samples)
+
+        if len(samples) > 0:
+            self.keys = sorted(samples[0].keys(), key=lambda k: int("".join(ch for ch in k if ch.isdigit()) or 0),)
+
+            # Normalize against the global max across all bands/samples so bar heights are comparable sample-to-sample.
+            self.global_max = max((v for s in samples for v in s.values() if isinstance(v, (int, float))), default=1,) or 1
+
+            self._draw(samples)
 
     def _decode_vdj_waveform(self, waveform_bytes: bytes):
         waveform = waveform_bytes.hex()
@@ -544,30 +564,34 @@ class WaveformViewer(ttk.Frame):
 
         else:
             self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
-            raise TypeError(f"Unsupported waveform type: {type(waveform).__name__}")
-
+            return []
+        
         block_size = 28
         data_len = len(data)
         if data_len % block_size:
             self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
-            raise ValueError(f"Invalid waveform size: {data_len} bytes")
+            return []
+        else:
+            samples = []
+            for offset in range(0, data_len, block_size):
+                try:
+                    v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
+                    sample = {
+                        "v0": v0 / 2**24,
+                        "v1": v1 / 2**24,
+                        "v2": v2 / 2**24,
+                        "v3": v3 / 2**24,
+                        "v4": v4 / 2**24,
+                        "v5": v5 / 2**24,
+                        "v6": v6,
+                    }
+                    samples.append(sample)
+                except Exception as e:
+                    strMsgLog = f"offset={offset}: {e}"
+                    self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
+           
 
-        samples = []
-
-        for offset in range(0, data_len, block_size):
-            v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
-            sample = {
-                "v0": v0 / 2**24,
-                "v1": v1 / 2**24,
-                "v2": v2 / 2**24,
-                "v3": v3 / 2**24,
-                "v4": v4 / 2**24,
-                "v5": v5 / 2**24,
-                "v6": v6,
-            }
-            samples.append(sample)
-
-        return samples
+            return samples
 
     def _build_ui(self, parent_frame):
         toolbar = ttk.Frame(parent_frame)
