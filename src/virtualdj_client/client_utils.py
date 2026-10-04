@@ -11,6 +11,7 @@ from typing import Optional, Literal
 import psutil
 import subprocess
 import logging
+import sqlite3
 
 from .client_config import VDJ_PROCESS_NAME, VDJ_PROCESS_PATH_WINDOWS, VDJ_PROCESS_PATH_MAC
 from .client_logging import VdjClientLog
