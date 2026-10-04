@@ -8,7 +8,6 @@ from typing import Optional, Union
 from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
-from contextlib import closing
 from datetime import datetime,timedelta
 
 from .client_utils import VirtualDJUtils
