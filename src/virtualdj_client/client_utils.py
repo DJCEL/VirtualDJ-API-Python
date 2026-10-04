@@ -68,7 +68,7 @@ class VirtualDJUtils:
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
-        #letters_list="DEFGHIJKLMNOPQRSTUVWXYZ"
+        #letters_list="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         drives_Windows = [ chr(x) + ":\\" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
         return drives_Windows
     #------------------------------------------------------------------------------------
