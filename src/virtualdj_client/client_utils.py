@@ -68,10 +68,14 @@ class VirtualDJUtils:
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
+        #drives_windows = []
         #letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        #root = Path(f"{letter}:/")
-        drives_Windows = [ chr(x) + ":\\" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
-        return drives_Windows
+        #for letter in letters:
+        #    root = Path(f"{letter}:/")
+        #    if root.exists():
+        #        drives_windows.append(root)
+        drives_windows = [ chr(x) + ":\\" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+        return drives_windows
     #------------------------------------------------------------------------------------
     @staticmethod
     def _darwin_drive_roots() -> list[Path]:
