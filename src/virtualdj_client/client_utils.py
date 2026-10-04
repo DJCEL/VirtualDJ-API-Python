@@ -128,7 +128,7 @@ class VirtualDJUtils:
 
         return True
     #------------------------------------------------------------------------------------
-    def _sqlite_query(self, database_path: Path, sql_script) -> list[dict]:
+    def sqlite_query(self, database_path: Path, sql_script) -> list[dict]:
         result = []
         try:
            with sqlite3.connect(database_path, timeout=3) as connection:
