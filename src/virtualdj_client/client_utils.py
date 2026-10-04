@@ -123,7 +123,7 @@ class VirtualDJUtils:
             return False
         except Exception as e:
             msg =  app_path + "\n" + str(e)
-            self.vdj_client_log.save_client_log(msg,__name__)
+            self.vdj_client_log.save_client_log(msg=msg,parent_name=__name__, level="ERROR")
             return False
 
         return True
@@ -140,7 +140,8 @@ class VirtualDJUtils:
                         result.append(value)
         except Exception as e:
             message = str(e)
-            self.vdj_client_log.save_client_log(msg=f"Failed to query the sqlite database: {message}", parent_name=__name__, level="ERROR")
+            strMsgLog = f"Failed to query the sqlite database: {message}"
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
             result = []
 
         return result
