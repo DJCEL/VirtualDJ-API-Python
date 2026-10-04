@@ -22,9 +22,9 @@ class VirtualDJUtils:
         self.VIRTUALDJ_FOLDER = "VirtualDJ"
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_list(self) -> list[Path]:
-        system = platform.system()
-        if system == "Windows":
-            home = Path.home()
+        system = platform.system().lower()
+        home = Path.home()
+        if system == "windows":
             main_folder_list = [ 
                 home / "Documents",
                 home / "OneDrive" / "Documents",
@@ -33,8 +33,7 @@ class VirtualDJUtils:
             localappdata = os.getenv('LOCALAPPDATA')
             if localappdata:
                main_folder_list.append(Path(localappdata))
-        elif system == "Darwin":
-            home = Path.home()
+        elif system == "darwin":
             main_folder_list = [ 
                 home / "Documents",
                 home / "Library" / "Application Support",
