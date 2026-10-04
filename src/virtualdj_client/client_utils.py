@@ -52,10 +52,10 @@ class VirtualDJUtils:
         return vdj_home_list
     #------------------------------------------------------------------------------------
     def get_virtualdj_home_ext_list(self) -> list[Path]:
-        system = platform.system()
-        if system == "Windows":
+        system = platform.system().lower()
+        if system == "windows":
             drives = self._windows_drive_roots()
-        elif system == "Darwin":
+        elif system == "darwin":
             drives = self._darwin_drive_roots()
         else:
             return []
@@ -90,10 +90,13 @@ class VirtualDJUtils:
     def is_virtualdj_running(self) -> bool:
         """ Check if VirtualDJ software is running """
         bRes = False
-        for proc in psutil.process_iter(["pid", "name"]):
-            process_name = proc.info["name"]
-            if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():
-                bRes = True
+        system = platform.system().lower()
+        if system == "windows":
+        
+            for proc in psutil.process_iter(["pid", "name"]):
+                process_name = proc.info["name"]
+                if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():
+                    bRes = True
 
         return bRes
     #------------------------------------------------------------------------------------
