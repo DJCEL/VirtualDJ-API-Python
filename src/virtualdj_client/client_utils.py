@@ -90,7 +90,6 @@ class VirtualDJUtils:
     def is_virtualdj_running(self) -> bool:
         """ Check if VirtualDJ software is running """
         bRes = False
-        
         for proc in psutil.process_iter(["pid", "name"]):
             process_name = proc.info["name"]
             if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():

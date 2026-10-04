@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.23'
+__version__ = '1.0.24'
 
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
@@ -139,6 +139,12 @@ class VdjWaveform:
     version: int
     valuesPerSecond: float
     waveform: bytes
+
+#------------------------------------------------------------------------------------
+@dataclass
+class VdjLyrics:
+    lid: str
+    xml: str
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
     def __init__(self, controller = None):
@@ -393,3 +399,59 @@ class VirtualDJSongsDatabase():
         result_list = self.vdj_utils.sqlite_query(database_path, sql_script)
 
         return result_list
+
+    #------------------------------------------------------------------------------------
+    def decode_waveform(self, item: VdjWaveform):
+        waveform_bytes = item["waveform"]
+        valuesPerSecond = item["valuesPerSecond"]
+
+        waveform = waveform_bytes.hex()
+        if isinstance(waveform, str):
+            waveform = waveform.strip()
+
+            # Remove optional 0x prefix
+            if waveform.startswith("0x"):
+                waveform = waveform[2:]
+
+            data = bytes.fromhex(waveform)
+
+        elif isinstance(waveform, bytes):
+            data = waveform
+
+        elif isinstance(waveform, bytearray):
+            data = bytes(waveform)
+
+        else:
+            self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
+            return []
+        
+        block_size = 28
+        data_len = len(data)
+        if data_len % block_size:
+           self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
+            return []
+        else:
+            samples = []
+            for offset in range(0, data_len, block_size):
+                try:
+                    v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
+                    sample = {
+                        "v0": v0 / 2**24,
+                        "v1": v1 / 2**24,
+                        "v2": v2 / 2**24,
+                        "v3": v3 / 2**24,
+                        "v4": v4 / 2**24,
+                        "v5": v5 / 2**24,
+                        "v6": v6,
+                    }
+                    samples.append(sample)
+                except Exception as e:
+                    strMsgLog = f"offset={offset}: {e}"
+                    self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
+           
+
+            return samples
+
+    #------------------------------------------------------------------------------------
+    def decode_lyrics(self, item: VdjLyrics):
+        return

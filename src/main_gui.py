@@ -310,6 +310,7 @@ class VirtualDJMonitor(tk.Tk):
             if (self.database_name == self.songsDB.SQLITE_CACHE_DB and self.table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS): 
                 item = database[pos]
                 self._update_frame_text(self.frameDB,item)
+                version = item["version"]
                 waveform_bytes = item["waveform"]
                 valuesPerSecond = item["valuesPerSecond"]
                 self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
