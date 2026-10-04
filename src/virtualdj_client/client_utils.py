@@ -2,7 +2,7 @@
 # VirtualDJ - Folders structure
 #------------------------------------------------------------------------------------
 
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 import os
 import platform
@@ -24,16 +24,20 @@ class VirtualDJUtils:
     def get_virtualdj_home_list(self) -> list[Path]:
         system = platform.system()
         if system == "Windows":
+            home = Path.home()
             main_folder_list = [ 
-                Path.home() / "Documents",
+                home / "Documents",
+                home / "OneDrive" / "Documents",
             ]
-            local_appdata = os.getenv('LOCALAPPDATA')
-            if local_appdata:
-               main_folder_list.append(Path(local_appdata))
+            #userprofile = os.environ.get("USERPROFILE")
+            localappdata = os.getenv('LOCALAPPDATA')
+            if localappdata:
+               main_folder_list.append(Path(localappdata))
         elif system == "Darwin":
+            home = Path.home()
             main_folder_list = [ 
-                Path.home() / "Documents",
-                Path.home() / "Library" / "Application Support",
+                home / "Documents",
+                home / "Library" / "Application Support",
             ]
         else:
             return []
