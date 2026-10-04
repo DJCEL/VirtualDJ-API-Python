@@ -127,3 +127,20 @@ class VirtualDJUtils:
             return False
 
         return True
+    #------------------------------------------------------------------------------------
+    def _sqlite_query(self, database_path: Path, sql_script) -> list[dict]:
+        result = []
+        try:
+           with sqlite3.connect(database_path, timeout=3) as connection:
+               connection.row_factory = sqlite3.Row
+               with closing(connection.cursor()) as cursor:
+                    rows = cursor.execute(sql_script).fetchall()
+                    for row in rows:
+                        value = dict(row)
+                        result.append(value)
+        except Exception as e:
+            message = str(e)
+            self.vdj_client_log.save_client_log(msg=f"Failed to query the sqlite database: {message}", parent_name=__name__, level="ERROR")
+            result = []
+
+        return result
