@@ -281,7 +281,7 @@ class VirtualDJMonitor(tk.Tk):
         move_down10_button.grid(row=2, column=3, padx=5,pady=5)
 
 
-        self.frameDB = ttk.LabelFrame(parent, text="First item")
+        self.frameDB = ttk.LabelFrame(parent, text="Details item")
         self.frameDB.grid(row=4,column=0, sticky="nsew",padx=10,pady=5)
         text = tk.Text(self.frameDB, height=1, state='disabled', font=("Consolas",10))
         text.pack(fill="both", expand=True)

@@ -70,13 +70,13 @@ class VirtualDJUtils:
     #------------------------------------------------------------------------------------
     @staticmethod
     def _windows_drive_roots() -> list[Path]:
-        #drives_windows = []
-        #letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        #for letter in letters:
-        #    root = Path(f"{letter}:/")
-        #    if root.exists():
-        #        drives_windows.append(root)
-        drives_windows = [ chr(x) + ":\\" for x in range(65,91) if os.path.exists(chr(x) + ":") ]
+        drives_windows = []
+        letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        for letter in letters:
+            root = Path(f"{letter}:/")
+            if root.exists():
+                drives_windows.append(root)
+       
         return drives_windows
     #------------------------------------------------------------------------------------
     @staticmethod
@@ -90,22 +90,12 @@ class VirtualDJUtils:
     def is_virtualdj_running(self) -> bool:
         """ Check if VirtualDJ software is running """
         bRes = False
-        system = platform.system().lower()
-        if system == "windows":
         
-            for proc in psutil.process_iter(["pid", "name"]):
-                process_name = proc.info["name"]
-                if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():
-                    bRes = True
-        elif system == "darwin":
-            script = 'tell application "System Events" to return exists process "VirtualDJ"'
-            r = subprocess.run(
-                ["osascript", "-e", script],
-                capture_output=True,
-               text=True,
-               timeout=15,
-            )
-            bRes = (r.stdout.strip().lower() ==  "true")
+        for proc in psutil.process_iter(["pid", "name"]):
+            process_name = proc.info["name"]
+            if process_name and VDJ_PROCESS_NAME.lower() in process_name.lower():
+                bRes = True
+        
 
         return bRes
     #------------------------------------------------------------------------------------
@@ -132,12 +122,13 @@ class VirtualDJUtils:
                  popen_kwargs["creationflags"] = (subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS)
 
             subprocess.Popen([app_path], **popen_kwargs)
+
         except FileNotFoundError:
             self.vdj_client_log.save_client_log(msg=f"VirtualDJ not found: {app_path}",parent_name=__name__, level="ERROR")
             return False
         except Exception as e:
-            msg =  app_path + "\n" + str(e)
-            self.vdj_client_log.save_client_log(msg=msg,parent_name=__name__, level="ERROR")
+             strMsgLog =  app_path + "\n" + str(e)
+            self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__, level="ERROR")
             return False
 
         return True
