@@ -111,10 +111,10 @@ class VirtualDJUtils:
     #------------------------------------------------------------------------------------
     def launch_virtualdj_software(self) -> bool:
         """ Launch VirtualDJ software """
-        system = platform.system()
-        if system == "Windows":
+        system = platform.system().lower()
+        if system == "windows":
             app_path = VDJ_PROCESS_PATH_WINDOWS
-        elif system == "Darwin":
+        elif system == "darwin":
             app_path = os.path.join(VDJ_PROCESS_PATH_MAC,"Contents","MacOS","VirtualDJ")
         else:
             return False
