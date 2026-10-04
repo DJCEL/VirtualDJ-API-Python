@@ -1,14 +1,13 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ databases
 #------------------------------------------------------------------------------------
-__version__ = '1.0.22'
+__version__ = '1.0.23'
 
 import xml.etree.ElementTree as ET
 from typing import Optional, Union
 from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
-import sqlite3
 from contextlib import closing
 from datetime import datetime,timedelta
 
@@ -392,23 +391,6 @@ class VirtualDJSongsDatabase():
         if sql_script == "":
             return []
 
-        result_list = self._sqlite_query(database_path, sql_script)
+        result_list = self.vdj_utils.sqlite_query(database_path, sql_script)
 
         return result_list
-    #------------------------------------------------------------------------------------
-    def _sqlite_query(self, database_path: Path, sql_script) -> list[dict]:
-        result = []
-        try:
-           with sqlite3.connect(database_path) as connection:
-               connection.row_factory = sqlite3.Row
-               with closing(connection.cursor()) as cursor:
-                    rows = cursor.execute(sql_script).fetchall()
-                    for row in rows:
-                        value = dict(row)
-                        result.append(value)
-        except Exception as e:
-            message = str(e)
-            self.vdj_client_log.save_client_log(msg=f"Failed to query the sqlite database: {message}", parent_name=__name__, level="ERROR")
-            result = []
-
-        return result
