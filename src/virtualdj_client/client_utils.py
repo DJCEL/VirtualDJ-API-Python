@@ -100,12 +100,12 @@ class VirtualDJUtils:
         elif system == "darwin":
             script = 'tell application "System Events" to return exists process "VirtualDJ"'
             r = subprocess.run(
-            ["osascript", "-e", script],
-            capture_output=True,
-            text=True,
-            timeout=15,
-        )
-        bRes = (r.stdout.strip().lower() ==  "true")
+                ["osascript", "-e", script],
+                capture_output=True,
+               text=True,
+               timeout=15,
+            )
+            bRes = (r.stdout.strip().lower() ==  "true")
 
         return bRes
     #------------------------------------------------------------------------------------
