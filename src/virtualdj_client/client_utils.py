@@ -119,7 +119,7 @@ class VirtualDJUtils:
 
             subprocess.Popen([app_path], **popen_kwargs)
         except FileNotFoundError:
-            self.vdj_client_log.save_client_log(f"VirtualDJ not found: {app_path}",__name__)
+            self.vdj_client_log.save_client_log(msg=f"VirtualDJ not found: {app_path}",parent_name=__name__, level="ERROR")
             return False
         except Exception as e:
             msg =  app_path + "\n" + str(e)
