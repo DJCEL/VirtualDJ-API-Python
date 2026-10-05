@@ -380,7 +380,7 @@ class VirtualDJSongsDatabase():
         elif database_name == self.SQLITE_EXTRA_DB:
             if table_name == self.SQLITE_EXTRA_DB_LYRICS:
                 # lyrics : lid[BLOB,PRIMARY_KEY], xml[TEXT]
-                sql_script = f"SELECT * FROM {table_name}"
+                sql_script = f"SELECT hex(lid) as lid_hex, xml FROM {table_name}"
             elif table_name == self.SQLITE_EXTRA_DB_RELATED_TRACKS:
                 # related_tracks: id[INTEGER,PRIMARY_KEY], sid1[INTEGER], sid2[INTEGER]
                 sql_script = f"SELECT * FROM {table_name}"
@@ -429,7 +429,7 @@ class VirtualDJSongsDatabase():
         data_len = len(data)
         if data_len % block_size:
            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
-            return []
+           return []
         else:
             samples = []
             for offset in range(0, data_len, block_size):

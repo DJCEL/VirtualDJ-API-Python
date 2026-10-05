@@ -126,7 +126,7 @@ class VirtualDJUtils:
             self.vdj_client_log.save_client_log(msg=f"VirtualDJ not found: {app_path}",parent_name=__name__, level="ERROR")
             return False
         except Exception as e:
-             strMsgLog =  app_path + "\n" + str(e)
+            strMsgLog =  app_path + "\n" + str(e)
             self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__, level="ERROR")
             return False
 
