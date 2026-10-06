@@ -186,6 +186,7 @@ class VdjAutomix:
     automixTempoMode: Optional[str] = None
     automixBeatMatchOnFade: Optional[bool] = None
     automixDoubleClick: Optional[str] = None
+    automix_file_count: Optional[int] = None
 #------------------------------------------------------------------------------------------------------------------------------------
 @dataclass
 class VdjVideo:
@@ -748,6 +749,7 @@ class VirtualDJClient():
             automix.automix_nextsong_title = self.to_str(await self._get_result("get_automix_song 'title' 1"))
             automix.automix_nextsong2_artist = self.to_str(await self._get_result("get_automix_song 'artist' 2"))
             automix.automix_nextsong2_title = self.to_str(await self._get_result("get_automix_song 'title' 2"))
+            automix.automix_file_count = self.to_int(await self._get_result("file_count automix"))
 
         return automix
     #------------------------------------------------------------------------------------
