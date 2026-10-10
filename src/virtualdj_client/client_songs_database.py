@@ -441,5 +441,12 @@ class VirtualDJSongsDatabase():
 
             return samples, valuesPerSecond
     #------------------------------------------------------------------------------------
-    def decode_lyrics(self, item: VdjLyrics):
-        return
+    def decode_lyrics(self, item: dict):
+        lyrics = item["xml"]
+        if len(lyrics) > 0:
+            if "#LANG" in lyrics:
+                language = lyrics[0:9]
+                print(language)
+            elif "#NOLYRICS" in lyrics:
+                print("No Lyrics")
+        return lyrics

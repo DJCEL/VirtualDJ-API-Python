@@ -321,13 +321,7 @@ class VirtualDJMonitor(tk.Tk):
             elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS): 
                 item = database[pos]
                 self._update_frame_text(self.frameDB,item)
-                lyrics = item["xml"]
-                if len(lyrics) > 0:
-                    if "#LANG" in lyrics:
-                        language = lyrics[0:9]
-                        print(language)
-                    elif "#NOLYRICS" in lyrics:
-                        print("No Lyrics")
+                lyrics = self.songsDB.decode_lyrics(item)
                 self._update_frame_text(self.lyrics_frame,lyrics)
             else:
                 item = database[pos]
