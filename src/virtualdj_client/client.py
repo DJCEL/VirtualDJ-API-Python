@@ -686,34 +686,37 @@ class VirtualDJClient():
     async def get_BrowserFolder_async(self) -> VdjBrowserFolder:
         # TODO: check if we can use asyncio.gather() to decrease the latency
         browserfolder = VdjBrowserFolder()
-        browserfolder.browsed_folder = self.to_str(await self._get_result("get_browsed_folder"))
-        browserfolder.browsed_folder_icon = self.to_int(await self._get_result("get_browsed_folder_icon"))
-        browserfolder.browsed_folder_path = self.to_str(await self._get_result("get_browsed_folder_path"))
-        browserfolder.browsed_folder_scrollpos = self.to_int(await self._get_result("get_browsed_folder_scrollpos"))
-        browserfolder.browsed_folder_scrollsize = self.to_int(await self._get_result("get_browsed_folder_scrollsize"))
-        browserfolder.browsed_folder_selection_index = self.to_int(await self._get_result("get_browsed_folder_selection_index"))
-        browserfolder.browsed_folder_tab = self.to_int(await self._get_result("get_browsed_folder_tab"))
-        browserfolder.browsed_header = self.to_str(await self._get_result("get_browsed_header"))
         browserfolder.file_count = self.to_int(await self._get_result("file_count"))
+        browserfolder.browsed_folder = self.to_str(await self._get_result("get_browsed_folder"))
+        browserfolder.browsed_header = self.to_str(await self._get_result("get_browsed_header"))
+        if browserfolder.browsed_folder is not None:
+            browserfolder.browsed_folder_icon = self.to_int(await self._get_result("get_browsed_folder_icon"))
+            browserfolder.browsed_folder_path = self.to_str(await self._get_result("get_browsed_folder_path"))
+            browserfolder.browsed_folder_scrollpos = self.to_int(await self._get_result("get_browsed_folder_scrollpos"))
+            browserfolder.browsed_folder_scrollsize = self.to_int(await self._get_result("get_browsed_folder_scrollsize"))
+            browserfolder.browsed_folder_selection_index = self.to_int(await self._get_result("get_browsed_folder_selection_index"))
+            browserfolder.browsed_folder_tab = self.to_int(await self._get_result("get_browsed_folder_tab"))
         return browserfolder
     #------------------------------------------------------------------------------------
     async def get_BrowserFile_async(self) -> VdjBrowserFile:
         # TODO: check if we can use asyncio.gather() to decrease the latency
+        file_count = self.to_int(await self._get_result("file_count"))
         browserfile = VdjBrowserFile()
-        browserfile.browsed_scrollpos = self.to_int(await self._get_result("get_browsed_scrollpos"))
-        browserfile.browsed_scrollsize = self.to_int(await self._get_result("get_browsed_scrollsize"))
-        #browserfile.browsed_selection_index = self.to_int(await self._get_result("get_browsed_selection_index"))
-        browserfile.browsed_filepath = self.to_str(await self._get_result("get_browsed_filepath"))
-        browserfile.browsed_artist = self.to_str(await self._get_result("get_browsed_artist"))
-        browserfile.browsed_title = self.to_str(await self._get_result("get_browsed_title"))
-        browserfile.browsed_title_artist = self.to_str(await self._get_result("get_browsed_title_artist "))
-        browserfile.browsed_bpm = self.to_float(await self._get_result("get_browsed_bpm"))
-        browserfile.browsed_key = self.to_str(await self._get_result("get_browsed_key"))
-        browserfile.browsed_genre = self.to_str(await self._get_result("get_browsed_genre"))
-        browserfile.browsed_comment = self.to_str(await self._get_result("get_browsed_comment"))
-        browserfile.browsed_composer = self.to_str(await self._get_result("get_browsed_composer"))
-        browserfile.browsed_color = self.to_str(await self._get_result("get_browsed_song color"))
-        browserfile.browsed_album = self.to_str(await self._get_result("get_browsed_album"))
+        if file_count is not None and file_count != 0:
+            browserfile.browsed_scrollsize = self.to_int(await self._get_result("get_browsed_scrollsize"))  
+            browserfile.browsed_scrollpos = self.to_int(await self._get_result("get_browsed_scrollpos"))
+            #browserfile.browsed_selection_index = self.to_int(await self._get_result("get_browsed_selection_index"))
+            browserfile.browsed_filepath = self.to_str(await self._get_result("get_browsed_filepath"))
+            browserfile.browsed_artist = self.to_str(await self._get_result("get_browsed_artist"))
+            browserfile.browsed_title = self.to_str(await self._get_result("get_browsed_title"))
+            browserfile.browsed_title_artist = self.to_str(await self._get_result("get_browsed_title_artist "))
+            browserfile.browsed_bpm = self.to_float(await self._get_result("get_browsed_bpm"))
+            browserfile.browsed_key = self.to_str(await self._get_result("get_browsed_key"))
+            browserfile.browsed_genre = self.to_str(await self._get_result("get_browsed_genre"))
+            browserfile.browsed_comment = self.to_str(await self._get_result("get_browsed_comment"))
+            browserfile.browsed_composer = self.to_str(await self._get_result("get_browsed_composer"))
+            browserfile.browsed_color = self.to_str(await self._get_result("get_browsed_song color"))
+            browserfile.browsed_album = self.to_str(await self._get_result("get_browsed_album"))
         return browserfile
     #------------------------------------------------------------------------------------
     async def get_Browser_async(self) -> VdjBrowser:
