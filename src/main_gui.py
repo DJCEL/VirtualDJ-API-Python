@@ -142,8 +142,10 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     def _define_tab_get(self, parent):
 
-        #self.get_toggle_button = tk.Button(parent,text="GetRefresh", command= self._toggle_GetRefresh, width=18)
-        #self.get_toggle_button.pack(fill="both", expand=True)
+         # Client query refresh switch
+        self._get_refresh_enabled = True
+        self.get_refresh_button = ttk.Button(parent,text="Refresh: ON", command=self._toggle_GetRefresh)
+        self.get_refresh_button.grid(row=0, column=0, sticky="w", padx=10, pady=5)
 
         frames_get_definition = [
             ("leftdecksong_frame", "Left Deck - Song", lambda client: client.get_DeckSong_async("left")),
@@ -159,7 +161,7 @@ class VirtualDJMonitor(tk.Tk):
 
         self.get_frames = {}
 
-        for row, (frame_name, frame_title, frame_function) in enumerate(frames_get_definition):
+        for row, (frame_name, frame_title, frame_function) in enumerate(frames_get_definition, start=1):
             frame = ttk.LabelFrame(parent, text=frame_title)
             text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
             text.pack(fill="both", expand=True)
@@ -170,7 +172,10 @@ class VirtualDJMonitor(tk.Tk):
             self.get_frames[frame_name] = {"frame": frame, "function": frame_function}
     #------------------------------------------------------------------------------------
     def _toggle_GetRefresh(self):
-        return
+        self._get_refresh_enabled = not self._get_refresh_enabled
+
+        strTextButton = "Refresh: ON" if self._get_refresh_enabled else "Refresh: OFF"
+        self.get_refresh_button.configure(text=strTextButton)
     #------------------------------------------------------------------------------------
     def _define_tab_send(self, parent):
         vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
@@ -437,10 +442,12 @@ class VirtualDJMonitor(tk.Tk):
         async with VirtualDJClient() as client:
             self.client = client
             tasks = []
-            for name, config in self.get_frames.items():
-                getter = config["function"]
-                task = asyncio.create_task(self._poll_data(client, name, getter))
-                tasks.append(task)
+            client_running = self.client.is_app_running()
+            if client_running:
+                for name, config in self.get_frames.items():
+                    getter = config["function"]
+                    task = asyncio.create_task(self._poll_data(client, name, getter))
+                    tasks.append(task)
                    
             try:
                 await asyncio.gather(*tasks)
@@ -453,6 +460,13 @@ class VirtualDJMonitor(tk.Tk):
     #------------------------------------------------------------------------------------
     async def _poll_data(self, client, name, getter):
         while not self._stopping.is_set():
+
+            while (not self._get_refresh_enabled and not self._stopping.is_set()):
+                await asyncio.sleep(0.1)
+
+            if self._stopping.is_set():
+                break
+            
             start_time = asyncio.get_running_loop().time()
 
             try:
