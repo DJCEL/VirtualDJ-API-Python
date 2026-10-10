@@ -546,8 +546,7 @@ class WaveformViewer(ttk.Frame):
         self.RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
 
 
-    def draw_waveform(self, samples: list[dict], valuesPerSecond: float): 
-       
+    def draw_waveform(self, samples: list[dict], valuesPerSecond: float):       
         self.duration = len(samples) / valuesPerSecond
         self.values_per_second = valuesPerSecond
         self.seconds_per_sample = 1 / valuesPerSecond
