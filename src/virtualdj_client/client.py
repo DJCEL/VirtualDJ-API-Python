@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------------
 # VirtualDJ Client
 #------------------------------------------------------------------------------------
-__version__ = "1.0.31"
+__version__ = "1.0.32"
 
 import asyncio
 import time
@@ -238,10 +238,11 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
+        strMsgLog = f"HTTP {status_code}: {status} / {result}"
         if status == "ok":
            return True
         else:
-            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result}", parent_name=__name__,level="ERROR")
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__,level="ERROR")
             return False
     #------------------------------------------------------------------------------------
     #  Launch / Quit VirtualDJ
@@ -283,7 +284,8 @@ class VirtualDJClient():
 
         checkUpdates = self.get_checkUpdates()
         if checkUpdates:
-            self.vdj_client_log.save_client_log(msg=f"VirtualDJ checkUpdates option => {checkUpdates}",parent_name=__name__,level="INFO")
+            strMsgLog = f"VirtualDJ checkUpdates option => {checkUpdates}"
+            self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__,level="INFO")
             self.set_checkUpdates('off')
 
         bRes = self.vdj_utils.launch_virtualdj_software()
@@ -345,11 +347,12 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
+        strMsgLog = f"HTTP {status_code}: {status} / {result} with query={vdjscript}"
         if status == "ok":
-            #self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with query={vdjscript}",parent_name=__name__,level="DEBUG")
+            #self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__,level="DEBUG")
             return result
         else:
-            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with query={vdjscript}",parent_name=__name__,level="ERROR")
+            self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__,level="ERROR")
             return result           
     #------------------------------------------------------------------------------------
     async def send_async(self, vdjscript: str) -> bool:
@@ -358,11 +361,12 @@ class VirtualDJClient():
         status = vdj_response.status
         status_code = vdj_response.status_code
         result = vdj_response.result
+        strMsgLog = f"HTTP {status_code}: {status} / {result} with execute={vdjscript}"
         if status == "ok":
-            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",parent_name=__name__,level="DEBUG")
+            self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__,level="DEBUG")
             return (result.lower() == "true")
         else:
-            self.vdj_client_log.save_client_log(msg=f"HTTP {status_code}: {status} / {result} with execute={vdjscript}",parent_name=__name__,level="ERROR")
+            self.vdj_client_log.save_client_log(msg=strMsgLog,parent_name=__name__,level="ERROR")
             return False
     #------------------------------------------------------------------------------------
     #  Vdjscript Helper
