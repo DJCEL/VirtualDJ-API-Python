@@ -45,23 +45,29 @@ class VirtualDJMonitor(tk.Tk):
     def _init_vdj_client(self):
         # Check if VirtualDJ is running
         client_running = self.client.is_app_running()
-        self.vdj_client_log.save_client_log(msg=f"VirtualDJ running => {client_running}", parent_name=__name__, level="INFO")
+        strMsgLog = f"VirtualDJ running => {client_running}"
+        self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
 
         # Launch VirtualDJ if not running
         if client_running == False:
-            self.vdj_client_log.save_client_log(msg="Launching VirtualDJ...", parent_name=__name__, level="INFO")
+            strMsgLog = "Launching VirtualDJ..."
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
             client_launched = self.client.open_app()
-            self.vdj_client_log.save_client_log(msg=f"VirtualDJ launched => {client_launched}", parent_name=__name__, level="INFO")
+            strMsgLog = f"VirtualDJ launched => {client_launched}"
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
             client_running = self.client.is_app_running()
-            self.vdj_client_log.save_client_log(msg=f"VirtualDJ running => {client_running}", parent_name=__name__, level="INFO")
+            strMsgLog = f"VirtualDJ running => {client_running}"
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
             if (client_running == False):
                 sys.exit()
 
         # Check the NetWork Control plugin
         client_connected = self.client.is_connected()
-        self.vdj_client_log.save_client_log(msg=f"VirtualDJ NetWork Control plugin connected => {client_connected}", parent_name=__name__, level="INFO")
+        strMsgLog = f"VirtualDJ NetWork Control plugin connected => {client_connected}"
+        self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
         if (client_connected == False):
-            self.client_log.save_client_log(msg="Check that the NetWork Control plugin is available and activated in VirtualDJ", parent_name=__name__, level="ERROR")
+            strMsgLog = "Check that the NetWork Control plugin is available and activated in VirtualDJ"
+            self.client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
             sys.exit()
     #------------------------------------------------------------------------------------
     def _create_window(self, controller):
@@ -80,12 +86,12 @@ class VirtualDJMonitor(tk.Tk):
 
         self._define_menubar(controller)
         self._define_notebook(controller)
+        self._stopping = threading.Event()
         self.protocol("WM_DELETE_WINDOW", self._destroy_window)
 
         """ Refresh loop for the GET tab """
         self.interval_refresh = 100  # ms
         self._loop: asyncio.AbstractEventLoop | None = None
-        self._stopping = threading.Event()
         self._result_queue = queue.Queue(maxsize=1)
         self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self._async_thread.start()

@@ -44,7 +44,8 @@ class VdjClientLog:
         formatter = logging.Formatter(FORMAT,datefmt="%Y/%m/%d %H:%M:%S")
 
         try:
-            file_handler = RotatingFileHandler(filename=self.filepath, mode="a", maxBytes=(1024*1024), backupCount=3, encoding='utf-8')
+            #maxBytes=(1024*1024)
+            file_handler = RotatingFileHandler(filename=self.filepath, mode="a", maxBytes=0, backupCount=3, encoding='utf-8')
             file_handler.setFormatter(formatter)
             logger.addHandler(file_handler)
         except Exception as e:
@@ -83,17 +84,20 @@ class VdjClientLog:
             else:
                 logger = logging.getLogger(parent_name)
 
-
             if level == "DEBUG":
-                logger.debug(msg)
+                logger.debug(msg=msg)
             elif level == "INFO":
-                logger.info(msg)
+                try:
+                    logger.info(msg=msg)
+                except Exception as e:
+                    print(f"Failed to log message: {msg}. Error: {str(e)}")
             elif level == "WARNING":
-                logger.warning(msg)
+                logger.warning(msg=msg)
             elif level == "ERROR":
-                logger.error(msg)
+                logger.error(msg=msg)
             elif level == "CRITICAL":
-                logger.critical(msg)
+                logger.critical(msg=msg)
+            
 
     #------------------------------------------------------------------------------------
     def close_client_logs() -> None:

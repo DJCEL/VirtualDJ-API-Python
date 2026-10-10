@@ -410,14 +410,14 @@ class VirtualDJSongsDatabase():
 
         if not isinstance(waveform, bytes):
             self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
-            return []
+            return [], valuesPerSecond 
 
         data = waveform
         data_len = len(data)
         block_size = 28
         if data_len % block_size:
            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
-           return []
+           return [], valuesPerSecond 
 
         samples = []
         for offset in range(0, data_len, block_size):
@@ -444,11 +444,10 @@ class VirtualDJSongsDatabase():
         lid_hex = item["lid_hex"]
         lyrics = item["xml"]
 
-        audiosig = base64.b64encode(bytes.fromhex(lid_hex)).decode("ascii")
-
-        lyrics = "#AUDIOSIG=" + str(audiosig) + "\n" + lyrics
-
         if len(lyrics) > 0:
+            audiosig = base64.b64encode(bytes.fromhex(lid_hex)).decode("ascii")
+            lyrics = "#AUDIOSIG=" + str(audiosig) + "\n" + lyrics
+
             if "#LANG" in lyrics:
                 language = lyrics[0:9]
                 print(language)
@@ -456,4 +455,5 @@ class VirtualDJSongsDatabase():
                 print("No Lyrics")
             elif "#CUSTOM" in lyrics:
                 print("Custom Lyrics")
-        return lyrics, audiosig
+
+        return lyrics
