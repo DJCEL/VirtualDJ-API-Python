@@ -291,6 +291,12 @@ class VirtualDJMonitor(tk.Tk):
         self.waveform_frame.grid(row=5,column=0, sticky="nsew",padx=10,pady=5)
         self.waveform_viewer = WaveformViewer(controller, self.waveform_frame)
 
+        self.lyrics_frame = ttk.LabelFrame(parent, text="Lyrics")
+        self.lyrics_frame.grid(row=6,column=0, sticky="nsew",padx=10,pady=5)
+        text = tk.Text(self.lyrics_frame, height=10, state='disabled', font=("Consolas",10))
+        text.pack(fill="both", expand=True)
+        self.lyrics_frame.text_widget = text
+
     #------------------------------------------------------------------------------------
     def _on_moveDB(self,step: int):
         if step < 0 :
@@ -314,6 +320,11 @@ class VirtualDJMonitor(tk.Tk):
                 waveform_bytes = item["waveform"]
                 valuesPerSecond = item["valuesPerSecond"]
                 self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
+            elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS): 
+                item = database[pos]
+                self._update_frame_text(self.frameDB,item)
+                lyrics = item["xml"]
+                self._update_frame_text(self.lyrics_frame,lyrics)
             else:
                 item = database[pos]
                 self._update_frame_text(self.frameDB, item)
