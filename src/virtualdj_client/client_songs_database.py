@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from enum import Enum
 from datetime import datetime,timedelta
+import struct
 
 from .client_utils import VirtualDJUtils
 from .client_logging import VdjClientLog
@@ -139,7 +140,6 @@ class VdjWaveform:
     version: int
     valuesPerSecond: float
     waveform: bytes
-
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjLyrics:
@@ -401,32 +401,21 @@ class VirtualDJSongsDatabase():
         return result_list
 
     #------------------------------------------------------------------------------------
-    def decode_waveform(self, item: VdjWaveform):
-        waveform_bytes = item["waveform"]
+    def decode_waveform(self, item: dict) -> tuple[list[dict], float]:
+        wf_type = item["type"]
+        wf_version = item["version"]
+        waveform = item["waveform"]
         valuesPerSecond = item["valuesPerSecond"]
 
-        waveform = waveform_bytes.hex()
-        if isinstance(waveform, str):
-            waveform = waveform.strip()
 
-            # Remove optional 0x prefix
-            if waveform.startswith("0x"):
-                waveform = waveform[2:]
-
-            data = bytes.fromhex(waveform)
-
-        elif isinstance(waveform, bytes):
+        if isinstance(waveform, bytes):
             data = waveform
-
-        elif isinstance(waveform, bytearray):
-            data = bytes(waveform)
-
+            data_len = len(data)
         else:
             self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
             return []
         
         block_size = 28
-        data_len = len(data)
         if data_len % block_size:
            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
            return []
@@ -450,8 +439,7 @@ class VirtualDJSongsDatabase():
                     self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
            
 
-            return samples
-
+            return samples, valuesPerSecond
     #------------------------------------------------------------------------------------
     def decode_lyrics(self, item: VdjLyrics):
         return

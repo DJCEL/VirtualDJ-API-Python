@@ -8,7 +8,6 @@ import sys
 import os
 from pathlib import Path
 from functools import partial
-import struct
 
 __version__ = "1.0.12"
 
@@ -150,6 +149,7 @@ class VirtualDJMonitor(tk.Tk):
         ]
 
         self.get_frames = {}
+
         for row, (frame_name, frame_title, frame_function) in enumerate(frames_get_definition):
             frame = ttk.LabelFrame(parent, text=frame_title)
             text = tk.Text(frame, height=1, state='disabled', font=("Consolas",10))
@@ -316,10 +316,8 @@ class VirtualDJMonitor(tk.Tk):
             if (self.database_name == self.songsDB.SQLITE_CACHE_DB and self.table_name == self.songsDB.SQLITE_CACHE_DB_WAVEFORMS): 
                 item = database[pos]
                 self._update_frame_text(self.frameDB,item)
-                version = item["version"]
-                waveform_bytes = item["waveform"]
-                valuesPerSecond = item["valuesPerSecond"]
-                self.waveform_viewer.draw_waveform(waveform_bytes, valuesPerSecond)
+                samples, valuesPerSecond = self.songsDB.decode_waveform(item)
+                self.waveform_viewer.draw_waveform(samples, valuesPerSecond)
             elif (self.database_name == self.songsDB.SQLITE_EXTRA_DB and self.table_name == self.songsDB.SQLITE_EXTRA_DB_LYRICS): 
                 item = database[pos]
                 self._update_frame_text(self.frameDB,item)
@@ -548,8 +546,8 @@ class WaveformViewer(ttk.Frame):
         self.RULER_HEIGHT = 24  # px reserved at the bottom for the time ruler
 
 
-    def draw_waveform(self, waveform_bytes: bytes, valuesPerSecond: float): 
-        samples = self._decode_vdj_waveform(waveform_bytes)
+    def draw_waveform(self, samples: list[dict], valuesPerSecond: float): 
+       
         self.duration = len(samples) / valuesPerSecond
         self.values_per_second = valuesPerSecond
         self.seconds_per_sample = 1 / valuesPerSecond
@@ -563,54 +561,6 @@ class WaveformViewer(ttk.Frame):
             self.global_max = max((v for s in samples for v in s.values() if isinstance(v, (int, float))), default=1,) or 1
 
             self._draw(samples)
-
-    def _decode_vdj_waveform(self, waveform_bytes: bytes):
-        waveform = waveform_bytes.hex()
-        if isinstance(waveform, str):
-            waveform = waveform.strip()
-
-            # Remove optional 0x prefix
-            if waveform.startswith("0x"):
-                waveform = waveform[2:]
-
-            data = bytes.fromhex(waveform)
-
-        elif isinstance(waveform, bytes):
-            data = waveform
-
-        elif isinstance(waveform, bytearray):
-            data = bytes(waveform)
-
-        else:
-            self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
-            return []
-        
-        block_size = 28
-        data_len = len(data)
-        if data_len % block_size:
-            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
-            return []
-        else:
-            samples = []
-            for offset in range(0, data_len, block_size):
-                try:
-                    v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
-                    sample = {
-                        "v0": v0 / 2**24,
-                        "v1": v1 / 2**24,
-                        "v2": v2 / 2**24,
-                        "v3": v3 / 2**24,
-                        "v4": v4 / 2**24,
-                        "v5": v5 / 2**24,
-                        "v6": v6,
-                    }
-                    samples.append(sample)
-                except Exception as e:
-                    strMsgLog = f"offset={offset}: {e}"
-                    self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
-           
-
-            return samples
 
     def _build_ui(self, parent_frame):
         toolbar = ttk.Frame(parent_frame)
