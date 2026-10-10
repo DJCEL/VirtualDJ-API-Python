@@ -45,11 +45,11 @@ class VdjClientLog:
 
         try:
             file_handler = RotatingFileHandler(filename=self.filepath, mode="a", maxBytes=(1024*1024), backupCount=3, encoding='utf-8')
+            file_handler.setFormatter(formatter)
+            logger.addHandler(file_handler)
         except Exception as e:
             print("Failed to set up log file: %s" % str(e))
             return None
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
         
         if useRichConsole:
             from rich.console import Console

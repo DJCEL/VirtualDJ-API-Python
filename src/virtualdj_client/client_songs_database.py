@@ -10,6 +10,7 @@ from pathlib import Path
 from enum import Enum
 from datetime import datetime,timedelta
 import struct
+import base64
 
 from .client_utils import VirtualDJUtils
 from .client_logging import VdjClientLog
@@ -136,8 +137,8 @@ class VdjWaveform:
     filepath: str
     filename: str
     filesize: int
-    type: int
-    version: int
+    type: int  # 0 or 1
+    version: int # 2 or 3 or 4
     valuesPerSecond: float
     waveform: bytes
 #------------------------------------------------------------------------------------
@@ -374,7 +375,7 @@ class VirtualDJSongsDatabase():
         if database_name == self.SQLITE_CACHE_DB:
             if table_name == self.SQLITE_CACHE_DB_WAVEFORMS:
                 # waveforms: id[INTEGER, PRIMARY_KEY], filepath[TEXT], filename[TEXT], filesize[INTEGER], type[INTEGER], version[INTEGER], valuesPerSecond[REAL], waveform[BLOB]
-                sql_script = f"SELECT * FROM {table_name}"
+                sql_script = f"SELECT id,filepath,filename,filesize,type,version,valuesPerSecond,waveform FROM {table_name}"
             else:
                 sql_script = ""
         elif database_name == self.SQLITE_EXTRA_DB:
@@ -407,46 +408,52 @@ class VirtualDJSongsDatabase():
         waveform = item["waveform"]
         valuesPerSecond = item["valuesPerSecond"]
 
-
-        if isinstance(waveform, bytes):
-            data = waveform
-            data_len = len(data)
-        else:
+        if not isinstance(waveform, bytes):
             self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
             return []
-        
+
+        data = waveform
+        data_len = len(data)
         block_size = 28
         if data_len % block_size:
            self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
            return []
-        else:
-            samples = []
-            for offset in range(0, data_len, block_size):
-                try:
-                    v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
-                    sample = {
-                        "v0": v0 / 2**24,
-                        "v1": v1 / 2**24,
-                        "v2": v2 / 2**24,
-                        "v3": v3 / 2**24,
-                        "v4": v4 / 2**24,
-                        "v5": v5 / 2**24,
-                        "v6": v6,
-                    }
-                    samples.append(sample)
-                except Exception as e:
-                    strMsgLog = f"offset={offset}: {e}"
-                    self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
+
+        samples = []
+        for offset in range(0, data_len, block_size):
+            try:
+                v0, v1, v2, v3, v4, v5, v6 = struct.unpack_from("<7I", data, offset)
+                sample = {
+                    "v0": v0 / 2**24,
+                    "v1": v1 / 2**24,
+                    "v2": v2 / 2**24,
+                    "v3": v3 / 2**24,
+                    "v4": v4 / 2**24,
+                    "v5": v5 / 2**24,
+                    "v6": v6,
+                }
+                samples.append(sample)
+            except Exception as e:
+                strMsgLog = f"offset={offset}: {e}"
+                self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
            
 
-            return samples, valuesPerSecond
+        return samples, valuesPerSecond
     #------------------------------------------------------------------------------------
     def decode_lyrics(self, item: dict):
+        lid_hex = item["lid_hex"]
         lyrics = item["xml"]
+
+        audiosig = base64.b64encode(bytes.fromhex(lid_hex)).decode("ascii")
+
+        lyrics = "#AUDIOSIG=" + str(audiosig) + "\n" + lyrics
+
         if len(lyrics) > 0:
             if "#LANG" in lyrics:
                 language = lyrics[0:9]
                 print(language)
             elif "#NOLYRICS" in lyrics:
                 print("No Lyrics")
-        return lyrics
+            elif "#CUSTOM" in lyrics:
+                print("Custom Lyrics")
+        return lyrics, audiosig

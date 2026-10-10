@@ -80,13 +80,12 @@ class VirtualDJMonitor(tk.Tk):
 
         self._define_menubar(controller)
         self._define_notebook(controller)
-
+        self.protocol("WM_DELETE_WINDOW", self._destroy_window)
 
         """ Refresh loop for the GET tab """
         self.interval_refresh = 100  # ms
         self._loop: asyncio.AbstractEventLoop | None = None
         self._stopping = threading.Event()
-        self.protocol("WM_DELETE_WINDOW", self._destroy_window)
         self._result_queue = queue.Queue(maxsize=1)
         self._async_thread = threading.Thread(target=self._run_async_client, daemon=True)
         self._async_thread.start()
@@ -136,6 +135,10 @@ class VirtualDJMonitor(tk.Tk):
         self._define_tab_songsdb(controller, parent=self.songDB_tab)
     #------------------------------------------------------------------------------------
     def _define_tab_get(self, parent):
+
+        #self.get_toggle_button = tk.Button(parent,text="GetRefresh", command= self._toggle_GetRefresh, width=18)
+        #self.get_toggle_button.pack(fill="both", expand=True)
+
         frames_get_definition = [
             ("leftdecksong_frame", "Left Deck - Song", lambda client: client.get_DeckSong_async("left")),
             ("leftdeckengine_frame", "Left Deck - Engine", lambda client: client.get_DeckEngine_async("left")),
@@ -159,6 +162,9 @@ class VirtualDJMonitor(tk.Tk):
             parent.grid_columnconfigure(0,weight=1)
             frame.grid(row=row,column=0,sticky="nsew",padx=10,pady=5)
             self.get_frames[frame_name] = {"frame": frame, "function": frame_function}
+    #------------------------------------------------------------------------------------
+    def _toggle_GetRefresh(self):
+        return
     #------------------------------------------------------------------------------------
     def _define_tab_send(self, parent):
         vdjscript_frame = ttk.LabelFrame(parent, text="VdjScript")
