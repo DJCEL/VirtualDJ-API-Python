@@ -409,14 +409,16 @@ class VirtualDJSongsDatabase():
         valuesPerSecond = item["valuesPerSecond"]
 
         if not isinstance(waveform, bytes):
-            self.vdj_client_log.save_client_log(msg=f"Unsupported waveform type: {type(waveform).__name__}", parent_name=__name__, level="ERROR")
+            strMsgLog = f"Unsupported waveform type: {type(waveform).__name__}"
+            self.vdj_client_log.save_client_log(msg= strMsgLog, parent_name=__name__, level="ERROR")
             return [], valuesPerSecond 
 
         data = waveform
         data_len = len(data)
         block_size = 28
         if data_len % block_size:
-           self.vdj_client_log.save_client_log(msg=f"Invalid waveform size: {data_len} bytes", parent_name=__name__, level="ERROR")
+           strMsgLog = f"Invalid waveform size: {data_len} bytes (not a multiple of {block_size})"
+           self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
            return [], valuesPerSecond 
 
         samples = []

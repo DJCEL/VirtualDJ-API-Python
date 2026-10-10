@@ -99,9 +99,10 @@ class VirtualDJMonitor(tk.Tk):
      #------------------------------------------------------------------------------------
     def _destroy_window(self):
         if self._stopping.is_set():
-            return
-        self._stopping.set()
-        self.destroy()
+            self.destroy()
+        else:
+            self._stopping.set()
+            self.destroy()
     #------------------------------------------------------------------------------------
     def _define_menubar(self, controller):
         menubar = tk.Menu(self)
@@ -143,8 +144,8 @@ class VirtualDJMonitor(tk.Tk):
     def _define_tab_get(self, parent):
 
          # Client query refresh switch
-        self._get_refresh_enabled = True
-        self.get_refresh_button = ttk.Button(parent,text="Refresh: ON", command=self._toggle_GetRefresh)
+        self._get_refresh_enabled = False
+        self.get_refresh_button = ttk.Button(parent,text="Refresh: OFF", command=self._toggle_GetRefresh)
         self.get_refresh_button.grid(row=0, column=0, sticky="w", padx=10, pady=5)
 
         frames_get_definition = [
@@ -506,8 +507,11 @@ class VirtualDJMonitor(tk.Tk):
                 config = self.get_frames.get(name)
                 if config is not None:
                     frame = config["frame"]
-                    self._update_frame_text(frame, data)
-                 
+                    if self._get_refresh_enabled:
+                        self._update_frame_text(frame, data)
+                    else:
+                        self._update_frame_text(frame, "")
+ 
         except queue.Empty:
             pass
 
@@ -545,7 +549,6 @@ class WaveformViewer(ttk.Frame):
         self.gap = 1
         self.max_height = 260
         self._build_ui(parent_frame)
-        self.vdj_client_log = VdjClientLog(controller)
 
         # A distinct color per band (v0, v1, v2, ...). Extend if you have more bands.
         self.BAND_COLORS = [
