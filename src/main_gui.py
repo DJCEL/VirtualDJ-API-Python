@@ -324,6 +324,12 @@ class VirtualDJMonitor(tk.Tk):
                 item = database[pos]
                 self._update_frame_text(self.frameDB,item)
                 lyrics = item["xml"]
+                if len(lyrics) > 0:
+                    if "#LANG" in lyrics:
+                        language = lyrics[0:9]
+                        print(language)
+                    elif "#NOLYRICS" in lyrics:
+                        print("No Lyrics")
                 self._update_frame_text(self.lyrics_frame,lyrics)
             else:
                 item = database[pos]
@@ -332,6 +338,7 @@ class VirtualDJMonitor(tk.Tk):
     def on_selectDB(self, event):
         self._update_frame_text(self.frameDBcount,"")
         self._update_frame_text(self.frameDB,"")
+        self._update_frame_text(self.lyrics_frame,"")
         self.database = []
         self._pos_db = 0
         
