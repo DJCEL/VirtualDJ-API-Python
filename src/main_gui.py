@@ -32,8 +32,8 @@ from virtualdj_client import __version__ as __vdjclient_version__
 class VirtualDJMonitor(tk.Tk):
     def __init__(self):
         self.controller = self
-        self.vdj_client_log = VdjClientLog(self.controller)
         self.client = VirtualDJClient(self.controller)
+        self.vdj_client_log = VdjClientLog(self.controller)
         self.songsDB = VirtualDJSongsDatabase(self.controller)
         self._init_vdj_client()
         self._create_window(self.controller)
@@ -67,7 +67,7 @@ class VirtualDJMonitor(tk.Tk):
         self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="INFO")
         if (client_connected == False):
             strMsgLog = "Check that the NetWork Control plugin is available and activated in VirtualDJ"
-            self.client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
+            self.vdj_client_log.save_client_log(msg=strMsgLog, parent_name=__name__, level="ERROR")
             sys.exit()
     #------------------------------------------------------------------------------------
     def _create_window(self, controller):
