@@ -144,7 +144,7 @@ class VdjWaveform:
 #------------------------------------------------------------------------------------
 @dataclass
 class VdjLyrics:
-    lid: str
+    lid: str # audiosig encoded in base64
     xml: str
 #------------------------------------------------------------------------------------ 
 class VirtualDJSongsDatabase():
