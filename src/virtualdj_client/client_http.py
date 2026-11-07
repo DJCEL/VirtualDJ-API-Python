@@ -47,7 +47,7 @@ class VirtualDJClientHttp:
         encoded_vdjscript = encodeURI(vdjscript)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
-        #TODO: since VirtualDJ build 9735, &type="text" is available
+        #TODO: since VirtualDJ build 9735, &type="text" is available for querying text
         #vdj_url_full_text = f"{vdj_url}?script={encoded_vdjscript}&type=’text’"
 
        
