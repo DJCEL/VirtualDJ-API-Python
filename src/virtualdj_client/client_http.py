@@ -47,6 +47,9 @@ class VirtualDJClientHttp:
         encoded_vdjscript = encodeURI(vdjscript)
         vdj_url_full = f"{vdj_url}?script={encoded_vdjscript}"
 
+        #TODO: since VirtualDJ build 9735, &type="text" is available
+        #vdj_url_full_text = f"{vdj_url}?script={encoded_vdjscript}&type=’text’"
+
        
         if self._client is None:
             self._client = httpx.AsyncClient(timeout=VDJ_NETWORK_CONTROL_TIMEOUT)
